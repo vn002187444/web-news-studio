@@ -1,0 +1,21 @@
+{
+  "Header": {
+    "tech": "Công Nghệ",
+    "blockchain": "Blockchain",
+    "game": "Esports",
+    "finance": "Tài Chính",
+    "lifestyle": "Đời Sống",
+    "sports": "Thể Thao",
+    "entertainment": "Giải Trí",
+    "education": "Giáo Dục",
+    "science": "Khoa Học",
+    "read_now": "ĐỌC BÁO"
+  },
+  "Common": {
+    "ai_suggested": "Gợi ý bởi AI",
+    "for_you": "Dành Riêng Cho Bạn",
+    "listen": "Nghe bài báo (AI)",
+    "author": "AI Biên Tập Viên",
+    "system": "Hệ thống Autoblog"
+  }
+}

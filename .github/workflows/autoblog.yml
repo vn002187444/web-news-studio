@@ -1,0 +1,56 @@
+name: AI Autoblogger Cron
+
+on:
+  schedule:
+    # Chạy tự động mỗi 2 tiếng một lần (Tùy chỉnh: 0 * * * * cho 1 tiếng)
+    - cron: '0 */2 * * *'
+  # Cho phép bấm chạy thủ công trên GitHub UI
+  workflow_dispatch:
+
+jobs:
+  autoblog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Cấp quyền cho Bot tự động commit code
+    defaults:
+      run:
+        working-directory: frontend # package.json + scripts nằm trong frontend/
+      
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+          
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Run AI Autoblogger Script
+        env:
+          # Truyền khóa bảo mật từ GitHub Secrets vào
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: production
+          SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
+        run: npm run autoblog
+        
+      - name: Commit and Push New Articles
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Autoblog Action"
+          git add src/data/posts/*.mdx
+          
+          # Chỉ commit nếu có bài báo mới được sinh ra (tránh báo lỗi empty commit)
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "🤖 AI Auto-publish: $(date +'%Y-%m-%d %H:%M:%S')"
+            git push
+          else
+            echo "⏩ No new articles to publish."
+          fi

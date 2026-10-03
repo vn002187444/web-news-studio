@@ -1,0 +1,51 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Reset base colors applied in layout */
+body {
+  font-family: var(--font-sans);
+}
+
+/* GĐ3: Glitch keyframes — dịch clip-path + text-shadow ngẫu nhiên */
+@keyframes glitch-rgb1 {
+  0%, 86%, 100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); opacity: 0.7; }
+  87% { transform: translate(-4px, -2px); clip-path: inset(10% 0 60% 0); opacity: 0.9; }
+  89% { transform: translate(4px, 2px); clip-path: inset(60% 0 10% 0); opacity: 0.9; }
+  91% { transform: translate(-3px, 1px); clip-path: inset(30% 0 40% 0); text-shadow: -2px 0 #0ff, 2px 0 #f0f; }
+  93% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+}
+@keyframes glitch-rgb2 {
+  0%, 88%, 100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); opacity: 0.7; }
+  89% { transform: translate(4px, 2px); clip-path: inset(50% 0 20% 0); opacity: 0.9; }
+  91% { transform: translate(-4px, -1px); clip-path: inset(10% 0 70% 0); }
+  94% { transform: translate(3px, -2px); clip-path: inset(70% 0 5% 0); text-shadow: 2px 0 #0ff, -2px 0 #f00; }
+  96% { transform: translate(0, 0); }
+}
+@keyframes glitch-main {
+  0%, 90%, 100% { transform: skewX(0); }
+  91% { transform: skewX(-2deg); }
+  93% { transform: skewX(2deg); }
+  95% { transform: skewX(0); }
+}
+.animate-glitch-rgb1 { animation: glitch-rgb1 4s infinite; }
+.animate-glitch-rgb2 { animation: glitch-rgb2 4s infinite; }
+.animate-glitch-main { animation: glitch-main 4s infinite; }
+
+/* GĐ7: Ken Burns auto 5% / 10s — ảnh tự "thở" */
+@keyframes kenburns-slow {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+.animate-kenburns-slow { animation: kenburns-slow 10s ease-in-out infinite alternate; }
+
+/* Ticker fallback nếu cần */
+@keyframes ticker-seamless {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}

@@ -1,0 +1,21 @@
+{
+  "Header": {
+    "tech": "Tech",
+    "blockchain": "Web3",
+    "game": "Gaming",
+    "finance": "Markets",
+    "lifestyle": "Hedonic",
+    "sports": "Sports",
+    "entertainment": "Showbiz",
+    "education": "Campus",
+    "science": "Science",
+    "read_now": "READ NOW"
+  },
+  "Common": {
+    "ai_suggested": "AI Suggested",
+    "for_you": "Curated For You",
+    "listen": "Listen (AI)",
+    "author": "AI Editor",
+    "system": "Autoblog System"
+  }
+}
