@@ -1,5 +1,6 @@
 frontend/node_modules
 frontend/.next
+frontend/.open-next
 .env
 .env.local
 .DS_Store

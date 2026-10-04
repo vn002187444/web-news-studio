@@ -9,36 +9,62 @@ export default function MobileBottomNav() {
     { name: 'Trang chủ', href: '/', icon: '⌂' },
     { name: 'Công nghệ', href: '/tech', icon: '⚛' },
     { name: 'Blockchain', href: '/blockchain', icon: '₿' },
-    { name: 'Esports', href: '/game', icon: '✜' },
     { name: 'Tài chính', href: '/finance', icon: '📈' },
-    { name: 'Đời sống', href: '/lifestyle', icon: '✦' },
-    { name: 'Thể thao', href: '/sports', icon: '⚽' },
-    { name: 'Giải trí', href: '/entertainment', icon: '🎬' },
-    { name: 'Giáo dục', href: '/education', icon: '🎓' },
-    { name: 'Khoa học', href: '/science', icon: '🔬' },
   ];
 
+  const triggerSearch = () => {
+    try {
+      (navigator as any).vibrate?.(10);
+    } catch {
+      /* noop */
+    }
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+  };
+
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 bg-[#111111]/95 backdrop-blur-xl border-t border-white/10 text-white pb-safe">
-      <ul className="flex items-center h-16 px-1 overflow-x-auto">
+    <nav 
+      aria-label="Thanh điều hướng di động"
+      className="lg:hidden fixed bottom-0 left-0 w-full z-50 bg-[#0d0d0d]/92 backdrop-blur-2xl border-t border-white/10 text-white shadow-[0_-8px_30px_rgba(0,0,0,0.6)]"
+      style={{
+        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
+      }}
+    >
+      <ul className="flex items-center justify-around h-14 px-2 max-w-md mx-auto">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
           return (
             <li key={item.href} className="flex-1">
               <Link 
                 href={item.href}
-                className={`flex flex-col items-center justify-center w-full h-full py-1 gap-1 transition-colors ${
+                className={`flex flex-col items-center justify-center w-full h-full py-1 transition-all duration-200 relative group ${
                   isActive ? 'text-red-500 font-bold' : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <span className="text-lg leading-none">{item.icon}</span>
-                <span className="text-[9px] font-mono uppercase tracking-wider truncate max-w-[55px] text-center">
+                <span className={`text-lg leading-none transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-105'}`}>
+                  {item.icon}
+                </span>
+                <span className="text-[10px] font-mono tracking-wider mt-1 truncate max-w-[64px] text-center">
                   {item.name}
                 </span>
+                {isActive && (
+                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full mt-0.5 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+                )}
               </Link>
             </li>
           );
         })}
+
+        {/* Nút Tìm kiếm nhanh ngay trên ngón tay cái */}
+        <li className="flex-1">
+          <button
+            onClick={triggerSearch}
+            className="flex flex-col items-center justify-center w-full h-full py-1 text-gray-400 hover:text-white transition-all duration-200 active:scale-95"
+            aria-label="Mở tìm kiếm"
+          >
+            <span className="text-base leading-none">🔍</span>
+            <span className="text-[10px] font-mono tracking-wider mt-1">Tìm kiếm</span>
+          </button>
+        </li>
       </ul>
     </nav>
   );

@@ -55,4 +55,19 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     author: [{
       '@type': 'Person',
       name: post.meta.author || 'AI Editor',
-      url: 'https://news-studio.exampl
+      url: 'https://news-studio.example.com/author/ai-editor'
+    }]
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <SingleArticleClient meta={post.meta} slug={slug} allPosts={allPosts}>
+        <MDXRemote source={post.content} />
+      </SingleArticleClient>
+    </>
+  );
+}
