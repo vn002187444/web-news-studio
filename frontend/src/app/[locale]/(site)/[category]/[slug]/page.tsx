@@ -1,7 +1,6 @@
 import { getPostUnified, getAllPostsUnified } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { MDXRemote } from 'next-mdx-remote/rsc';
 import SingleArticleClient from './SingleArticleClient';
 import { SITE_URL, absoluteUrl, escapeJsonLd } from '@/lib/site';
 
@@ -90,9 +89,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: escapeJsonLd(JSON.stringify(jsonLd)) }}
       />
-      <SingleArticleClient meta={post.meta} slug={slug} allPosts={allPosts}>
-        <MDXRemote source={post.content} />
-      </SingleArticleClient>
+      <SingleArticleClient meta={post.meta} slug={slug} allPosts={allPosts} content={post.content} />
     </>
   );
 }

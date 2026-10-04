@@ -5,11 +5,12 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import RecommendedArticles from '@/components/ui/RecommendedArticles';
+import MarkdownBody from '@/components/ui/MarkdownBody';
 import { useTranslations } from 'next-intl';
 
 interface TocItem { id: string; text: string; level: number }
 
-export default function SingleArticleClient({ children, meta, slug, allPosts }: { children: React.ReactNode, meta: any, slug: string, allPosts: any[] }) {
+export default function SingleArticleClient({ content, meta, slug, allPosts }: { content: string, meta: any, slug: string, allPosts: any[] }) {
   const t = useTranslations('Common');
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -133,9 +134,9 @@ export default function SingleArticleClient({ children, meta, slug, allPosts }: 
             </div>
           </figure>
 
-          {/* MDX Article Body */}
+          {/* Markdown Article Body — react-markdown (không eval, chạy được trên Workers) */}
           <div id="article-content" className="prose prose-lg md:prose-xl prose-serif max-w-none prose-headings:font-serif prose-headings:tracking-tight prose-a:text-red-600 prose-a:no-underline hover:prose-a:underline">
-            {children}
+            <MarkdownBody content={content} />
           </div>
 
           {/* Author Tag */}

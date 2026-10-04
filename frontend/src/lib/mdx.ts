@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+// Manifest nhúng sẵn: bundle vào JS nên Workers (không có fs ở runtime) vẫn đọc được.
+import manifestPosts from '@/data/posts-manifest.json';
 
 const postsDirectory = path.join(process.cwd(), 'src/data/posts');
 
@@ -16,26 +18,38 @@ export interface PostMeta {
 }
 
 export function getPostSlugs() {
-  if (!fs.existsSync(postsDirectory)) return [];
-  return fs.readdirSync(postsDirectory).filter(file => file.endsWith('.mdx'));
+  try {
+    if (!fs.existsSync(postsDirectory)) throw new Error('no-posts-dir');
+    return fs.readdirSync(postsDirectory).filter(file => file.endsWith('.mdx'));
+  } catch {
+    // Runtime không có fs (Cloudflare Workers): dùng manifest nhúng sẵn
+    return (manifestPosts as { slug: string }[]).map((p) => `${p.slug}.mdx`);
+  }
 }
 
 export function getPostBySlug(slug: string) {
   const realSlug = slug.replace(/\.mdx$/, '');
-  const fullPath = path.join(postsDirectory, `${realSlug}.mdx`);
-  
-  if (!fs.existsSync(fullPath)) {
-    return null;
+  try {
+    const fullPath = path.join(postsDirectory, `${realSlug}.mdx`);
+
+    if (!fs.existsSync(fullPath)) {
+      throw new Error('not-on-disk');
+    }
+
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const { data, content } = matter(fileContents);
+
+    return {
+      slug: realSlug,
+      meta: data as PostMeta,
+      content,
+    };
+  } catch {
+    // Fallback manifest cho Workers runtime
+    const hit = (manifestPosts as { slug: string; meta: PostMeta; content: string }[]).find((p) => p.slug === realSlug);
+    if (!hit) return null;
+    return { slug: hit.slug, meta: hit.meta, content: hit.content };
   }
-
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
-
-  return {
-    slug: realSlug,
-    meta: data as PostMeta,
-    content,
-  };
 }
 
 export function getAllPosts() {

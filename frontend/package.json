@@ -10,7 +10,8 @@
     "deploy": "npx wrangler deploy",
     "start": "next start",
     "lint": "eslint",
-    "autoblog": "tsx scripts/autoblog.ts"
+    "autoblog": "tsx scripts/autoblog.ts",
+    "sync-posts": "tsx scripts/sync-posts.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -28,9 +29,10 @@
     "lightweight-charts": "^5.2.1",
     "next": "16.3.8",
     "next-intl": "^4.14.9",
-    "next-mdx-remote": "^6.0.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "rss-parser": "^3.13.0",
     "tailwind-merge": "^3.7.0",
     "three": "^0.186.1",
