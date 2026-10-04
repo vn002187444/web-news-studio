@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   images: {
+    unoptimized: true, // Tương thích 100% với Cloudflare Pages miễn phí
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
