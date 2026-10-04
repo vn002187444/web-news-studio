@@ -1,9 +1,8 @@
 name = "web-news-studio"
-main = ".worker-next/index.mjs"
+main = ".open-next/worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-# When deploying to Cloudflare Workers, the static assets are uploaded separately
 [assets]
-directory = ".worker-next/assets"
+directory = ".open-next/assets"
 binding = "ASSETS"
