@@ -44,6 +44,16 @@ body {
 }
 .animate-kenburns-slow { animation: kenburns-slow 10s ease-in-out infinite alternate; }
 
+/* Custom cursor: chỉ ẩn cursor hệ thống khi custom cursor đang bật (desktop) */
+.has-custom-cursor, .has-custom-cursor a, .has-custom-cursor button {
+  cursor: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-glitch-rgb1, .animate-glitch-rgb2, .animate-glitch-main, .animate-kenburns-slow {
+    animation: none !important;
+  }
+}
+
 /* Ticker fallback nếu cần */
 @keyframes ticker-seamless {
   from { transform: translateX(0); }

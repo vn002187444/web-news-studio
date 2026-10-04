@@ -3,10 +3,14 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
 import { pushArticleToSanity } from '../src/lib/sanity';
+import dotenv from 'dotenv';
 
-// MOCK: In production, pass via process.env.GEMINI_API_KEY
-// Assuming the user runs this script when needed. We will simulate the behavior if no key is present.
+// Load biến môi trường từ .env.local và .env
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
+dotenv.config();
+
 const API_KEY = process.env.GEMINI_API_KEY || 'MOCK_KEY'; 
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite'; 
 
 const parser = new Parser();
 const genAI = new GoogleGenerativeAI(API_KEY);
@@ -36,6 +40,14 @@ const RSS_FEEDS = [
   { url: 'https://vnexpress.net/rss/khoa-hoc.rss', category: 'science' }
 ];
 
+function toSlug(s: string) {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '').slice(0, 80);
+}
+
+function yamlEscape(s: string) {
+  return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' ');
+}
+
 const POSTS_DIR = path.join(process.cwd(), 'src/data/posts');
 
 async function rewriteArticle(title: string, content: string, category: string) {
@@ -51,7 +63,7 @@ async function rewriteArticle(title: string, content: string, category: string) 
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
     const prompt = `
       You are an elite Tech Journalist and SEO Expert. 
       Rewrite the following article to be 100% unique (avoid plagiarism).
@@ -121,7 +133,7 @@ async function runAutoblogger() {
         if (!latestItem) continue;
 
         // CƠ CHẾ CHỐNG QUÁ TẢI 3: Kiểm tra bài viết đã tồn tại chưa TRƯỚC KHI gọi AI
-        const tempSlug = latestItem.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || '';
+        const tempSlug = toSlug(latestItem.title || '');
         const tempFilePath = path.join(POSTS_DIR, `${tempSlug}.mdx`);
         
         // Đoạn này dùng approximate check. Nếu title không đổi, AI sinh slug sẽ giống nhau.
@@ -151,14 +163,14 @@ async function runAutoblogger() {
         if (!rewritten) continue;
 
         const mdxContent = `---
-title: "${rewritten.title.replace(/"/g, '\\"')}"
-excerpt: "${rewritten.excerpt.replace(/"/g, '\\"')}"
+title: "${yamlEscape(rewritten.title).slice(0, 200)}"
+excerpt: "${yamlEscape(rewritten.excerpt).slice(0, 500)}"
 category: "${feed.category}"
 publishedAt: "${new Date().toISOString()}"
 thumbnail: "${extractedThumbnail}"
 tags: ["AI", "AutoBlogger", "News"]
 author: "AI Autobot"
-slug: "${rewritten.slug}"
+slug: "${toSlug(rewritten.slug || rewritten.title)}"
 ---
 
 ${rewritten.content}

@@ -1,5 +1,6 @@
 import { getAllPosts as getMdxPosts, getPostBySlug as getMdxPost, type PostMeta } from './mdx';
-import { fetchSanityPosts, fetchSanityPost, type SanityArticle } from './sanity';
+import { fetchSanityPosts, fetchSanityPost, fetchSanityByCategory, type SanityArticle } from './sanity';
+import { cache } from 'react';
 
 export interface UnifiedPost {
   slug: string;
@@ -31,7 +32,7 @@ function fromMdx(p: { slug: string; meta: PostMeta; content: string }): UnifiedP
 }
 
 /** Sanity-first, MDX fallback. Chưa config Sanity → dùng MDX như cũ (build không vỡ). */
-export async function getAllPostsUnified(): Promise<UnifiedPost[]> {
+export const getAllPostsUnified = cache(async (): Promise<UnifiedPost[]> => {
   const mdx = getMdxPosts().map(fromMdx);
   try {
     const sanity = await fetchSanityPosts();
@@ -45,7 +46,7 @@ export async function getAllPostsUnified(): Promise<UnifiedPost[]> {
   } catch {
     return mdx;
   }
-}
+});
 
 export async function getPostUnified(slug: string): Promise<UnifiedPost | null> {
   try {
@@ -57,14 +58,23 @@ export async function getPostUnified(slug: string): Promise<UnifiedPost | null> 
 }
 
 export async function getPostsByCategoryUnified(category: string): Promise<UnifiedPost[]> {
+  const cat = category.toLowerCase();
+  try {
+    const sanityOnly = await fetchSanityByCategory(cat);
+    if (sanityOnly && sanityOnly.length > 0) {
+      return sanityOnly.map(fromSanity).sort(
+        (a, b) => new Date(b.meta.publishedAt).getTime() - new Date(a.meta.publishedAt).getTime()
+      );
+    }
+  } catch { /* fallback merge */ }
   const all = await getAllPostsUnified();
-  return all.filter((p) => p.meta.category.toLowerCase() === category.toLowerCase());
+  return all.filter((p) => p.meta.category.toLowerCase() === cat);
 }
 
-export async function searchPostsUnified(query: string): Promise<{ title: string; slug: string; category: string }[]> {
+export async function searchPostsUnified(query: string, limit = 10): Promise<{ title: string; slug: string; category: string }[]> {
+  const q = query.toLowerCase().trim().slice(0, 100);
   const all = await getAllPostsUnified();
-  const q = query.toLowerCase();
-  if (!q) return all.slice(0, 10).map((p) => ({ title: p.meta.title, slug: p.slug, category: p.meta.category }));
+  if (!q) return all.slice(0, limit).map((p) => ({ title: p.meta.title, slug: p.slug, category: p.meta.category }));
   return all
     .filter(
       (p) =>
@@ -72,5 +82,6 @@ export async function searchPostsUnified(query: string): Promise<{ title: string
         p.meta.excerpt?.toLowerCase().includes(q) ||
         p.meta.tags?.some((t) => t.toLowerCase().includes(q))
     )
+    .slice(0, limit)
     .map((p) => ({ title: p.meta.title, slug: p.slug, category: p.meta.category }));
 }

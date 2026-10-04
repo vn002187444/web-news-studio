@@ -3,7 +3,8 @@ import { revalidatePath } from 'next/cache';
 
 export async function POST(request: Request) {
   const secret = process.env.SANITY_WEBHOOK_SECRET || '';
-  const got = request.headers.get('x-sanity-secret') || new URL(request.url).searchParams.get('secret') || '';
+  // Chỉ nhận qua header, không nhận query param để tránh lộ log
+  const got = request.headers.get('x-sanity-secret') || request.headers.get('authorization')?.replace('Bearer ', '') || '';
   if (!secret || got !== secret) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }

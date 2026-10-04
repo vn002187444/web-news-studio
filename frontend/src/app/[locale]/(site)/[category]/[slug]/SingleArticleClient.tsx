@@ -126,6 +126,7 @@ export default function SingleArticleClient({ children, meta, slug, allPosts }: 
                 src={meta.thumbnail || "https://images.unsplash.com/photo-1677442136019-21780ecad995"}
                 alt={meta.title}
                 fill
+                sizes="(max-width: 768px) 100vw, 1200px"
                 className="object-cover"
                 priority
               />

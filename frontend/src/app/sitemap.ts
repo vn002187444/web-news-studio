@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
 import { getAllPostsUnified } from '@/lib/posts';
+import { SITE_URL } from '@/lib/site';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://news2026.example.com';
+  const baseUrl = SITE_URL;
   const locales = ['vi', 'en'];
 
   const categoryRoutes = ['tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'].flatMap((cat) =>

@@ -1,29 +1,48 @@
 import { createClient, type SanityClient } from '@sanity/client';
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID || '';
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET || 'production';
-const apiVersion = process.env.SANITY_API_VERSION || '2026-01-01';
-// Token chỉ dùng phía server (autoblog / route). Không prefix NEXT_PUBLIC.
-const token = process.env.SANITY_API_TOKEN || '';
+function getSanityConfig() {
+  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID || '';
+  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET || 'production';
+  const apiVersion = process.env.SANITY_API_VERSION || '2026-01-01';
+  const token = process.env.SANITY_API_TOKEN || '';
+  return { projectId, dataset, apiVersion, token };
+}
 
-export const isSanityConfigured = Boolean(projectId && token);
+export function isSanityConfigured(): boolean {
+  const { projectId, token } = getSanityConfig();
+  return Boolean(projectId && token);
+}
 
-let client: SanityClient | null = null;
+let publicClient: SanityClient | null = null;
+let writeClient: SanityClient | null = null;
 
 export function getSanityClient(withToken = false): SanityClient | null {
+  const { projectId, dataset, apiVersion, token } = getSanityConfig();
   if (!projectId) return null;
-  if (withToken && !token) return null;
-  if (!client) {
-    client = createClient({
+  if (withToken) {
+    if (!token) return null;
+    if (!writeClient) {
+      writeClient = createClient({
+        projectId,
+        dataset,
+        apiVersion,
+        useCdn: false,
+        token,
+        perspective: 'published',
+      });
+    }
+    return writeClient;
+  }
+  if (!publicClient) {
+    publicClient = createClient({
       projectId,
       dataset,
       apiVersion,
-      useCdn: !withToken, // read công khai dùng CDN, write dùng token không CDN
-      token: withToken ? token : undefined,
+      useCdn: true,
       perspective: 'published',
     });
   }
-  return client;
+  return publicClient;
 }
 
 export interface SanityArticle {

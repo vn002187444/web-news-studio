@@ -5,8 +5,8 @@ export const runtime = 'edge';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const title = searchParams.get('title') || 'News Studio - Kỷ Nguyên Báo Chí Tương Lai';
-    const category = searchParams.get('category') || 'TIN TỨC';
+    const title = (searchParams.get('title') || 'News Studio - Kỷ Nguyên Báo Chí Tương Lai').slice(0, 140);
+    const category = (searchParams.get('category') || 'TIN TỨC').slice(0, 30);
 
     return new ImageResponse(
       (

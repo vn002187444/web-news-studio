@@ -4,20 +4,28 @@ import { useEffect, useState } from 'react';
 import { motion, useSpring } from 'framer-motion';
 
 export default function CustomCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [cursorText, setCursorText] = useState("");
   const [isHovered, setIsHovered] = useState(false);
+  const [enabled, setEnabled] = useState(false);
 
   // Smooth springs for cursor movement
   const cursorX = useSpring(0, { stiffness: 500, damping: 28 });
   const cursorY = useSpring(0, { stiffness: 500, damping: 28 });
 
   useEffect(() => {
-    // Hide default cursor globally
-    document.body.style.cursor = 'none';
+    // Chỉ bật trên desktop có chuột mịn, tôn trọng reduced-motion
+    try {
+      const fine = window.matchMedia('(pointer: fine)').matches;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const touch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (!fine || reduced || (touch && !fine)) return;
+    } catch { /* ignore */ }
+    setEnabled(true);
+    // Không ép cursor:none toàn body qua JS để tránh kẹt trên mobile;
+    // CSS sẽ ẩn cursor khi có custom cursor.
+    document.documentElement.classList.add('has-custom-cursor');
 
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
 
@@ -34,12 +42,14 @@ export default function CustomCursor() {
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      document.body.style.cursor = 'auto';
+      document.documentElement.classList.remove('has-custom-cursor');
     };
   }, [cursorX, cursorY]);
+
+  if (!enabled) return null;
 
   return (
     <>

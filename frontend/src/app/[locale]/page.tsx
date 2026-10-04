@@ -3,6 +3,17 @@ import HeroSection from "@/components/ui/HeroSection";
 import BentoGrid from "@/components/ui/BentoGrid";
 import TrendingWidget from "@/components/ui/TrendingWidget";
 import { getAllPostsUnified } from "@/lib/posts";
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    alternates: {
+      canonical: `/${locale}`,
+      languages: { vi: '/vi', en: '/en' },
+    },
+  };
+}
 
 export default async function Home() {
   const posts = await getAllPostsUnified();
@@ -21,7 +32,7 @@ export default async function Home() {
   return (
     <>
       <div className="pt-24 bg-[#F4F4F0]">
-        <NewsTicker />
+        <NewsTicker articles={articles.map((a) => ({ title: a.title, slug: a.slug, category: a.category }))} />
       </div>
       <HeroSection />
       <div className="bg-white">

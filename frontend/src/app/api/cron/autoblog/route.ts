@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { toSlug } from '@/lib/site';
 
 // Cron Sanity-only (Vercel cron gọi mỗi 30' theo vercel.json).
 // Không ghi file (serverless read-only) — chỉ RSS -> Gemini -> Sanity.
@@ -14,15 +15,23 @@ const FEEDS = [
   { url: 'https://cointelegraph.com/rss', category: 'blockchain' },
 ];
 
-const toSlug = (s: string) =>
-  s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '').slice(0, 80);
+function validRewrite(j: any): { title: string; excerpt: string; content: string } | null {
+  if (!j || typeof j !== 'object') return null;
+  const title = typeof j.title === 'string' ? j.title.slice(0, 200).trim() : '';
+  const excerpt = typeof j.excerpt === 'string' ? j.excerpt.slice(0, 500).trim() : '';
+  const content = typeof j.content === 'string' ? j.content.slice(0, 20000).trim() : '';
+  if (!title || !content) return null;
+  return { title, excerpt, content };
+}
 
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET || '';
-  const got = request.headers.get('authorization')?.replace('Bearer ', '') || new URL(request.url).searchParams.get('secret') || '';
-  if (cronSecret && got !== cronSecret) return NextResponse.json({ ok: false }, { status: 401 });
+  const got = request.headers.get('authorization')?.replace('Bearer ', '') || '';
+  // Fail-closed: thiếu CRON_SECRET thì từ chối luôn, không cho trigger mở
+  if (!cronSecret || got !== cronSecret) return NextResponse.json({ ok: false }, { status: 401 });
 
   const geminiKey = process.env.GEMINI_API_KEY || '';
+  const geminiModel = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
   const { getSanityClient } = await import('@/lib/sanity');
   const sanity = getSanityClient(true);
   if (!sanity) return NextResponse.json({ ok: false, reason: 'sanity-not-configured' }, { status: 501 });
@@ -41,14 +50,15 @@ export async function GET(request: Request) {
       const exists = await sanity.fetch(`*[_type == "article" && slug.current == $slug][0]._id`, { slug });
       if (exists) continue;
 
-      let title = item.title, excerpt = item.contentSnippet || '', content = `## Tóm tắt\n\n${item.contentSnippet || item.title}`;
+      let title = item.title.slice(0, 200), excerpt = (item.contentSnippet || '').slice(0, 500), content = `## Tóm tắt\n\n${(item.contentSnippet || item.title).slice(0, 2000)}`;
       if (geminiKey) {
         try {
           const { GoogleGenerativeAI } = await import('@google/generative-ai');
-          const model = new GoogleGenerativeAI(geminiKey).getGenerativeModel({ model: 'gemini-1.5-flash' });
+          const model = new GoogleGenerativeAI(geminiKey).getGenerativeModel({ model: geminiModel });
           const r = await model.generateContent(`Viết lại tin sau sang tiếng Việt chuẩn SEO, trả JSON {"title","slug","excerpt","content"} (content markdown, có mục Key Takeaways). Tin gốc: ${item.title} — ${item.contentSnippet || ''}`);
-          const j = JSON.parse(r.response.text().replace(/```json|```/g, '').trim());
-          title = j.title || title; excerpt = j.excerpt || excerpt; content = j.content || content;
+          const parsed = JSON.parse(r.response.text().replace(/```json|```/g, '').trim());
+          const v = validRewrite(parsed);
+          if (v) { title = v.title; excerpt = v.excerpt || excerpt; content = v.content; }
         } catch { /* giữ bản RSS gốc */ }
       }
 

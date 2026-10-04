@@ -25,20 +25,45 @@ const spaceMono = Space_Mono({
   weight: ["400", "700"]
 });
 
-export const metadata: Metadata = {
-  title: "News Studio | Nền Tảng Báo Chí Kỷ Nguyên Mới",
-  description: "Trải nghiệm tin tức đột phá với giao diện 3D và nội dung phân tích chuyên sâu được vận hành bởi AI.",
-};
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { routing } from '@/i18n/routing';
+import { SITE_URL, SITE_NAME } from '@/lib/site';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const other = locale === 'vi' ? 'en' : 'vi';
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: 'News Studio | Nền Tảng Báo Chí Kỷ Nguyên Mới',
+      template: '%s | News Studio',
+    },
+    description: 'Trải nghiệm tin tức đột phá với giao diện 3D và nội dung phân tích chuyên sâu được vận hành bởi AI.',
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        vi: '/vi',
+        en: '/en',
+        'x-default': '/vi',
+      },
+    },
+    openGraph: {
+      siteName: SITE_NAME,
+      locale: locale === 'vi' ? 'vi_VN' : 'en_US',
+      alternateLocale: [other === 'vi' ? 'vi_VN' : 'en_US'],
+      type: 'website',
+    },
+    robots: { index: true, follow: true },
+  };
+}
 
 // Prerender tĩnh locale cho Cloudflare Pages (không fs ở runtime)
 export function generateStaticParams() {
   return [{ locale: 'vi' }, { locale: 'en' }];
 }
-
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { routing } from '@/i18n/routing';
 
 export default async function RootLayout({ children, params }: Readonly<{ children: React.ReactNode, params: Promise<{ locale: string }> }>) {
   const { locale } = await params;
@@ -47,6 +72,7 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
+  setRequestLocale(locale);
  
   // Providing all messages to the client
   // side is the easiest way to get started
