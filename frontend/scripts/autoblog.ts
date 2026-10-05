@@ -65,21 +65,25 @@ async function rewriteArticle(title: string, content: string, category: string) 
   try {
     const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
     const prompt = `
-      You are an elite Tech Journalist and SEO Expert. 
-      Rewrite the following article to be 100% unique (avoid plagiarism).
+      You are an elite Journalist and Search Engine Optimization (SEO/GEO/AEO) Master.
+      Rewrite the following article to be 100% unique, authoritative, and fact-checked.
       
       Original Title: ${title}
       Original Content (Snippet/HTML): ${content}
+      Category: ${category}
       
       REQUIREMENTS:
-      1. MUST output the article in VIETNAMESE language, regardless of the source language.
-      2. Create a catchy, click-worthy Title in Vietnamese.
+      1. MUST output the article in VIETNAMESE language, natural tone for Vietnamese audience.
+      2. Create a compelling, click-worthy Title in Vietnamese (max 90 chars).
       3. Generate an SEO-friendly URL slug in English or unaccented Vietnamese (kebab-case).
-      4. Write a 1-2 sentence excerpt/meta description in Vietnamese.
-      5. Format the content in Markdown (.mdx).
-      6. Include a "## Những điểm chính (Key Takeaways)" section at the top (AEO Optimization).
-      7. Include dummy internal links formatting like [text](/tech/some-slug) (SEO Optimization).
-      8. Do not hallucinate facts. Maintain the original core news.
+      4. Write a 1-2 sentence excerpt (meta description) in Vietnamese (140-160 chars) highlighting the core value.
+      5. Format content in clean Markdown (.mdx):
+         - Start with "## Những điểm chính (Key Takeaways)" (3-4 bullet points answering Who, What, Why). (AEO Optimization)
+         - Follow with detailed, well-structured paragraphs with H3 subheadings.
+         - Include relevant contextual internal links like [từ khóa](/chuyen-muc/slug) (SEO Optimization).
+         - Include a "## Câu hỏi thường gặp (FAQ)" section with 2 high-value Q&A pairs (Direct Answers for Voice Search & AI Overviews). (AEO Optimization)
+         - Include a brief citation/attribution note acknowledging the verified reporting. (GEO Optimization)
+      6. Maintain factual accuracy from the original news. Do not hallucinate.
       
       Output the result STRICTLY as a JSON object with this schema:
       {
@@ -145,15 +149,50 @@ async function runAutoblogger() {
 
         console.log(`📰 Found article: ${latestItem.title}`);
         
-        // Bóc tách hình ảnh từ RSS
-        let extractedThumbnail = 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80';
+        // Bóc tách hình ảnh từ RSS đa nguồn (enclosure, media:content, media:thumbnail, html img)
+        const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
+          tech: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+          blockchain: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1200&q=80',
+          game: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1200&q=80',
+          finance: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80',
+          lifestyle: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80',
+          sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80',
+          entertainment: 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=1200&q=80',
+          education: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80',
+          science: 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=1200&q=80',
+        };
+
+        let extractedThumbnail = '';
+        const itemAny = latestItem as any;
         if (latestItem.enclosure && latestItem.enclosure.url) {
           extractedThumbnail = latestItem.enclosure.url;
+        } else if (itemAny['media:content']?.url) {
+          extractedThumbnail = itemAny['media:content'].url;
+        } else if (itemAny['media:content']?.$?.url) {
+          extractedThumbnail = itemAny['media:content'].$.url;
+        } else if (Array.isArray(itemAny['media:content']) && itemAny['media:content'][0]?.$?.url) {
+          extractedThumbnail = itemAny['media:content'][0].$.url;
+        } else if (itemAny['media:thumbnail']?.url) {
+          extractedThumbnail = itemAny['media:thumbnail'].url;
+        } else if (itemAny['media:thumbnail']?.$?.url) {
+          extractedThumbnail = itemAny['media:thumbnail'].$.url;
         } else {
-          const imgMatch = (latestItem.content || latestItem.contentSnippet || '').match(/<img[^>]+src="?([^"\s]+)"?\s*/i);
+          const rawHtml = [
+            itemAny['content:encoded'],
+            latestItem.content,
+            latestItem.contentSnippet,
+            itemAny.summary,
+            itemAny.description
+          ].filter(Boolean).join(' ');
+          const imgMatch = rawHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
           if (imgMatch && imgMatch[1]) {
             extractedThumbnail = imgMatch[1];
           }
+        }
+
+        // Nếu vẫn không có ảnh, dùng ảnh fallback chuẩn của category
+        if (!extractedThumbnail || !extractedThumbnail.startsWith('http')) {
+          extractedThumbnail = CATEGORY_FALLBACK_IMAGES[feed.category] || CATEGORY_FALLBACK_IMAGES.tech;
         }
 
         console.log('✨ Rewriting and Optimizing with Gemini AI (GEO/AEO)...');
@@ -222,4 +261,13 @@ ${rewritten.content}
   }
 }
 
-runAutoblogger();
+// Chạy và tự thoát gọn gàng, tránh treo runner GitHub Actions 6 tiếng
+runAutoblogger()
+  .then(() => {
+    console.log('✅ Autoblog process exited cleanly.');
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error('❌ Autoblog fatal crash:', err);
+    process.exit(1);
+  });

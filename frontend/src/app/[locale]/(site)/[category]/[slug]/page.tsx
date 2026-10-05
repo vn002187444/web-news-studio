@@ -62,9 +62,12 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
   }
 
   const pageUrl = `${SITE_URL}/${locale}/${category}/${slug}`;
-  const jsonLd = {
-    '@context': 'https://schema.org',
+  const categoryUrl = `${SITE_URL}/${locale}/${category}`;
+  const homeUrl = `${SITE_URL}/${locale}`;
+
+  const articleJsonLd = {
     '@type': 'NewsArticle',
+    '@id': `${pageUrl}#article`,
     headline: post.meta.title,
     description: post.meta.excerpt,
     image: [post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80'],
@@ -72,6 +75,13 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     dateModified: post.meta.publishedAt,
     mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
     inLanguage: locale === 'vi' ? 'vi-VN' : 'en-US',
+    keywords: (post.meta.tags || []).join(', '),
+    articleSection: category.toUpperCase(),
+    // Tối ưu AEO / Trả lời bằng giọng nói & AI Overviews
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['#article-content h2', '#article-content p'],
+    },
     author: [{
       '@type': 'Person',
       name: typeof post.meta.author === 'string' ? post.meta.author : 'AI Editor',
@@ -81,6 +91,36 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
       name: 'News Studio',
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon-512x512.png` },
     },
+  };
+
+  const breadcrumbJsonLd = {
+    '@type': 'BreadcrumbList',
+    '@id': `${pageUrl}#breadcrumb`,
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: locale === 'vi' ? 'Trang chủ' : 'Home',
+        item: homeUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: category.toUpperCase(),
+        item: categoryUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.meta.title,
+        item: pageUrl,
+      },
+    ],
+  };
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [articleJsonLd, breadcrumbJsonLd],
   };
 
   return (
