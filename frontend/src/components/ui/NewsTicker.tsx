@@ -53,9 +53,9 @@ export default function NewsTicker({ articles }: { articles?: TickerArticle[] })
       aria-label="Tin nóng"
     >
       <motion.div
-        className="flex whitespace-nowrap w-max group-hover/ticker:[animation-play-state:paused]"
+        className="flex whitespace-nowrap w-max group-hover/ticker:[animation-play-state:paused] will-change-transform"
         animate={{ x: ['0%', '-50%'] }}
-        transition={{ repeat: Infinity, ease: 'linear', duration: 30 }}
+        transition={{ repeat: Infinity, ease: 'linear', duration: 90 }}
       >
         {/* Duplicate mảng để loop liền mạch — mỗi nửa đều bấm được */}
         {[...news, ...news].map((a, i) => (

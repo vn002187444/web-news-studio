@@ -89,7 +89,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: escapeJsonLd(JSON.stringify(jsonLd)) }}
       />
-      <SingleArticleClient meta={post.meta} slug={slug} allPosts={allPosts} content={post.content} />
+      <SingleArticleClient meta={post.meta} slug={slug} allPosts={allPosts} content={post.content} body={post.body} />
     </>
   );
 }

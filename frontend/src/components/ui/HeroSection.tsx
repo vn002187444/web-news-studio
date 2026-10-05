@@ -3,8 +3,19 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import Image from 'next/image';
+import { Link } from '@/i18n/routing';
 
-export default function HeroSection() {
+interface HeroArticle {
+  title: string;
+  excerpt: string;
+  category: string;
+  slug: string;
+  thumbnail: { url: string; alt: string };
+}
+
+const FALLBACK_IMG = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80';
+
+export default function HeroSection({ article }: { article?: HeroArticle }) {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -37,19 +48,49 @@ export default function HeroSection() {
           >
             Khám phá những điểm giao thoa giữa Công nghệ, Blockchain và Phong cách sống thế hệ mới.
           </motion.p>
+
+          {article && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 1 }}
+              className="mt-8 max-w-md"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-red-600">
+                Tin mới nhất — {article.category}
+              </span>
+              <Link
+                href={`/${article.category}/${article.slug}`}
+                className="block mt-2 font-serif text-xl font-bold leading-snug hover:underline underline-offset-4"
+                data-cursor="READ"
+              >
+                {article.title}
+              </Link>
+            </motion.div>
+          )}
         </div>
 
-        {/* Right: Parallax Image */}
+        {/* Right: Parallax Image — ảnh bài mới nhất */}
         <div className="lg:col-span-5 h-[500px] lg:h-[700px] w-full relative overflow-hidden bg-gray-200">
           <motion.div style={{ y }} className="w-full h-[120%] -top-[10%] relative">
             <Image 
-              src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80"
-              alt="Retro Tech Setup"
+              src={article?.thumbnail.url || FALLBACK_IMG}
+              alt={article?.thumbnail.alt || 'Retro Tech Setup'}
               fill
               className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
               priority
             />
           </motion.div>
+          {article && (
+            <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/80 to-transparent">
+              <span className="font-mono text-[10px] uppercase tracking-widest bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-white">
+                {article.category}
+              </span>
+              <p className="mt-2 text-white font-serif text-lg leading-snug line-clamp-2">
+                {article.title}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </section>

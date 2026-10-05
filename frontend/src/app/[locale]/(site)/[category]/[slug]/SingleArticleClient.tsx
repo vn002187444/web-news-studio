@@ -6,11 +6,12 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import RecommendedArticles from '@/components/ui/RecommendedArticles';
 import MarkdownBody from '@/components/ui/MarkdownBody';
+import PortableArticleBody from '@/components/ui/PortableArticleBody';
 import { useTranslations } from 'next-intl';
 
 interface TocItem { id: string; text: string; level: number }
 
-export default function SingleArticleClient({ content, meta, slug, allPosts }: { content: string, meta: any, slug: string, allPosts: any[] }) {
+export default function SingleArticleClient({ content, body, meta, slug, allPosts }: { content: string, body?: any[], meta: any, slug: string, allPosts: any[] }) {
   const t = useTranslations('Common');
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -134,15 +135,15 @@ export default function SingleArticleClient({ content, meta, slug, allPosts }: {
             </div>
           </figure>
 
-          {/* Markdown Article Body — react-markdown (không eval, chạy được trên Workers) */}
+          {/* Body — ưu tiên Portable Text (Sanity mới), fallback markdown */}
           <div id="article-content" className="prose prose-lg md:prose-xl prose-serif max-w-none prose-headings:font-serif prose-headings:tracking-tight prose-a:text-red-600 prose-a:no-underline hover:prose-a:underline">
-            <MarkdownBody content={content} />
+            {body && body.length > 0 ? <PortableArticleBody body={body} /> : <MarkdownBody content={content} />}
           </div>
 
-          {/* Author Tag */}
+          {/* Author Tag — hồ sơ tác giả từ Sanity (S3), fallback avatar mặc định */}
           <div className="mt-20 pt-10 border-t border-gray-200 flex items-center gap-6">
             <Image 
-              src="https://i.pravatar.cc/150?u=author"
+              src={meta.authorAvatar || "https://i.pravatar.cc/150?u=author"}
               alt={meta.author || "AI Author"}
               width={80}
               height={80}
@@ -150,7 +151,8 @@ export default function SingleArticleClient({ content, meta, slug, allPosts }: {
             />
             <div>
               <h4 className="font-bold uppercase tracking-wider text-sm mb-1">{meta.author || "AI Biên Tập Viên"}</h4>
-              <p className="font-mono text-xs text-gray-500 uppercase">Hệ thống Tự Động Hóa News Studio</p>
+              <p className="font-mono text-xs text-gray-500 uppercase">{meta.authorRole || "Hệ thống Tự Động Hóa News Studio"}</p>
+              {meta.authorBio && <p className="mt-2 text-sm text-gray-600 max-w-xl">{meta.authorBio}</p>}
             </div>
           </div>
 

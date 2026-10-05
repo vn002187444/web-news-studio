@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function EducationTemplate({ articles }: { articles: any[] }) {
   const eduArticles = articles && articles.length > 0 ? articles : [];
@@ -40,7 +41,17 @@ export default function EducationTemplate({ articles }: { articles: any[] }) {
                 
                 <div className="md:w-1/2" />
                 
-                <Link href={`/education/${article.slug}`} className="md:w-1/2 group block bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-[#1c355e]/5">
+                <Link href={`/education/${article.slug}`} className="md:w-1/2 group block bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-[#1c355e]/5 overflow-hidden">
+                  <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+                    <Image
+                      src={article.thumbnail?.url}
+                      alt={article.thumbnail?.alt || article.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-8">
                   <div className="flex justify-between items-start mb-4">
                     <span className="text-xs font-bold text-[#0047AB] uppercase tracking-wider bg-[#0047AB]/10 px-3 py-1 rounded-full">
                       Trending
@@ -57,6 +68,7 @@ export default function EducationTemplate({ articles }: { articles: any[] }) {
                   <p className="text-gray-600 line-clamp-3 text-sm leading-relaxed">
                     {article.excerpt}
                   </p>
+                  </div>
                 </Link>
               </div>
             ))}

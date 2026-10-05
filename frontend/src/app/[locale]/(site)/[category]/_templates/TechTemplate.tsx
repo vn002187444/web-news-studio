@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { Suspense, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -99,10 +100,20 @@ export default function TechTemplate({ articles }: { articles: any[] }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {techArticles.map((article) => (
             <Link key={article.id} href={`/tech/${article.slug}`}>
-              <div className="h-[400px] border border-white/10 rounded-2xl p-6 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
+              <div className="h-[480px] border border-white/10 rounded-2xl overflow-hidden bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-300 flex flex-col group relative">
                 {/* Glow effect on hover */}
-                <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 rounded-2xl" />
-                
+                <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 rounded-2xl pointer-events-none" />
+                <div className="relative h-48 w-full shrink-0 overflow-hidden">
+                  <Image
+                    src={article.thumbnail?.url}
+                    alt={article.thumbnail?.alt || article.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                </div>
+                <div className="p-6 flex flex-col justify-between flex-1 relative z-10">
                 <div className="relative z-10">
                   <span className="font-mono text-xs text-cyan-400 uppercase tracking-widest bg-cyan-900/30 px-3 py-1 rounded-full border border-cyan-500/30">
                     {article.tags?.[0] || 'Công Nghệ'}
@@ -116,6 +127,7 @@ export default function TechTemplate({ articles }: { articles: any[] }) {
                   <p className="font-sans text-sm text-white/60 line-clamp-3">
                     {article.excerpt}
                   </p>
+                </div>
                 </div>
               </div>
             </Link>

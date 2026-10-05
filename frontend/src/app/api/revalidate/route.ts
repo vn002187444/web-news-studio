@@ -1,25 +1,36 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 
+// Sanity Webhook → POST /api/revalidate?secret=... {slug, category}
+// Cấu hình trong Sanity Manage → API → Webhooks (on create/update/delete article).
 export async function POST(request: Request) {
-  const secret = process.env.SANITY_WEBHOOK_SECRET || '';
-  // Chỉ nhận qua header, không nhận query param để tránh lộ log
-  const got = request.headers.get('x-sanity-secret') || request.headers.get('authorization')?.replace('Bearer ', '') || '';
-  if (!secret || got !== secret) {
+  const url = new URL(request.url);
+  const secret = url.searchParams.get('secret') || request.headers.get('x-webhook-secret') || '';
+  if (!process.env.SANITY_WEBHOOK_SECRET || secret !== process.env.SANITY_WEBHOOK_SECRET) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
-  revalidatePath('/', 'layout');
-
+  let slug = '';
+  let category = '';
   try {
     const body = await request.json();
-    if (body.category) {
-      revalidatePath(`/vi/${body.category}`, 'page');
-      revalidatePath(`/en/${body.category}`, 'page');
-    }
-  } catch (err) {
-    // Body is optional, if parsing fails just proceed
-  }
+    slug = body?.slug?.current || body?.slug || '';
+    category = body?.category || '';
+  } catch { /* payload rỗng — revalidate homepage */ }
 
-  return NextResponse.json({ ok: true, revalidated: true });
+  try {
+    revalidatePath('/vi');
+    revalidatePath('/en');
+    if (category) {
+      revalidatePath(`/vi/${category}`);
+      revalidatePath(`/en/${category}`);
+    }
+    if (slug && category) {
+      revalidatePath(`/vi/${category}/${slug}`);
+      revalidatePath(`/en/${category}/${slug}`);
+    }
+  } catch (e) {
+    return NextResponse.json({ ok: false, error: String(e) }, { status: 500 });
+  }
+  return NextResponse.json({ ok: true, revalidated: { slug, category } });
 }

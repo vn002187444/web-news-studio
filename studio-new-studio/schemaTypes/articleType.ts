@@ -26,9 +26,22 @@ export const articleType = defineType({
     }),
     defineField({
       name: 'content',
-      title: 'Nội dung (Markdown)',
+      title: 'Nội dung (Markdown - cũ, giữ để tương thích)',
       type: 'text',
       rows: 15,
+    }),
+    defineField({
+      name: 'body',
+      title: 'Nội dung (Portable Text - mới)',
+      type: 'array',
+      of: [
+        { type: 'block' },
+        { type: 'keyTakeaways' },
+        { type: 'expertQuote' },
+        { type: 'ctaBanner' },
+        { type: 'chartEmbed' },
+        { type: 'videoEmbed' },
+      ],
     }),
     defineField({
       name: 'category',
@@ -62,9 +75,21 @@ export const articleType = defineType({
     }),
     defineField({
       name: 'author',
-      title: 'Tác giả',
+      title: 'Tác giả (chuỗi - cũ, giữ để tương thích)',
       type: 'string',
       initialValue: 'AI Autobot',
+    }),
+    defineField({
+      name: 'authorRef',
+      title: 'Tác giả (liên kết hồ sơ - mới)',
+      type: 'reference',
+      to: [{ type: 'author' }],
+    }),
+    defineField({
+      name: 'categoryRef',
+      title: 'Danh mục (liên kết - mới)',
+      type: 'reference',
+      to: [{ type: 'categoryDoc' }],
     }),
     defineField({
       name: 'publishedAt',

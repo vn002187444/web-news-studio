@@ -4,8 +4,16 @@ import { cache } from 'react';
 
 export interface UnifiedPost {
   slug: string;
-  meta: PostMeta & { slug: string };
+  meta: PostMeta & {
+    slug: string;
+    authorAvatar?: string;
+    authorRole?: string;
+    authorBio?: string;
+    categoryIcon?: string;
+    categoryColor?: string;
+  };
   content: string;
+  body?: any[]; // Portable Text (Sanity mới) — ưu tiên render
   source: 'sanity' | 'mdx';
 }
 
@@ -19,10 +27,16 @@ function fromSanity(a: SanityArticle): UnifiedPost {
       publishedAt: a.publishedAt,
       thumbnail: a.thumbnail,
       tags: a.tags || [],
-      author: a.author || 'AI Editor',
+      author: a.authorDetail?.name || a.author || 'AI Editor',
+      authorAvatar: a.authorDetail?.avatar || '',
+      authorRole: a.authorDetail?.role || '',
+      authorBio: a.authorDetail?.bio || '',
+      categoryIcon: a.categoryDetail?.icon || '',
+      categoryColor: a.categoryDetail?.color || '',
       slug: a.slug,
     },
     content: a.content,
+    body: a.body,
     source: 'sanity',
   };
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ScienceTemplate({ articles }: { articles: any[] }) {
   const scienceArticles = articles && articles.length > 0 ? articles : [];
@@ -23,8 +24,15 @@ export default function ScienceTemplate({ articles }: { articles: any[] }) {
             {scienceArticles.slice(0, 1).map((article, i) => (
               <Link key={i} href={`/science/${article.slug}`} className="group block mb-12">
                 <div className="relative h-[400px] bg-gray-100 rounded-xl mb-6 overflow-hidden border border-gray-200">
+                  <Image
+                    src={article.thumbnail?.url}
+                    alt={article.thumbnail?.alt || article.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 66vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                   {/* CSS Heatmap representation */}
-                  <div className="absolute inset-0 opacity-20 bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-teal-200 via-orange-200 to-teal-500" />
+                  <div className="absolute inset-0 opacity-20 bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-teal-200 via-orange-200 to-teal-500 pointer-events-none" />
                   
                   {/* Mini SVG Chart Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 h-32 p-4 flex items-end justify-between opacity-50 group-hover:opacity-100 transition-opacity">
@@ -48,6 +56,15 @@ export default function ScienceTemplate({ articles }: { articles: any[] }) {
           <div className="md:col-span-4 space-y-8">
             {scienceArticles.slice(1, 4).map((article, i) => (
               <Link key={i} href={`/science/${article.slug}`} className="group block border-l-4 border-[#008080] pl-6 hover:border-[#ff7f50] transition-colors">
+                <div className="relative h-32 w-full mb-3 overflow-hidden rounded-lg bg-gray-100">
+                  <Image
+                    src={article.thumbnail?.url}
+                    alt={article.thumbnail?.alt || article.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 rounded-full bg-[#ff7f50] animate-ping" />
                   <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Live Data</span>

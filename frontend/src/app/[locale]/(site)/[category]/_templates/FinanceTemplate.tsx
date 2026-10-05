@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { useState } from 'react';
 
@@ -118,7 +119,17 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
           ) : (
             financeArticles.slice(0, 6).map((article, i) => (
               <Link key={i} href={`/finance/${article?.slug}`} className="group">
-                <div className="border border-[#111111]/10 p-6 h-full hover:bg-white transition-colors shadow-none">
+                <div className="border border-[#111111]/10 h-full hover:bg-white transition-colors shadow-none overflow-hidden bg-white/60">
+                  <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+                    <Image
+                      src={article?.thumbnail?.url}
+                      alt={article?.thumbnail?.alt || article?.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-6">
                   <span className="font-mono text-[10px] text-red-600 uppercase font-semibold">Tài Chính</span>
                   <h4 className="font-serif text-2xl font-bold mt-4 mb-3 group-hover:underline decoration-1 underline-offset-4 line-clamp-3">
                     {article?.title}
@@ -126,6 +137,7 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
                   <p className="font-sans text-sm text-gray-600 line-clamp-3">
                     {article?.excerpt}
                   </p>
+                  </div>
                 </div>
               </Link>
             ))

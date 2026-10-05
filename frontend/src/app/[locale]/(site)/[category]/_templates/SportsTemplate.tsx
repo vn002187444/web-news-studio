@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function SportsTemplate({ articles }: { articles: any[] }) {
   const sportsArticles = articles && articles.length > 0 ? articles : [];
@@ -29,12 +30,23 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-8">
             {sportsArticles.map((article, i) => (
-              <Link key={i} href={`/sports/${article.slug}`} className="group block border border-[#39ff14]/20 p-6 hover:bg-[#39ff14]/5 transition-colors">
+              <Link key={i} href={`/sports/${article.slug}`} className="group block border border-[#39ff14]/20 hover:bg-[#39ff14]/5 transition-colors overflow-hidden">
+                <div className="relative aspect-video w-full overflow-hidden bg-black/40">
+                  <Image
+                    src={article.thumbnail?.url}
+                    alt={article.thumbnail?.alt || article.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 40vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-6">
                 <span className="text-[10px] text-white/50 uppercase">Breaking News</span>
                 <h3 className="text-2xl font-bold mt-2 text-white group-hover:text-[#39ff14] transition-colors uppercase leading-tight">
                   {article.title}
                 </h3>
                 <p className="mt-4 text-sm text-white/70 line-clamp-3">{article.excerpt}</p>
+                </div>
               </Link>
             ))}
           </div>

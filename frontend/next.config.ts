@@ -15,7 +15,27 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'i.pravatar.cc',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: '*.vnecdn.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.i-scmp.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.ctmedia.io',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
     ],
   },
   async headers() {

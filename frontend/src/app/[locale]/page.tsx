@@ -2,6 +2,7 @@ import NewsTicker from "@/components/ui/NewsTicker";
 import HeroSection from "@/components/ui/HeroSection";
 import BentoGrid from "@/components/ui/BentoGrid";
 import TrendingWidget from "@/components/ui/TrendingWidget";
+import CategorySections from "@/components/ui/CategorySections";
 import { getAllPostsUnified } from "@/lib/posts";
 import type { Metadata } from 'next';
 
@@ -34,7 +35,7 @@ export default async function Home() {
       <div className="pt-24 bg-[#F4F4F0]">
         <NewsTicker articles={articles.map((a) => ({ title: a.title, slug: a.slug, category: a.category }))} />
       </div>
-      <HeroSection />
+      <HeroSection article={articles[0]} />
       <div className="bg-white">
         <div className="max-w-[1600px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-9 min-w-0">
@@ -45,6 +46,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
+      <CategorySections articles={articles} />
     </>
   );
 }

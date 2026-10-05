@@ -50,30 +50,33 @@ export interface SanityArticle {
   slug: string;
   title: string;
   excerpt: string;
-  content: string; // markdown
+  content: string; // markdown (cũ — fallback)
+  body?: any[]; // Portable Text (mới — ưu tiên render)
   category: 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science';
   tags: string[];
   thumbnail: string;
   author: string;
   publishedAt: string;
+  authorDetail?: { name: string; role?: string; bio?: string; avatar?: string } | null;
+  categoryDetail?: { title: string; icon?: string; color?: string } | null;
 }
 
 const LIST_QUERY = `*[_type == "article" && defined(slug.current)] | order(publishedAt desc) [0...100] {
   _id,
   "slug": slug.current,
-  title, excerpt, content, category, tags, thumbnail, author, publishedAt
+  title, excerpt, content, body, category, tags, thumbnail, author, publishedAt, "authorDetail": authorRef->{name, role, bio, avatar}, "categoryDetail": categoryRef->{title, icon, color}
 }`;
 
 const BY_SLUG_QUERY = `*[_type == "article" && slug.current == $slug][0] {
   _id,
   "slug": slug.current,
-  title, excerpt, content, category, tags, thumbnail, author, publishedAt
+  title, excerpt, content, body, category, tags, thumbnail, author, publishedAt, "authorDetail": authorRef->{name, role, bio, avatar}, "categoryDetail": categoryRef->{title, icon, color}
 }`;
 
 const BY_CATEGORY_QUERY = `*[_type == "article" && category == $category] | order(publishedAt desc) [0...50] {
   _id,
   "slug": slug.current,
-  title, excerpt, content, category, tags, thumbnail, author, publishedAt
+  title, excerpt, content, body, category, tags, thumbnail, author, publishedAt, "authorDetail": authorRef->{name, role, bio, avatar}, "categoryDetail": categoryRef->{title, icon, color}
 }`;
 
 export async function fetchSanityPosts(): Promise<SanityArticle[] | null> {
@@ -107,14 +110,76 @@ export async function fetchSanityByCategory(category: string): Promise<SanityArt
   }
 }
 
+/** Chuyển markdown (bot AI sinh) sang Portable Text blocks để lưu field `body`. */
+export function markdownToBlocks(md: string): any[] {
+  const key = () => Math.random().toString(36).slice(2, 10);
+  const parseSpans = (text: string): { children: any[] } => {
+    const children: any[] = [];
+    const linkRe = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let last = 0;
+    let m: RegExpExecArray | null;
+    const pushText = (t: string, mark?: string) => {
+      if (!t) return;
+      const span: any = { _type: 'span', _key: key(), text: t };
+      if (mark) span.marks = [mark];
+      children.push(span);
+    };
+    let li = 0;
+    while ((m = linkRe.exec(text)) !== null) {
+      pushText(text.slice(last, m.index));
+      children.push({
+        _type: 'span', _key: key(), text: m[1],
+        marks: [`link-${li++}-${key()}`],
+      });
+      last = m.index + m[0].length;
+      // lưu tạm href vào def
+      (children[children.length - 1] as any)._href = m[2];
+    }
+    pushText(text.slice(last));
+    const defs = (children.filter((c) => c._href) as any[]).map((c) => {
+      const d = { _type: 'link', _key: c.marks[0], href: c._href };
+      delete c._href;
+      return d;
+    });
+    return { children, markDefs: defs } as any;
+  };
+
+  const blocks: any[] = [];
+  for (const rawLine of (md || '').split('\n')) {
+    const line = rawLine.trim();
+    if (!line || line === '---') continue;
+    if (line.startsWith('### ')) {
+      const { children, markDefs } = parseSpans(line.slice(4)) as any;
+      blocks.push({ _type: 'block', _key: key(), style: 'h3', children, markDefs });
+    } else if (line.startsWith('## ')) {
+      const { children, markDefs } = parseSpans(line.slice(3)) as any;
+      blocks.push({ _type: 'block', _key: key(), style: 'h2', children, markDefs });
+    } else if (/^[-*]\s+/.test(line)) {
+      const { children, markDefs } = parseSpans(line.replace(/^[-*]\s+/, '')) as any;
+      blocks.push({ _type: 'block', _key: key(), style: 'normal', listItem: 'bullet', level: 1, children, markDefs });
+    } else {
+      const { children, markDefs } = parseSpans(line.replace(/^\d+\.\s+/, '')) as any;
+      if (children.length === 0) continue;
+      blocks.push({ _type: 'block', _key: key(), style: 'normal', children, markDefs });
+    }
+  }
+  return blocks;
+}
+
 /** Ghi bài AI lên Sanity — dùng trong scripts/autoblog.ts (cần SANITY_API_TOKEN). */
 export async function pushArticleToSanity(doc: Omit<SanityArticle, '_id'>): Promise<boolean> {
   const c = getSanityClient(true);
   if (!c) return false;
   try {
+    const body = doc.body && doc.body.length > 0 ? doc.body : markdownToBlocks(doc.content || '');
+    const cat = (doc.category || 'tech') as string;
+    const refs: any = {};
+    // Seed S3 dùng _id cố định author-<cat> / category-<cat>
+    refs.authorRef = { _type: 'reference', _ref: `author-${cat}` };
+    refs.categoryRef = { _type: 'reference', _ref: `category-${cat}` };
     const existing = await c.fetch(`*[_type == "article" && slug.current == $slug][0]._id`, { slug: doc.slug });
     if (existing) {
-      await c.patch(existing).set({ ...doc, slug: undefined }).commit();
+      await c.patch(existing).set({ ...doc, body, ...refs, slug: undefined }).commit();
       return true;
     }
     await c.create({
@@ -124,6 +189,8 @@ export async function pushArticleToSanity(doc: Omit<SanityArticle, '_id'>): Prom
       slug: { _type: 'slug', current: doc.slug },
       excerpt: doc.excerpt,
       content: doc.content,
+      body,
+      ...refs,
       category: doc.category,
       tags: doc.tags,
       thumbnail: doc.thumbnail,

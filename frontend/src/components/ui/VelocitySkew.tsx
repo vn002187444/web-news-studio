@@ -8,13 +8,15 @@ export default function VelocitySkew({ children }: { children: React.ReactNode }
   
   const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
+  // Mượt kiểu Antigravity: lò xo mềm + damping cao để triệt rung trackpad
   const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 50,
-    stiffness: 400
+    damping: 30,
+    stiffness: 120,
+    mass: 0.8,
   });
 
-  // Map velocity to a skew degree (e.g. max 10 degrees)
-  const skew = useTransform(smoothVelocity, [-1000, 1000], [5, -5]);
+  // Map velocity to a skew degree — kẹp nhẹ ±2° để không rung layout
+  const skew = useTransform(smoothVelocity, [-2000, 2000], [2, -2]);
 
   return (
     <motion.div ref={containerRef} style={{ skewY: skew }} className="origin-center w-full">
