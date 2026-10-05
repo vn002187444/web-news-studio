@@ -3,7 +3,6 @@ import HeroSection from "@/components/ui/HeroSection";
 import BentoGrid from "@/components/ui/BentoGrid";
 import TrendingWidget from "@/components/ui/TrendingWidget";
 import { getAllPostsUnified } from "@/lib/posts";
-import { SITE_URL, SITE_NAME, escapeJsonLd } from "@/lib/site";
 import type { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -16,8 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+export default async function Home() {
   const posts = await getAllPostsUnified();
   
   // Map MDX meta to the format expected by UI components
@@ -31,34 +29,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     publishedAt: post.meta.publishedAt
   }));
 
-  const homeJsonLd = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebSite',
-        name: SITE_NAME,
-        url: `${SITE_URL}/${locale}`,
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: `${SITE_URL}/${locale}/search?q={search_term_string}`,
-          'query-input': 'required name=search_term_string',
-        },
-      },
-      {
-        '@type': 'NewsMediaOrganization',
-        name: SITE_NAME,
-        url: `${SITE_URL}/${locale}`,
-        logo: `${SITE_URL}/icon-512x512.png`,
-      },
-    ],
-  };
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: escapeJsonLd(JSON.stringify(homeJsonLd)) }}
-      />
       <div className="pt-24 bg-[#F4F4F0]">
         <NewsTicker articles={articles.map((a) => ({ title: a.title, slug: a.slug, category: a.category }))} />
       </div>

@@ -41,16 +41,6 @@ export default function EducationTemplate({ articles }: { articles: any[] }) {
                 <div className="md:w-1/2" />
                 
                 <Link href={`/education/${article.slug}`} className="md:w-1/2 group block bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-[#1c355e]/5">
-                  {article.thumbnail?.url && (
-                    <div className="w-full h-48 rounded-xl overflow-hidden mb-6 bg-slate-100">
-                      <img 
-                        src={article.thumbnail.url} 
-                        alt={article.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                        loading="lazy" 
-                      />
-                    </div>
-                  )}
                   <div className="flex justify-between items-start mb-4">
                     <span className="text-xs font-bold text-[#0047AB] uppercase tracking-wider bg-[#0047AB]/10 px-3 py-1 rounded-full">
                       Trending

@@ -12,7 +12,6 @@ import DefaultTemplate from './_templates/DefaultTemplate';
 
 import { Metadata } from 'next';
 import { getPostsByCategoryUnified } from '@/lib/posts';
-import { SITE_URL, escapeJsonLd } from '@/lib/site';
 
 const CATEGORIES = ['tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
 
@@ -48,8 +47,8 @@ export function generateStaticParams() {
   return ['vi', 'en'].flatMap((locale) => CATEGORIES.map((category) => ({ locale, category })));
 }
 
-export default async function CategoryPage({ params }: { params: Promise<{ locale: string; category: string }> }) {
-  const { category, locale } = await params;
+export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+  const { category } = await params;
   
   // Validate category
   const validCategories = ['tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
@@ -70,74 +69,27 @@ export default async function CategoryPage({ params }: { params: Promise<{ local
     publishedAt: post.meta.publishedAt
   }));
 
-  const pageUrl = `${SITE_URL}/${locale}/${category}`;
-  const homeUrl = `${SITE_URL}/${locale}`;
-  const categoryMeta = CATEGORY_META[category];
-
-  const categoryJsonLd = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'CollectionPage',
-        '@id': `${pageUrl}#webpage`,
-        url: pageUrl,
-        name: categoryMeta?.title || category,
-        description: categoryMeta?.description,
-        inLanguage: locale === 'vi' ? 'vi-VN' : 'en-US',
-      },
-      {
-        '@type': 'BreadcrumbList',
-        '@id': `${pageUrl}#breadcrumb`,
-        itemListElement: [
-          {
-            '@type': 'ListItem',
-            position: 1,
-            name: locale === 'vi' ? 'Trang chủ' : 'Home',
-            item: homeUrl,
-          },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: category.toUpperCase(),
-            item: pageUrl,
-          },
-        ],
-      },
-    ],
-  };
-
-  const renderTemplate = () => {
-    switch (category) {
-      case 'tech':
-        return <TechTemplate articles={articles} />;
-      case 'blockchain':
-        return <BlockchainTemplate articles={articles} />;
-      case 'game':
-        return <GameTemplate articles={articles} />;
-      case 'finance':
-        return <FinanceTemplate articles={articles} />;
-      case 'lifestyle':
-        return <LifestyleTemplate articles={articles} />;
-      case 'sports':
-        return <SportsTemplate articles={articles} />;
-      case 'entertainment':
-        return <EntertainmentTemplate articles={articles} />;
-      case 'education':
-        return <EducationTemplate articles={articles} />;
-      case 'science':
-        return <ScienceTemplate articles={articles} />;
-      default:
-        return <DefaultTemplate category={category} articles={articles} />;
-    }
-  };
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: escapeJsonLd(JSON.stringify(categoryJsonLd)) }}
-      />
-      {renderTemplate()}
-    </>
-  );
+  // Render specific template based on category
+  switch (category) {
+    case 'tech':
+      return <TechTemplate articles={articles} />;
+    case 'blockchain':
+      return <BlockchainTemplate articles={articles} />;
+    case 'game':
+      return <GameTemplate articles={articles} />;
+    case 'finance':
+      return <FinanceTemplate articles={articles} />;
+    case 'lifestyle':
+      return <LifestyleTemplate articles={articles} />;
+    case 'sports':
+      return <SportsTemplate articles={articles} />;
+    case 'entertainment':
+      return <EntertainmentTemplate articles={articles} />;
+    case 'education':
+      return <EducationTemplate articles={articles} />;
+    case 'science':
+      return <ScienceTemplate articles={articles} />;
+    default:
+      return <DefaultTemplate category={category} articles={articles} />;
+  }
 }

@@ -1,9 +1,7 @@
 frontend/node_modules
 frontend/.next
 frontend/.open-next
-frontend/.wrangler
 .env
 .env.local
 .DS_Store
 autoblog.lock
-studio-new-studio

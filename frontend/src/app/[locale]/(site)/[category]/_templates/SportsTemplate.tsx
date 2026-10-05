@@ -30,16 +30,6 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
           <div className="col-span-1 md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-8">
             {sportsArticles.map((article, i) => (
               <Link key={i} href={`/sports/${article.slug}`} className="group block border border-[#39ff14]/20 p-6 hover:bg-[#39ff14]/5 transition-colors">
-                {article.thumbnail?.url && (
-                  <div className="w-full h-44 mb-4 overflow-hidden border border-[#39ff14]/20 relative bg-black">
-                    <img 
-                      src={article.thumbnail.url} 
-                      alt={article.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100" 
-                      loading="lazy" 
-                    />
-                  </div>
-                )}
                 <span className="text-[10px] text-white/50 uppercase">Breaking News</span>
                 <h3 className="text-2xl font-bold mt-2 text-white group-hover:text-[#39ff14] transition-colors uppercase leading-tight">
                   {article.title}

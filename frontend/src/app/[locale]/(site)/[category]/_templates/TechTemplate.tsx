@@ -100,18 +100,6 @@ export default function TechTemplate({ articles }: { articles: any[] }) {
           {techArticles.map((article) => (
             <Link key={article.id} href={`/tech/${article.slug}`}>
               <div className="h-[400px] border border-white/10 rounded-2xl p-6 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
-                {/* Background Thumbnail */}
-                {article.thumbnail?.url && (
-                  <div className="absolute inset-0 z-0">
-                    <img 
-                      src={article.thumbnail.url} 
-                      alt={article.title} 
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-35 group-hover:scale-105 transition-all duration-700" 
-                      loading="lazy" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
-                  </div>
-                )}
                 {/* Glow effect on hover */}
                 <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 rounded-2xl" />
                 

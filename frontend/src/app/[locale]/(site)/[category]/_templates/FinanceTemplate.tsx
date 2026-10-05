@@ -118,26 +118,14 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
           ) : (
             financeArticles.slice(0, 6).map((article, i) => (
               <Link key={i} href={`/finance/${article?.slug}`} className="group">
-                <div className="border border-[#111111]/10 p-6 h-full hover:bg-white transition-colors shadow-none flex flex-col justify-between">
-                  <div>
-                    {article?.thumbnail?.url && (
-                      <div className="w-full h-44 overflow-hidden mb-4 bg-gray-200">
-                        <img 
-                          src={article.thumbnail.url} 
-                          alt={article.title} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                          loading="lazy" 
-                        />
-                      </div>
-                    )}
-                    <span className="font-mono text-[10px] text-red-600 uppercase font-semibold">Tài Chính</span>
-                    <h4 className="font-serif text-2xl font-bold mt-4 mb-3 group-hover:underline decoration-1 underline-offset-4 line-clamp-3">
-                      {article?.title}
-                    </h4>
-                    <p className="font-sans text-sm text-gray-600 line-clamp-3">
-                      {article?.excerpt}
-                    </p>
-                  </div>
+                <div className="border border-[#111111]/10 p-6 h-full hover:bg-white transition-colors shadow-none">
+                  <span className="font-mono text-[10px] text-red-600 uppercase font-semibold">Tài Chính</span>
+                  <h4 className="font-serif text-2xl font-bold mt-4 mb-3 group-hover:underline decoration-1 underline-offset-4 line-clamp-3">
+                    {article?.title}
+                  </h4>
+                  <p className="font-sans text-sm text-gray-600 line-clamp-3">
+                    {article?.excerpt}
+                  </p>
                 </div>
               </Link>
             ))
