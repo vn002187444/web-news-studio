@@ -2,7 +2,7 @@ import Parser from 'rss-parser';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
-import { pushArticleToSanity } from '../src/lib/sanity';
+import { pushArticleToSanity, getSanityClient } from '../src/lib/sanity';
 import dotenv from 'dotenv';
 
 // Load biến môi trường từ .env.local và .env
@@ -14,6 +14,25 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
 
 const parser = new Parser();
 const genAI = new GoogleGenerativeAI(API_KEY);
+
+// Kiểm tra tương đồng từ ngữ giữa 2 tiêu đề (chống bài trùng lặp tuyệt đối)
+function isSimilarTitle(t1: string, t2: string): boolean {
+  if (!t1 || !t2) return false;
+  const clean1 = t1.toLowerCase().trim();
+  const clean2 = t2.toLowerCase().trim();
+  if (clean1 === clean2) return true;
+
+  const w1 = new Set(clean1.replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter((w) => w.length > 2));
+  const w2 = new Set(clean2.replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter((w) => w.length > 2));
+  if (w1.size === 0 || w2.size === 0) return false;
+
+  let matches = 0;
+  w1.forEach((w) => {
+    if (w2.has(w)) matches++;
+  });
+  const similarity = matches / Math.min(w1.size, w2.size);
+  return similarity >= 0.50;
+}
 
 const RSS_FEEDS = [
   // Interleaved để MAX_ARTICLES_PER_RUN luôn phủ đủ 9 chuyên mục
@@ -160,7 +179,44 @@ async function runAutoblogger() {
     } catch {}
   }
 
-  // 3. Điều phối thông minh: Ưu tiên mục thiếu bài (< 3 bài) -> Khung giờ vàng
+  // 3. Thu thập dữ liệu các bài đã đăng để CHỐNG TRÙNG LẶP TUYỆT ĐỐI (từ Manifest + Sanity + MDX)
+  const publishedTitles: string[] = [];
+  const publishedSlugs = new Set<string>();
+
+  if (fs.existsSync(manifestPath)) {
+    try {
+      const posts = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      posts.forEach((p: any) => {
+        if (p.slug) publishedSlugs.add(p.slug);
+        if (p.meta?.slug) publishedSlugs.add(p.meta.slug);
+        if (p.meta?.title) publishedTitles.push(p.meta.title);
+      });
+    } catch {}
+  }
+
+  // Quét thêm Sanity CMS
+  try {
+    const sanity = getSanityClient(false);
+    if (sanity) {
+      const sanityArticles: any[] = await sanity.fetch(`*[_type == "article"] { "slug": slug.current, title }`);
+      sanityArticles.forEach((a) => {
+        if (a.slug) publishedSlugs.add(a.slug);
+        if (a.title) publishedTitles.push(a.title);
+      });
+    }
+  } catch {}
+
+  // Quét thêm thư mục local posts
+  if (fs.existsSync(POSTS_DIR)) {
+    try {
+      const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.mdx'));
+      files.forEach(f => publishedSlugs.add(f.replace(/\.mdx$/, '')));
+    } catch {}
+  }
+
+  console.log(`📚 Đã nạp ${publishedSlugs.size} slugs & ${publishedTitles.length} tiêu đề đã xuất bản để đối chiếu chống trùng.`);
+
+  // 4. Điều phối thông minh: Ưu tiên mục thiếu bài (< 3 bài) -> Khung giờ vàng
   const sortedFeeds = [...RSS_FEEDS].sort((a, b) => {
     const countA = catCount[a.category] || 0;
     const countB = catCount[b.category] || 0;
@@ -181,20 +237,31 @@ async function runAutoblogger() {
       try {
         const feedData = await parser.parseURL(feed.url);
 
-        // Duyệt 3 tin mới nhất, lấy tin đầu tiên chưa đăng (tránh mục trắng khi tin top đã có)
+        // Duyệt 5 tin mới nhất, lấy tin đầu tiên chưa đăng (kiểm tra chống trùng theo cả slug và nội dung tiêu đề)
         let latestItem: any = null;
-        for (const candidate of (feedData.items || []).slice(0, 3)) {
+        for (const candidate of (feedData.items || []).slice(0, 5)) {
           if (!candidate?.title) continue;
-          const candidateSlug = toSlug(candidate.title || '');
-          if (fs.existsSync(path.join(POSTS_DIR, `${candidateSlug}.mdx`))) {
-            console.log(`⏩ [Cache Check] Đã có bài tương tự, thử tin tiếp theo: ${candidate.title?.slice(0, 60)}`);
+          const candidateTitle = candidate.title.trim();
+          const candidateSlug = toSlug(candidateTitle);
+
+          // 1. Kiểm tra slug đã tồn tại
+          if (publishedSlugs.has(candidateSlug)) {
+            console.log(`⏩ [Chống trùng] Đã có slug tương tự: ${candidateSlug}`);
             continue;
           }
+
+          // 2. Kiểm tra tương đồng tiêu đề (>= 50% từ ngữ) với mọi bài đã xuất bản
+          const isDup = publishedTitles.some((t) => isSimilarTitle(t, candidateTitle));
+          if (isDup) {
+            console.log(`⏩ [Chống trùng] Đã có bài nội dung tương tự: "${candidateTitle.slice(0, 60)}"`);
+            continue;
+          }
+
           latestItem = candidate;
           break;
         }
         if (!latestItem) {
-          console.log(`⏩ [Cache Check] Cả 3 tin mới nhất của ${feed.category} đều đã tồn tại, bỏ qua feed.`);
+          console.log(`⏩ [Chống trùng] Tất cả tin mới nhất của ${feed.category} đều đã được xuất bản trước đó, bỏ qua feed.`);
           continue;
         }
 
@@ -239,6 +306,14 @@ async function runAutoblogger() {
           console.error('❌ AI trả thiếu trường bắt buộc (title/slug/content), bỏ qua bài.');
           continue;
         }
+
+        const finalSlug = toSlug(rewritten.slug || rewritten.title);
+        // Kiểm tra kép sau khi AI sinh: Liệu tiêu đề mới hoặc slug mới có bị trùng không?
+        if (publishedSlugs.has(finalSlug) || publishedTitles.some((t) => isSimilarTitle(t, rewritten.title))) {
+          console.log(`⏩ [AI Dup Check] Bài AI sinh ra trùng với nội dung đã có (${finalSlug}), bỏ qua.`);
+          continue;
+        }
+
         const aiTags = Array.isArray((rewritten as any).tags) && (rewritten as any).tags.length > 0
           ? (rewritten as any).tags.map(String).slice(0, 6)
           : ['AI', 'AutoBlogger', 'News'];
@@ -251,26 +326,32 @@ publishedAt: "${new Date().toISOString()}"
 thumbnail: "${extractedThumbnail}"
 tags: ${JSON.stringify(aiTags)}
 author: "AI Autobot"
-slug: "${toSlug(rewritten.slug || rewritten.title)}"
+slug: "${finalSlug}"
 ---
 
 ${rewritten.content}
 `;
 
-        const filePath = path.join(POSTS_DIR, `${rewritten.slug}.mdx`);
+        const filePath = path.join(POSTS_DIR, `${finalSlug}.mdx`);
         
         if (!fs.existsSync(filePath)) {
           fs.writeFileSync(filePath, mdxContent, 'utf8');
           console.log(`✅ Successfully published (MDX): ${filePath}`);
           articlesProcessed++;
         } else {
-          console.log(`⏩ Article already exists, skipping: ${rewritten.slug}`);
+          console.log(`⏩ Article already exists, skipping: ${finalSlug}`);
         }
+
+        // Đánh dấu vào bộ nhớ để các feed phía sau không bao giờ trùng bài này
+        publishedSlugs.add(finalSlug);
+        publishedSlugs.add(toSlug(latestItem.title));
+        publishedTitles.push(rewritten.title);
+        publishedTitles.push(latestItem.title);
 
         // Đẩy lên Sanity làm Source of Truth (nếu có SANITY_API_TOKEN + PROJECT_ID)
         try {
           const ok = await pushArticleToSanity({
-            slug: rewritten.slug,
+            slug: finalSlug,
             title: rewritten.title,
             excerpt: rewritten.excerpt,
             content: rewritten.content,
@@ -280,7 +361,7 @@ ${rewritten.content}
             author: 'AI Autobot',
             publishedAt: new Date().toISOString(),
           });
-          console.log(ok ? `☁️ Pushed to Sanity: ${rewritten.slug}` : `💾 Sanity chưa cấu hình — giữ MDX local: ${rewritten.slug}`);
+          console.log(ok ? `☁️ Pushed to Sanity: ${finalSlug}` : `💾 Sanity chưa cấu hình — giữ MDX local: ${finalSlug}`);
         } catch (e) {
           console.error('Sanity push error (giữ MDX):', e);
         }
