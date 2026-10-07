@@ -21,7 +21,7 @@ const RSS_FEEDS = [
   { url: 'https://vnexpress.net/rss/kinh-doanh.rss', category: 'finance' },
   { url: 'https://vnexpress.net/rss/the-thao.rss', category: 'sports' },
   { url: 'https://vnexpress.net/rss/doi-song.rss', category: 'lifestyle' },
-  { url: 'https://feeds.feedburner.com/ign/games-all', category: 'game' },
+  { url: 'https://www.eurogamer.net/feed/news', category: 'game' },
   { url: 'https://vnexpress.net/rss/giai-tri.rss', category: 'entertainment' },
   { url: 'https://vnexpress.net/rss/giao-duc.rss', category: 'education' },
   { url: 'https://vnexpress.net/rss/khoa-hoc.rss', category: 'science' },
@@ -92,12 +92,27 @@ async function rewriteArticle(title: string, content: string, category: string) 
       }
     `;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-    const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanJson);
+    let retries = 2;
+    while (retries >= 0) {
+      try {
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
+        const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(cleanJson);
+      } catch (err: any) {
+        if (retries > 0 && (err?.status === 503 || err?.status === 429)) {
+          console.warn(`⏳ Gemini API đang quá tải (${err.status}), đang thử lại sau 3 giây... (còn ${retries} lần)`);
+          await sleep(3000);
+          retries--;
+        } else {
+          console.error('Error generating content with Gemini:', err);
+          return null;
+        }
+      }
+    }
+    return null;
   } catch (error) {
-    console.error('Error generating content with Gemini:', error);
+    console.error('Error in rewriteArticle:', error);
     return null;
   }
 }
@@ -118,10 +133,45 @@ async function runAutoblogger() {
   console.log('🤖 AI Autoblogger Started... (Lock file created)');
 
   let articlesProcessed = 0;
-  const MAX_ARTICLES_PER_RUN = 9; // 1 bài × 9 chuyên mục: tech/finance/sports/lifestyle/game/entertainment/education/science/blockchain
+  const MAX_ARTICLES_PER_RUN = 9;
+
+  // 1. Phân tích Khung Giờ Vàng hiện tại (Giờ VN UTC+7)
+  const now = new Date();
+  const vnHour = (now.getUTCHours() + 7) % 24;
+  let preferredCategories: string[] = [];
+  if (vnHour >= 6 && vnHour < 10) {
+    preferredCategories = ['finance', 'tech', 'blockchain'];
+  } else if (vnHour >= 11 && vnHour < 15) {
+    preferredCategories = ['game', 'lifestyle', 'entertainment'];
+  } else {
+    preferredCategories = ['sports', 'blockchain', 'science', 'tech'];
+  }
+
+  // 2. Phân tích độ đói bài từ posts-manifest.json
+  const catCount: Record<string, number> = {};
+  const manifestPath = path.join(process.cwd(), 'src/data/posts-manifest.json');
+  if (fs.existsSync(manifestPath)) {
+    try {
+      const posts = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      posts.forEach((p: any) => {
+        const cat = p.meta?.category;
+        if (cat) catCount[cat] = (catCount[cat] || 0) + 1;
+      });
+    } catch {}
+  }
+
+  // 3. Điều phối thông minh: Ưu tiên mục thiếu bài (< 3 bài) -> Khung giờ vàng
+  const sortedFeeds = [...RSS_FEEDS].sort((a, b) => {
+    const countA = catCount[a.category] || 0;
+    const countB = catCount[b.category] || 0;
+    if (countA !== countB) return countA - countB;
+    const pA = preferredCategories.includes(a.category) ? 1 : 0;
+    const pB = preferredCategories.includes(b.category) ? 1 : 0;
+    return pB - pA;
+  });
 
   try {
-    for (const feed of RSS_FEEDS) {
+    for (const feed of sortedFeeds) {
       if (articlesProcessed >= MAX_ARTICLES_PER_RUN) {
         console.log(`🛑 Đạt giới hạn an toàn tối đa (${MAX_ARTICLES_PER_RUN} bài/lượt). Tạm dừng để nhường tài nguyên hệ thống.`);
         break;
@@ -253,4 +303,11 @@ ${rewritten.content}
   }
 }
 
-runAutoblogger();
+runAutoblogger()
+  .then(() => {
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error('❌ Autoblog fatal crash:', err);
+    process.exit(1);
+  });
