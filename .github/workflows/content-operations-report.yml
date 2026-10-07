@@ -1,0 +1,77 @@
+name: 📊 Daily Content Operations & Keyword Report
+
+on:
+  schedule:
+    # Chạy mỗi ngày lúc 07:00 sáng giờ Việt Nam (00:00 UTC)
+    - cron: '0 0 * * *'
+  # Cho phép bấm chạy thủ công trên GitHub UI
+  workflow_dispatch:
+    inputs:
+      create_issue:
+        description: 'Tạo GitHub Issue cho báo cáo này?'
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  report:
+    name: Generate Operations & Keyword Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # Cho phép commit file báo cáo vào repo
+      issues: write   # Cho phép tự động tạo GitHub Issue
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Operations & Keyword Report Generator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: production
+          SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
+        run: npm run report
+
+      - name: Commit and Push Report File
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "News Studio Bot"
+          git add reports/report-*.md
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "📊 Auto-report: $(date +'%Y-%m-%d') [skip ci]"
+            git push
+          else
+            echo "Báo cáo ngày hôm nay đã tồn tại."
+          fi
+
+      - name: Create GitHub Issue for Editorial Team
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.create_issue == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPORT_FILE="reports/report-$(date +'%Y-%m-%d').md"
+          if [ -f "$REPORT_FILE" ]; then
+            gh issue create \
+              --title "📊 [Báo Cáo Vận Hành] $(date +'%d/%m/%Y') - Kiểm Tra Bảo Trì & Đề Xuất Từ Khóa" \
+              --body-file "$REPORT_FILE" \
+              --label "report,analytics" || echo "Không thể tạo issue (vui lòng kiểm tra quyền Actions trong Settings > Actions > General > Workflow permissions)."
+          fi
