@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-// Mirror của studio-new-studio/schemaTypes/articleType.ts
+// Schema canonical duy nhất (Studio embedded tại /studio)
 // Giữ khớp 100% với GROQ trong src/lib/sanity.ts
 export const articleType = defineType({
   name: 'article',
