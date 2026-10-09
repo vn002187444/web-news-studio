@@ -67,6 +67,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
 
   // Gợi ý "Dành cho bạn" chỉ cần 12 bài gọn nhẹ (slug + meta tối thiểu).
   // KHÔNG truyền allPosts full (kèm content/body ~170 bài) → HTML/RSC phình ~440KB, chuyển trang chậm.
+  // Note: Cast as any here to pass into UnifiedPost[] prop, as we only need partial data
   const relatedPosts = allPosts
     .filter((p) => p.slug !== slug)
     .sort(
@@ -77,7 +78,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     .map((p) => ({
       slug: p.slug,
       meta: { title: p.meta.title, category: p.meta.category, thumbnail: p.meta.thumbnail },
-    }));
+    })) as any;
 
   const pageUrl = `${SITE_URL}/${locale}/${category}/${slug}`;
   // Ảnh hero nén tại nguồn (Sanity/Unsplash transform) — w=1600 cho màn retina
