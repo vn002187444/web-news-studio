@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
       if (expectedBuffer.byteLength === inputBuffer.byteLength) {
         let result = 0;
-        for (let i = 0; i < expectedBuffer.byteLength; i++) {
+        for (let i = 0; i < expectedBuffer.length; i++) {
           result |= expectedBuffer[i] ^ inputBuffer[i];
         }
         if (result === 0) {
