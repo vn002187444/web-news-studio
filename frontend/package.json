@@ -10,6 +10,7 @@
     "deploy": "npx wrangler deploy",
     "start": "next start",
     "lint": "eslint",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "autoblog": "tsx scripts/autoblog.ts",
     "sync-posts": "tsx scripts/sync-posts.ts",
     "seed-taxonomy": "tsx scripts/seed-taxonomy.ts",
@@ -46,13 +47,17 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.186.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
+    "jest": "^30.5.2",
     "tailwindcss": "^4",
+    "ts-jest": "^29.4.14",
     "tsx": "^4.23.15",
     "typescript": "^5"
   }
