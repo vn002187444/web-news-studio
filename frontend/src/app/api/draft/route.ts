@@ -1,6 +1,15 @@
 import { draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { timingSafeEqual } from 'node:crypto';
+
+// Hàm so sánh an toàn để chống timing attack
+function secureCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
 
 // Bật chế độ nháp cho admin: /api/draft?secret=...&redirect=/vi/tech/slug
 export async function GET(request: Request) {
@@ -8,10 +17,7 @@ export async function GET(request: Request) {
   const secret = url.searchParams.get('secret') || '';
   const expected = process.env.SANITY_PREVIEW_SECRET || process.env.CRON_SECRET || '';
 
-  const secretBuffer = Buffer.from(secret);
-  const expectedBuffer = Buffer.from(expected);
-
-  if (!expected || expectedBuffer.length !== secretBuffer.length || !timingSafeEqual(secretBuffer, expectedBuffer)) {
+  if (!expected || !secureCompare(secret, expected)) {
     return new Response('Sai secret.', { status: 401 });
   }
   (await draftMode()).enable();
