@@ -111,7 +111,8 @@ async function rewriteArticle(title: string, content: string, category: string) 
       }
     `;
 
-    let retries = 2;
+    let retries = 5;
+    let delay = 3000;
     while (retries >= 0) {
       try {
         const result = await model.generateContent(prompt);
@@ -120,20 +121,40 @@ async function rewriteArticle(title: string, content: string, category: string) 
         return JSON.parse(cleanJson);
       } catch (err: any) {
         if (retries > 0 && (err?.status === 503 || err?.status === 429)) {
-          console.warn(`⏳ Gemini API đang quá tải (${err.status}), đang thử lại sau 3 giây... (còn ${retries} lần)`);
-          await sleep(3000);
+          console.warn(`⏳ Gemini API đang quá tải (${err.status}), đang thử lại sau ${delay/1000} giây... (còn ${retries} lần)`);
+          await sleep(delay);
+          delay *= 2;
           retries--;
         } else {
           console.error('Error generating content with Gemini:', err);
-          return null;
+          break; // Thoát vòng lặp để xử lý fallback
         }
       }
     }
-    return null;
+
+    // Fallback logic when API repeatedly fails
+    console.warn(`⚠️ Gemini API thất bại liên tục, sử dụng nội dung fallback cho bài viết: ${title}`);
+
+    return createFallbackArticle(title, content);
   } catch (error) {
     console.error('Error in rewriteArticle:', error);
-    return null;
+    return createFallbackArticle(title, content);
   }
+}
+
+function createFallbackArticle(title: string, content: string) {
+  const fallbackSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  const fallbackExcerpt = typeof content === 'string' ? content.replace(/<[^>]+>/g, '').substring(0, 150) + '...' : 'Nội dung đang được cập nhật...';
+
+  return {
+    title: `[Auto-Generated] ${title}`,
+    slug: fallbackSlug,
+    excerpt: fallbackExcerpt,
+    tags: ['Auto-Generated', 'News'],
+    takeaways: ['Nội dung gốc chưa qua xử lý AI.'],
+    faq: [],
+    content: `> **Cảnh báo:** Bài viết này được tạo tự động mà không qua quá trình xử lý của AI do hệ thống API đang quá tải.\n\n${content}`
+  };
 }
 
 // Hàm Sleep để tránh Rate Limit API & Quá tải CPU
@@ -152,7 +173,7 @@ async function runAutoblogger() {
   console.log('🤖 AI Autoblogger Started... (Lock file created)');
 
   let articlesProcessed = 0;
-  const MAX_ARTICLES_PER_RUN = 9;
+  const MAX_ARTICLES_PER_RUN = 20;
 
   // 1. Phân tích Khung Giờ Vàng hiện tại (Giờ VN UTC+7)
   const now = new Date();
