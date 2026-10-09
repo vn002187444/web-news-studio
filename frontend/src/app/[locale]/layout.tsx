@@ -31,8 +31,6 @@ import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { SITE_URL, SITE_NAME } from '@/lib/site';
-import { draftMode } from 'next/headers';
-import { VisualEditing } from 'next-sanity/visual-editing';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -83,7 +81,6 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
-  const isDraft = (await draftMode()).isEnabled;
 
   return (
     <html
@@ -102,17 +99,6 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
             <Footer />
             <MobileBottomNav />
           </SmoothScrollProvider>
-          {isDraft && (
-            <>
-              <a
-                href="/api/disable-draft"
-                className="fixed bottom-20 right-4 z-[100] bg-red-600 text-white font-mono text-xs uppercase px-4 py-2 rounded-full shadow-lg"
-              >
-                ✎ Draft — Thoát
-              </a>
-              <VisualEditing />
-            </>
-          )}
         </NextIntlClientProvider>
       </body>
     </html>
