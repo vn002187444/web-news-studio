@@ -10,11 +10,5 @@ export async function GET(request: Request) {
     return new Response('Sai secret.', { status: 401 });
   }
   (await draftMode()).enable();
-
-  let redirectTo = url.searchParams.get('redirect');
-  if (!redirectTo || !redirectTo.startsWith('/') || redirectTo.startsWith('//')) {
-    redirectTo = '/vi';
-  }
-
-  redirect(redirectTo);
+  redirect(url.searchParams.get('redirect') || '/vi');
 }
