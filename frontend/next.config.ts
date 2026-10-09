@@ -5,6 +5,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   images: {
+    // Custom loader (src/lib/imgLoader.ts): ảnh remote tải trực tiếp từ CDN gốc,
+    // không qua `/_next/image` (tránh Cloudflare Images trả phí + TTFB ~2.4s ở LCP).
+    loader: 'custom',
+    loaderFile: './src/lib/imgLoader.ts',
     // Workers via OpenNext hỗ trợ tối ưu ảnh; giữ remotePatterns
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
