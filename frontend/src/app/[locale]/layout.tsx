@@ -4,6 +4,7 @@ import Footer from "@/components/ui/Footer";
 import CustomCursor from "@/components/ui/CustomCursor";
 import CommandPalette from "@/components/ui/CommandPalette";
 import MobileBottomNav from "@/components/ui/MobileBottomNav";
+import { SearchProvider } from "@/components/ui/SearchProvider";
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, Space_Mono } from "next/font/google";
 import "../globals.css";
@@ -96,13 +97,15 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
         <NextIntlClientProvider messages={messages}>
           <CustomCursor />
           <SmoothScrollProvider>
-            <Header />
-            <CommandPalette />
-            <main className="flex-grow mb-16 md:mb-0">
-              {children}
-            </main>
-            <Footer />
-            <MobileBottomNav />
+            <SearchProvider>
+              <Header />
+              <CommandPalette />
+              <main className="flex-grow mb-16 md:mb-0">
+                {children}
+              </main>
+              <Footer />
+              <MobileBottomNav />
+            </SearchProvider>
           </SmoothScrollProvider>
         </NextIntlClientProvider>
       </body>
