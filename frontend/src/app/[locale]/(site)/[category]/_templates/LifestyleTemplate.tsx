@@ -56,6 +56,7 @@ export default function LifestyleTemplate({ articles }: { articles: any[] }) {
                         src={item.thumbnail.url}
                         alt={item.title || 'Lifestyle Article'}
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover animate-kenburns-slow"
                       />
                     )}
