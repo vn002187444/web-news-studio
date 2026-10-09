@@ -1,12 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import { Link } from '@/i18n/routing';
 import Decimal from 'decimal.js';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import { Suspense, useRef } from 'react';
+
+// Quả cầu 3D chỉ tải khi browser (không SSR) → three.js không vào bundle trang.
+const BlockchainSphere = dynamic(() => import('./BlockchainSphere'), {
+  ssr: false,
+  loading: () => <div className="hidden md:block w-[300px] h-[300px] rounded-full border border-green-500/20 animate-pulse" />,
+});
 
 // Particle Burst Logic for CTA buttons
 function ParticleBurst({ x, y, onComplete }: { x: number; y: number; onComplete: () => void }) {
@@ -44,22 +48,7 @@ function ParticleBurst({ x, y, onComplete }: { x: number; y: number; onComplete:
   );
 }
 
-// 3D Wireframe Sphere Component
-function WireframeSphere() {
-  const meshRef = useRef<any>(null);
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.2;
-      meshRef.current.rotation.x += delta * 0.1;
-    }
-  });
-  return (
-    <mesh ref={meshRef}>
-      <sphereGeometry args={[2.5, 16, 16]} />
-      <meshBasicMaterial color="#4ade80" wireframe transparent opacity={0.3} />
-    </mesh>
-  );
-}
+// 3D Wireframe Sphere Component — xem ./BlockchainSphere (dynamic, ssr:false)
 
 // Sparkline mini — vẽ đường giá lịch sử trong widget
 function Sparkline({ data, up }: { data: number[]; up: boolean }) {
@@ -213,17 +202,8 @@ export default function BlockchainTemplate({ articles }: { articles: any[] }) {
           <h1 className="text-6xl md:text-9xl font-sans font-black tracking-tighter uppercase mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-700">
             WEB3 <br /> FRONTIER
           </h1>
-          {/* Quả cầu wireframe Three.js xoay + Bloom (lazy dynamic ssr:false via canvas) */}
-          <div aria-hidden="true" className="hidden md:block relative w-[300px] h-[300px] shrink-0">
-            <Suspense fallback={<div className="w-full h-full rounded-full border border-green-500/20 animate-pulse" />}>
-              <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 1.5]} performance={{ min: 0.5 }}>
-                <WireframeSphere />
-                <EffectComposer>
-                  <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.9} intensity={1.5} />
-                </EffectComposer>
-              </Canvas>
-            </Suspense>
-          </div>
+          {/* Quả cầu wireframe Three.js xoay + Bloom (dynamic ssr:false) */}
+          <BlockchainSphere />
         </div>
 
         <div onClick={handleCTAClick} className="inline-block cursor-pointer">

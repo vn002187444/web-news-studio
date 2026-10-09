@@ -23,12 +23,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function Home() {
   const posts = await getAllPostsUnified();
   
-  // Map MDX meta to the format expected by UI components
+  // Map MDX meta to the format expected by UI components.
+  // Excerpt cắt 140 ký tự (card CSS line-clamp nên không đổi giao diện) → giảm ~60KB HTML.
   const articles = posts.map(post => ({
     id: post.slug,
     slug: post.slug,
     title: post.meta.title,
-    excerpt: post.meta.excerpt,
+    excerpt: (post.meta.excerpt || '').slice(0, 140),
     category: post.meta.category,
     thumbnail: { url: post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80', alt: post.meta.title },
     publishedAt: post.meta.publishedAt

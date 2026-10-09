@@ -59,13 +59,14 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
     notFound();
   }
 
-  // Fetch real articles — Sanity-first, MDX fallback
+  // Fetch real articles — Sanity-first, MDX fallback.
+  // Excerpt cắt 140 ký tự (card line-clamp, không đổi giao diện) → nhẹ HTML/RSC payload.
   const rawPosts = await getPostsByCategoryUnified(category);
   const articles = rawPosts.map(post => ({
     id: post.slug,
     slug: post.slug,
     title: post.meta.title,
-    excerpt: post.meta.excerpt,
+    excerpt: (post.meta.excerpt || '').slice(0, 140),
     category: post.meta.category,
     thumbnail: { url: post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80', alt: post.meta.title },
     tags: post.meta.tags || [],
