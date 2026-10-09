@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { createChart, IChartApi, ISeriesApi, CandlestickSeries } from 'lightweight-charts';
+import { createChart, IChartApi, ISeriesApi, CandlestickSeries, Time } from 'lightweight-charts';
 import Decimal from 'decimal.js';
 import { CHART_POLL_MS } from './chartMeta';
 
@@ -10,16 +10,16 @@ import { CHART_POLL_MS } from './chartMeta';
 const POLL_MS = CHART_POLL_MS;
 
 interface Candle {
-  time: number;
+  time: Time;
   open: number;
   high: number;
   low: number;
   close: number;
 }
 
-function toCandle(k: any[]): Candle {
+function toCandle(k: [number, string, string, string, string, ...unknown[]]): Candle {
   return {
-    time: Math.floor(k[0] / 1000),
+    time: Math.floor(k[0] / 1000) as Time,
     open: new Decimal(k[1]).toNumber(),
     high: new Decimal(k[2]).toNumber(),
     low: new Decimal(k[3]).toNumber(),
@@ -88,7 +88,7 @@ export default function TradingChart({ symbol = 'BTCUSDT', interval = '1m' }: { 
         const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`);
         const rows = await r.json();
         if (!alive() || !Array.isArray(rows)) return;
-        seriesRef.current!.setData(rows.map(toCandle) as any);
+        seriesRef.current!.setData(rows.map(toCandle));
       } catch {
         // Giữ dữ liệu cũ khi Binance chặn (không vẽ mock để tránh nhiễu giá)
       }
@@ -100,7 +100,7 @@ export default function TradingChart({ symbol = 'BTCUSDT', interval = '1m' }: { 
         const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=2`);
         const rows = await r.json();
         if (!alive() || !Array.isArray(rows) || rows.length === 0) return;
-        seriesRef.current!.update(toCandle(rows[rows.length - 1]) as any);
+        seriesRef.current!.update(toCandle(rows[rows.length - 1]));
       } catch { /* bỏ qua tick lỗi */ }
     };
 
