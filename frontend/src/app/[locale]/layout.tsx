@@ -87,6 +87,11 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
       lang={locale}
       className={`${inter.variable} ${playfair.variable} ${spaceMono.variable} font-sans h-full antialiased selection:bg-black selection:text-white`}
     >
+      <head>
+        {/* Rút ngắn handshake tới host ảnh chính → cải thiện LCP (ảnh hero đã priority) */}
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="anonymous" />
+      </head>
       <body className="min-h-full flex flex-col bg-[#F4F4F0] text-[#111111]">
         <NextIntlClientProvider messages={messages}>
           <CustomCursor />
