@@ -93,17 +93,44 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
               </div>
               
               {/* AI Text to Speech Button */}
-              <button 
+              <button
                 onClick={() => {
-                  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-                    const text = document.getElementById('article-content')?.innerText || meta.excerpt;
+                  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+                    alert('Trình duyệt của bạn không hỗ trợ tính năng đọc AI.');
+                    return;
+                  }
+                  const synth = window.speechSynthesis;
+                  const text = document.getElementById('article-content')?.innerText || meta.excerpt;
+
+                  // Chọn giọng tiếng Việt theo thiết bị (Chrome/Android/iOS load voices bất đồng bộ)
+                  const pickViVoice = (): SpeechSynthesisVoice | null => {
+                    const voices = synth.getVoices();
+                    if (!voices.length) return null;
+                    return (
+                      voices.find((v) => v.lang?.toLowerCase().startsWith('vi')) ||
+                      voices.find((v) => /vietnami?/i.test(v.name)) ||
+                      null
+                    );
+                  };
+                  const speak = () => {
+                    synth.cancel(); // Stop current playing
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = 'vi-VN';
                     utterance.rate = 1.1; // Hơi nhanh một chút cho giống MC
-                    window.speechSynthesis.cancel(); // Stop current playing
-                    window.speechSynthesis.speak(utterance);
+                    const viVoice = pickViVoice();
+                    if (viVoice) utterance.voice = viVoice;
+                    synth.speak(utterance);
+                  };
+
+                  if (synth.getVoices().length === 0) {
+                    // Đợi voices load xong (tối đa ~1.5s) rồi đọc, tránh rơi vào giọng Anh mặc định
+                    let done = false;
+                    const finish = () => { if (!done) { done = true; speak(); } };
+                    synth.onvoiceschanged = finish;
+                    setTimeout(finish, 1500);
+                    synth.getVoices();
                   } else {
-                    alert('Trình duyệt của bạn không hỗ trợ tính năng đọc AI.');
+                    speak();
                   }
                 }}
                 className="flex items-center gap-2 bg-[#111111] text-white px-4 py-2 rounded-full font-mono text-xs uppercase hover:bg-red-600 transition-colors"

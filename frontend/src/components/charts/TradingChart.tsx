@@ -3,16 +3,40 @@
 import { useEffect, useRef } from 'react';
 import { createChart, IChartApi, ISeriesApi, CandlestickSeries } from 'lightweight-charts';
 import Decimal from 'decimal.js';
+import { CHART_POLL_MS } from './chartMeta';
 
-export default function TradingChart() {
+// Poll REST mỗi 12s thay vì SSE/WS liên tục → tiết kiệm CPU Workers Free.
+// Chỉ gọi khi tab đang mở (document.visibilityState === 'visible').
+const POLL_MS = CHART_POLL_MS;
+
+interface Candle {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
+
+function toCandle(k: any[]): Candle {
+  return {
+    time: Math.floor(k[0] / 1000),
+    open: new Decimal(k[1]).toNumber(),
+    high: new Decimal(k[2]).toNumber(),
+    low: new Decimal(k[3]).toNumber(),
+    close: new Decimal(k[4]).toNumber(),
+  };
+}
+
+export default function TradingChart({ symbol = 'BTCUSDT', interval = '1m' }: { symbol?: string; interval?: string }) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const reqRef = useRef(0);
 
+  // Tạo chart 1 lần duy nhất
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    // Create chart — đúng spec GĐ6: attribution + Canvas 2D
     const chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
       height: chartContainerRef.current.clientHeight || 400,
@@ -32,121 +56,14 @@ export default function TradingChart() {
     });
 
     chartRef.current = chart;
-
-    const candlestickSeries = chart.addSeries(CandlestickSeries, {
+    seriesRef.current = chart.addSeries(CandlestickSeries, {
       upColor: '#26a69a',
       downColor: '#ef5350',
       borderVisible: false,
       wickUpColor: '#26a69a',
       wickDownColor: '#ef5350',
     });
-    seriesRef.current = candlestickSeries;
 
-    // Nến lịch sử: Binance REST, fallback mock khi bị chặn
-    let lastClose = new Decimal(65000);
-    fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=100')
-      .then((r) => r.json())
-      .then((rows: any[]) => {
-        if (!Array.isArray(rows) || !seriesRef.current) return;
-        const data = rows.map((k) => ({
-          time: Math.floor(k[0] / 1000) as any,
-          open: new Decimal(k[1]).toNumber(),
-          high: new Decimal(k[2]).toNumber(),
-          low: new Decimal(k[3]).toNumber(),
-          close: new Decimal(k[4]).toNumber(),
-        }));
-        seriesRef.current.setData(data);
-        lastClose = new Decimal(rows[rows.length - 1][4]);
-      })
-      .catch(() => {
-        // Fallback mock — dùng Decimal.js tránh sai số float (spec GĐ6)
-        const initialData = [];
-        let currentTime = Math.floor(Date.now() / 1000) - 100 * 60;
-        for (let i = 0; i < 100; i++) {
-          const open = lastClose;
-          const high = open.plus(new Decimal(Math.random() * 200));
-          const low = open.minus(new Decimal(Math.random() * 200));
-          const close = open.plus(high).plus(low).dividedBy(3).plus(new Decimal((Math.random() - 0.5) * 100));
-          initialData.push({ time: currentTime as any, open: open.toNumber(), high: high.toNumber(), low: low.toNumber(), close: close.toNumber() });
-          lastClose = close;
-          currentTime += 60;
-        }
-        seriesRef.current?.setData(initialData);
-      });
-
-    // Realtime: Binance WS, fallback SSE mock nếu WS chết 3 lần liên tiếp
-    let ws: WebSocket | null = null;
-    let sse: EventSource | null = null;
-    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-    let lastTickAt = Date.now();
-    let closed = false;
-    let wsFails = 0;
-
-    const connectSSEFallback = () => {
-      if (closed || sse) return;
-      sse = new EventSource('/api/finance/stream');
-      sse.onmessage = (event) => {
-        if (!seriesRef.current) return;
-        try {
-          const d = JSON.parse(event.data);
-          const tick = { time: d.time, open: new Decimal(d.open).toNumber(), high: new Decimal(d.high).toNumber(), low: new Decimal(d.low).toNumber(), close: new Decimal(d.close).toNumber() };
-          seriesRef.current.update(tick);
-          lastClose = new Decimal(d.close);
-          lastTickAt = Date.now();
-        } catch { /* ignore */ }
-      };
-    };
-
-    const connectWS = () => {
-      if (closed) return;
-      ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
-
-      ws.onmessage = (event) => {
-        if (!seriesRef.current) return;
-        try {
-          const data = JSON.parse(event.data);
-          if (data.e === 'kline') {
-            const { t, o, h, l, c } = data.k;
-            const tick = {
-              time: Math.floor(t / 1000) as any,
-              open: new Decimal(o).toNumber(),
-              high: new Decimal(h).toNumber(),
-              low: new Decimal(l).toNumber(),
-              close: new Decimal(c).toNumber(),
-            };
-            seriesRef.current.update(tick);
-            lastClose = new Decimal(c);
-            lastTickAt = Date.now();
-          }
-        } catch (err) {
-          console.error("Lỗi parse WS data", err);
-        }
-      };
-
-      ws.onclose = () => {
-        if (closed) return;
-        wsFails += 1;
-        if (wsFails >= 3) { connectSSEFallback(); return; }
-        reconnectTimer = setTimeout(connectWS, 3000);
-      };
-
-      ws.onerror = () => {
-        ws?.close();
-      };
-    };
-
-    connectWS();
-
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible' && Date.now() - lastTickAt > 5000) {
-        ws?.close();
-        if (reconnectTimer) clearTimeout(reconnectTimer);
-        connectWS();
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibility);
-
-    // ResizeObserver — đúng spec GĐ6 (thay window.resize width-only)
     const resizeObserver = new ResizeObserver((entries) => {
       const { width, height } = entries[0].contentRect;
       chart.applyOptions({ width: Math.floor(width), height: Math.floor(height) });
@@ -154,15 +71,54 @@ export default function TradingChart() {
     resizeObserver.observe(chartContainerRef.current);
 
     return () => {
-      closed = true;
-      if (reconnectTimer) clearTimeout(reconnectTimer);
-      ws?.close();
-      sse?.close();
-      document.removeEventListener('visibilitychange', onVisibility);
       resizeObserver.disconnect();
       chart.remove();
+      chartRef.current = null;
+      seriesRef.current = null;
     };
   }, []);
+
+  // Nạp nến + poll khi đổi mã / khung giờ
+  useEffect(() => {
+    const myReq = ++reqRef.current;
+    const alive = () => myReq === reqRef.current && seriesRef.current;
+
+    const loadHistory = async () => {
+      try {
+        const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`);
+        const rows = await r.json();
+        if (!alive() || !Array.isArray(rows)) return;
+        seriesRef.current!.setData(rows.map(toCandle) as any);
+      } catch {
+        // Giữ dữ liệu cũ khi Binance chặn (không vẽ mock để tránh nhiễu giá)
+      }
+    };
+
+    const pollLatest = async () => {
+      if (document.visibilityState !== 'visible') return; // Tab ẩn → bỏ qua, tiết kiệm request
+      try {
+        const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=2`);
+        const rows = await r.json();
+        if (!alive() || !Array.isArray(rows) || rows.length === 0) return;
+        seriesRef.current!.update(toCandle(rows[rows.length - 1]) as any);
+      } catch { /* bỏ qua tick lỗi */ }
+    };
+
+    loadHistory();
+    const timer = setInterval(pollLatest, POLL_MS);
+
+    // Tab mở lại → cập nhật ngay thay vì chờ hết chu kỳ poll
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') pollLatest();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      reqRef.current++; // Hủy các fetch đang bay của symbol/interval cũ
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [symbol, interval]);
 
   return (
     <div ref={chartContainerRef} className="w-full h-[400px] lg:h-[600px]" />

@@ -7,9 +7,13 @@ import { useState } from 'react';
 
 // Dynamically import the chart to avoid SSR issues with canvas
 const TradingChart = dynamic(() => import('@/components/charts/TradingChart'), { ssr: false, loading: () => <div className="w-full h-[400px] lg:h-[600px] bg-[#111111] animate-pulse" /> });
+import { CHART_SYMBOLS, CHART_INTERVALS } from '@/components/charts/chartMeta';
 
 export default function FinanceTemplate({ articles }: { articles: any[] }) {
   const financeArticles = articles && articles.length > 0 ? articles : [];
+  const [chartSymbol, setChartSymbol] = useState<string>('BTCUSDT');
+  const [chartInterval, setChartInterval] = useState<string>('1m');
+  const chartLabel = CHART_SYMBOLS.find((s) => s.id === chartSymbol)?.label ?? chartSymbol;
   
   // Fake ticker data for Watchlist
   const [tickers, setTickers] = useState([
@@ -93,18 +97,34 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
 
         {/* Chart Section */}
         <div className="mb-16 bg-[#111111] p-6 border border-[#111111] shadow-none">
-          <div className="flex justify-between items-center mb-6 text-white font-mono tabular-nums">
+          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6 text-white font-mono tabular-nums">
             <div>
-              <h2 className="text-2xl font-bold">BTC/USD <span className="text-sm font-normal text-gray-400">REALTIME STREAM</span></h2>
+              <h2 className="text-2xl font-bold">{chartLabel} <span className="text-sm font-normal text-gray-400">POLL 12S</span></h2>
             </div>
-            <div className="flex gap-2 text-xs">
-              <button className="px-3 py-1 bg-white/10 hover:bg-white/20">15M</button>
-              <button className="px-3 py-1 bg-white/20 hover:bg-white/30">1H</button>
-              <button className="px-3 py-1 bg-white/10 hover:bg-white/20">4H</button>
+            <div className="flex flex-wrap gap-2 text-xs items-center">
+              {CHART_SYMBOLS.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setChartSymbol(s.id)}
+                  className={`px-3 py-1 ${chartSymbol === s.id ? 'bg-red-600 text-white' : 'bg-white/10 hover:bg-white/20'}`}
+                >
+                  {s.label.split('/')[0]}
+                </button>
+              ))}
+              <span className="w-px h-4 bg-white/20 mx-1" />
+              {CHART_INTERVALS.map((iv) => (
+                <button
+                  key={iv.id}
+                  onClick={() => setChartInterval(iv.id)}
+                  className={`px-3 py-1 ${chartInterval === iv.id ? 'bg-white text-black' : 'bg-white/10 hover:bg-white/20'}`}
+                >
+                  {iv.label}
+                </button>
+              ))}
             </div>
           </div>
-          
-          <TradingChart />
+
+          <TradingChart symbol={chartSymbol} interval={chartInterval} />
         </div>
 
         {/* News Grid */}
