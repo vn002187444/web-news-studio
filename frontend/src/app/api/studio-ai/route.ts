@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server';
 import { draftMode } from 'next/headers';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { markdownToBlocks } from '@/lib/sanity';
+import { toSlug } from '@/lib/site';
+import {
+  aiCacheKey,
+  cachedAiJson,
+  withTimeout,
+  GEMINI_TIMEOUT_MS,
+  GEMINI_RACE_MS,
+  GEMINI_CACHE_TTL_S,
+} from '@/lib/gemini';
 
 // Dùng bởi Studio tool "AI Viết bài": POST {input, category} → bài nháp đầy đủ cấu trúc.
 // Bảo vệ quota Gemini: yêu cầu bật Draft Mode trước (/api/draft?secret=...).
@@ -23,10 +32,14 @@ export async function POST(request: Request) {
   if (!input.trim()) return NextResponse.json({ ok: false, reason: 'Thiếu input (link tin hoặc ý chính)' }, { status: 400 });
 
   try {
-    const model = new GoogleGenerativeAI(apiKey).getGenerativeModel({
-      model: process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite',
-    });
-    const r = await model.generateContent(`
+    const geminiModel = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+    const cacheKey = aiCacheKey([geminiModel, category, input]);
+
+    const buildArticle = async () => {
+      const model = new GoogleGenerativeAI(apiKey).getGenerativeModel({ model: geminiModel });
+      const r = await withTimeout(
+        model.generateContent(
+          `
 You are an elite Vietnamese Tech Journalist + SEO/GEO/AEO expert.
 Dựa vào gợi ý/link sau, viết 1 bài báo TIẾNG VIỆT hoàn chỉnh, unique, không bịa fact cốt lõi.
 
@@ -44,26 +57,52 @@ YÊU CẦU CẤU TRÚC (bắt buộc đủ):
 Độ dài content 800-1500 từ.
 
 Chỉ trả JSON thuần (không markdown fence) theo schema:
-{"title":"...","slug":"...","excerpt":"...","tags":[...],"takeaways":[...],"faq":[{"q":"...","a":"..."}],"content":"..."}`);
-    const parsed = JSON.parse(r.response.text().replace(/```json|```/g, '').trim());
-    if (!parsed.title || !parsed.content || !parsed.slug) {
-      return NextResponse.json({ ok: false, reason: 'AI trả thiếu trường bắt buộc' }, { status: 502 });
-    }
-    const body = markdownToBlocks(String(parsed.content));
-    return NextResponse.json({
-      ok: true,
-      article: {
+{"title":"...","slug":"...","excerpt":"...","tags":[...],"takeaways":[...],"faq":[{"q":"...","a":"..."}],"content":"..."}`,
+          { timeout: GEMINI_TIMEOUT_MS }
+        ),
+        GEMINI_RACE_MS,
+        'Gemini generateContent'
+      );
+      const parsed = JSON.parse(r.response.text().replace(/```json|```/g, '').trim());
+      if (!parsed.title || !parsed.content || !parsed.slug) {
+        throw new Error('AI trả thiếu trường bắt buộc');
+      }
+      return {
         title: String(parsed.title).slice(0, 200),
         slug: String(parsed.slug).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '').slice(0, 80),
         excerpt: String(parsed.excerpt || '').slice(0, 500),
         content: String(parsed.content).slice(0, 20000),
-        body,
         tags: Array.isArray(parsed.tags) ? parsed.tags.map(String).slice(0, 6) : [],
         takeaways: Array.isArray(parsed.takeaways) ? parsed.takeaways.map(String).slice(0, 6) : [],
         faq: Array.isArray(parsed.faq) ? parsed.faq.slice(0, 5) : [],
-      },
+      };
+    };
+
+    const { data: draft, cached } = await cachedAiJson(cacheKey, GEMINI_CACHE_TTL_S, buildArticle);
+    return NextResponse.json({
+      ok: true,
+      cached,
+      article: { ...draft, body: markdownToBlocks(String(draft.content)) },
     });
   } catch (e) {
-    return NextResponse.json({ ok: false, reason: `Gemini lỗi: ${String(e).slice(0, 200)}` }, { status: 502 });
+    // Graceful degradation: trả bản nháp tạm để Studio vẫn mở editor được, user bấm thử lại sau.
+    const title = input.split('\n')[0].slice(0, 120) || 'Bản nháp từ Studio';
+    return NextResponse.json(
+      {
+        ok: false,
+        reason: `Gemini lỗi: ${String(e).slice(0, 200)}`,
+        retryable: true,
+        fallback: {
+          title,
+          slug: toSlug(title) || `nhap-${Date.now().toString(36)}`,
+          excerpt: input.slice(0, 200),
+          content: `# ${title}\n\n${input.slice(0, 2000)}\n\n> _Bản nháp tạm do AI bận/timeout — bấm thử lại để AI viết đầy đủ._`,
+          tags: [category],
+          takeaways: [],
+          faq: [],
+        },
+      },
+      { status: 502 }
+    );
   }
 }

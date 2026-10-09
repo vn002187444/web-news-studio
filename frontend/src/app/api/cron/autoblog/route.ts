@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { toSlug } from '@/lib/site';
 import { markdownToBlocks } from '@/lib/sanity';
+import { withTimeout, GEMINI_TIMEOUT_MS, GEMINI_RACE_MS } from '@/lib/gemini';
 
 // Worker Điều Phối Nội Dung Tự Động Tăng Traffic (Serverless Edge & Cloudflare Worker)
 // 1. Tự động cân bằng chuyên mục thiếu bài (Starvation Balancer)
@@ -165,7 +166,11 @@ Chỉ trả về JSON thuần hợp lệ (không bọc trong markdown):
   "tags": ["String"],
   "content": "String (Markdown format)"
 }`;
-          const r = await model.generateContent(prompt);
+          const r = await withTimeout(
+            model.generateContent(prompt, { timeout: GEMINI_TIMEOUT_MS }),
+            GEMINI_RACE_MS,
+            'Gemini autoblog'
+          );
           const parsed = JSON.parse(r.response.text().replace(/```json|```/g, '').trim());
           const v = validRewrite(parsed);
           if (v) {

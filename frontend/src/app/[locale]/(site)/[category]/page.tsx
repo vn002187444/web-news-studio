@@ -42,6 +42,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
+// ISR 1h: giảm SSR lặp lại trên Workers Free (CPU 10ms/invocation).
+export const revalidate = 3600;
+
 // Prerender tĩnh mọi combo locale×category cho Cloudflare Pages
 export function generateStaticParams() {
   return ['vi', 'en'].flatMap((locale) => CATEGORIES.map((category) => ({ locale, category })));

@@ -6,6 +6,10 @@ import CategorySections from "@/components/ui/CategorySections";
 import { getAllPostsUnified } from "@/lib/posts";
 import type { Metadata } from 'next';
 
+// ISR 1h: bài mới từ autoblog hiện trong ≤1h mà không cần rebuild;
+// các hit còn lại phục vụ từ cache, giảm CPU/SSR trên Workers Free.
+export const revalidate = 3600;
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   return {

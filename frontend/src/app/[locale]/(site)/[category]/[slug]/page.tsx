@@ -40,6 +40,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
+// ISR 1h: bài render 1 lần rồi phục vụ từ cache — giảm CPU/SSR trên Workers Free.
+export const revalidate = 3600;
+
 // Prerender tĩnh mọi bài viết — Sanity-first, MDX fallback
 export async function generateStaticParams() {
   try {

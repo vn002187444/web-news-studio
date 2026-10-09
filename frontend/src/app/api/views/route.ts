@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getSanityClient } from '@/lib/sanity';
 
 // In-memory view store (reset khi restart; đủ cho trending realtime).
 // Production scale lớn: thay bằng KV/Redis, giữ nguyên contract API.
@@ -49,7 +50,6 @@ export async function POST(request: Request) {
     views.set(slug, cur);
     // Best-effort: cộng dồn views lên Sanity khi đã cấu hình (không chặn response)
     try {
-      const { getSanityClient } = await import('@/lib/sanity');
       const c = getSanityClient(true);
       if (c) {
         const id = await c.fetch(`*[_type == "article" && slug.current == $slug][0]._id`, { slug });
