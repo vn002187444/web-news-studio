@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import crypto from 'node:crypto';
 
 // Sanity Webhook → POST /api/revalidate?secret=... {slug, category}
 // Cấu hình trong Sanity Manage → API → Webhooks (on create/update/delete article).
@@ -13,11 +12,18 @@ export async function POST(request: Request) {
 
   if (envSecret) {
     try {
-      const expectedBuffer = Buffer.from(envSecret);
-      const inputBuffer = Buffer.from(secret);
+      const encoder = new TextEncoder();
+      const expectedBuffer = encoder.encode(envSecret);
+      const inputBuffer = encoder.encode(secret);
 
-      if (expectedBuffer.length === inputBuffer.length && crypto.timingSafeEqual(expectedBuffer, inputBuffer)) {
-        isAuthorized = true;
+      if (expectedBuffer.byteLength === inputBuffer.byteLength) {
+        let result = 0;
+        for (let i = 0; i < expectedBuffer.length; i++) {
+          result |= expectedBuffer[i] ^ inputBuffer[i];
+        }
+        if (result === 0) {
+          isAuthorized = true;
+        }
       }
     } catch (e) {
       // Ignore
