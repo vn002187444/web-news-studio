@@ -1,6 +1,6 @@
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
-  'https://news2026.example.com';
+  'https://news.minds.io.vn';
 
 export const SITE_NAME = 'News Studio';
 

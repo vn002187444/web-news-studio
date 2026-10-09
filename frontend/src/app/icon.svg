@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- News Studio favicon: Ink-black tile, paper-white serif-style "N", crimson breaking-news dot -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="#111111"/>
+  <g fill="#F4F4F0">
+    <rect x="140" y="150" width="60" height="212"/>
+    <rect x="312" y="150" width="60" height="212"/>
+    <polygon points="140,150 200,150 372,362 312,362"/>
+  </g>
+  <circle cx="372" cy="148" r="34" fill="#DC2626" stroke="#F4F4F0" stroke-width="12"/>
+</svg>

@@ -44,6 +44,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       template: '%s | News Studio',
     },
     description: 'Trải nghiệm tin tức đột phá với giao diện 3D và nội dung phân tích chuyên sâu được vận hành bởi AI.',
+    icons: {
+      icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+      apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+    },
     alternates: {
       canonical: `/${locale}`,
       languages: {
