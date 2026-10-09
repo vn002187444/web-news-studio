@@ -158,8 +158,6 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
   sizes="(max-width: 768px) 100vw, 1200px"
   className="object-cover"
   priority
-  fetchPriority="high"
-  loading="eager"
 />
             </div>
           </figure>
