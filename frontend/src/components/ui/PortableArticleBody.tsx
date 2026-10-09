@@ -1,6 +1,7 @@
 'use client';
 
 import { PortableText, type PortableTextComponents } from '@portabletext/react';
+import type { PortableTextBlock } from '@portabletext/types';
 import { Link } from '@/i18n/routing';
 
 function YoutubeEmbed({ url, caption }: { url: string; caption?: string }) {
@@ -94,7 +95,7 @@ const components: PortableTextComponents = {
   },
 };
 
-export default function PortableArticleBody({ body }: { body: any[] }) {
+export default function PortableArticleBody({ body }: { body: PortableTextBlock[] }) {
   if (!body || body.length === 0) return null;
   return <PortableText value={body} components={components} />;
 }

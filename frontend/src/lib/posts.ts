@@ -1,6 +1,7 @@
 import { getAllPosts as getMdxPosts, getPostBySlug as getMdxPost, type PostMeta } from './mdx';
 import { fetchSanityPosts, fetchSanityPost, fetchSanityByCategory, type SanityArticle } from './sanity';
 import { cache } from 'react';
+import type { PortableTextBlock } from '@portabletext/types';
 
 export interface UnifiedPost {
   slug: string;
@@ -13,7 +14,7 @@ export interface UnifiedPost {
     categoryColor?: string;
   };
   content: string;
-  body?: any[]; // Portable Text (Sanity mới) — ưu tiên render
+  body?: PortableTextBlock[]; // Portable Text (Sanity mới) — ưu tiên render
   source: 'sanity' | 'mdx';
 }
 

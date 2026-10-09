@@ -8,10 +8,11 @@ import RecommendedArticles from '@/components/ui/RecommendedArticles';
 import MarkdownBody from '@/components/ui/MarkdownBody';
 import PortableArticleBody from '@/components/ui/PortableArticleBody';
 import { useTranslations } from 'next-intl';
+import type { PortableTextBlock } from '@portabletext/types';
 
 interface TocItem { id: string; text: string; level: number }
 
-export default function SingleArticleClient({ content, body, meta, slug, allPosts }: { content: string, body?: any[], meta: any, slug: string, allPosts: any[] }) {
+export default function SingleArticleClient({ content, body, meta, slug, allPosts }: { content: string, body?: PortableTextBlock[], meta: any, slug: string, allPosts: any[] }) {
   const t = useTranslations('Common');
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
