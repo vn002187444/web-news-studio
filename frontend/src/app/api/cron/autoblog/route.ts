@@ -33,7 +33,8 @@ function validRewrite(j: any): { title: string; excerpt: string; content: string
 }
 
 export async function GET(request: Request) {
-  const cronSecret = process.env.CRON_SECRET || 'news_studio_cron_secret_2026';
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) return NextResponse.json({ ok: false, reason: 'cron-secret-not-configured' }, { status: 500 });
   const got = request.headers.get('authorization')?.replace('Bearer ', '') || '';
   if (got !== cronSecret) return NextResponse.json({ ok: false, reason: 'unauthorized' }, { status: 401 });
 
