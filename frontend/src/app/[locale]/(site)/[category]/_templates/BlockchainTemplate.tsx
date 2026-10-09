@@ -80,21 +80,17 @@ function CryptoTicker() {
         if (!r.ok || stop) return;
         const arr = await r.json();
         if (stop || !Array.isArray(arr)) return;
-        setTicks((prev) => {
-          const prevMap = new Map(prev.map(p => [p.sym, p]));
-          return arr.map((d: any) => {
-            const price = Number(d.lastPrice);
-            const chg = Number(d.priceChangePercent);
-            const sym = String(d.symbol).replace('USDT', '');
-            const old = prevMap.get(sym);
-            return {
-              sym,
-              price: Number.isFinite(price) ? price : (old?.price ?? 0),
-              chg: Number.isFinite(chg) ? chg : (old?.chg ?? 0),
-              hist: Number.isFinite(price) ? [...(old?.hist ?? []).slice(-9), price] : (old?.hist ?? []),
-            };
-          });
-        });
+        setTicks((prev) => arr.map((d: any) => {
+          const price = Number(d.lastPrice);
+          const chg = Number(d.priceChangePercent);
+          const old = prev.find((p) => p.sym === String(d.symbol).replace('USDT', ''));
+          return {
+            sym: String(d.symbol).replace('USDT', ''),
+            price: Number.isFinite(price) ? price : (old?.price ?? 0),
+            chg: Number.isFinite(chg) ? chg : (old?.chg ?? 0),
+            hist: Number.isFinite(price) ? [...(old?.hist ?? []).slice(-9), price] : (old?.hist ?? []),
+          };
+        }));
       } catch { /* giữ giá cũ khi Binance chặn */ }
     };
     load();
