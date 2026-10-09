@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { createChart, IChartApi, ISeriesApi, CandlestickSeries, Time } from 'lightweight-charts';
+import { createChart, IChartApi, ISeriesApi, CandlestickSeries } from 'lightweight-charts';
+import type { Time } from 'lightweight-charts';
 import Decimal from 'decimal.js';
 import { CHART_POLL_MS } from './chartMeta';
 
