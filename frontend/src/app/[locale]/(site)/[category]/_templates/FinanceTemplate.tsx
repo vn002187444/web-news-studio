@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Dynamically import the chart to avoid SSR issues with canvas
 const TradingChart = dynamic(() => import('@/components/charts/TradingChart'), { ssr: false, loading: () => <div className="w-full h-[400px] lg:h-[600px] bg-[#111111] animate-pulse" /> });
@@ -15,13 +15,46 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
   const [chartInterval, setChartInterval] = useState<string>('1m');
   const chartLabel = CHART_SYMBOLS.find((s) => s.id === chartSymbol)?.label ?? chartSymbol;
   
-  // Fake ticker data for Watchlist
-  const [tickers, setTickers] = useState([
-    { id: 'btc', symbol: 'BTC/USD', price: '65,241.00', change: '+2.4%', history: [64000, 64500, 64200, 65000, 65241] },
-    { id: 'eth', symbol: 'ETH/USD', price: '3,450.50', change: '-1.2%', history: [3500, 3550, 3480, 3460, 3450] },
-    { id: 'sol', symbol: 'SOL/USD', price: '145.20', change: '+5.6%', history: [135, 138, 142, 140, 145] },
-    { id: 'nvda', symbol: 'NVDA', price: '1,250.00', change: '+1.1%', history: [1220, 1230, 1225, 1240, 1250] },
-  ]);
+  // Watchlist giá THẬT — Binance 24hr ticker, poll 15s, dừng khi tab ẩn.
+  // Lịch sử sparkline tích lũy từ các lần poll (không bịa sẵn).
+  const WATCH_SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'DOGEUSDT'];
+  type Ticker = { id: string; symbol: string; price: string; change: string; up: boolean; history: number[] };
+  const [tickers, setTickers] = useState<Ticker[]>(WATCH_SYMBOLS.map((id) => ({
+    id, symbol: id.replace('USDT', '') + '/USD', price: '—', change: '—', up: true, history: [],
+  })));
+  useEffect(() => {
+    let stop = false;
+    const load = async () => {
+      try {
+        const r = await fetch(
+          `https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(WATCH_SYMBOLS))}`,
+          { cache: 'no-store' }
+        );
+        if (!r.ok || stop) return;
+        const arr = await r.json();
+        if (stop || !Array.isArray(arr)) return;
+        setTickers((prev) => arr.map((d: any) => {
+          const id = String(d.symbol);
+          const price = Number(d.lastPrice);
+          const pct = Number(d.priceChangePercent);
+          const old = prev.find((p) => p.id === id);
+          return {
+            id,
+            symbol: id.replace('USDT', '') + '/USD',
+            price: Number.isFinite(price)
+              ? price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: price < 10 ? 4 : 2 })
+              : '—',
+            change: Number.isFinite(pct) ? `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%` : '—',
+            up: pct >= 0,
+            history: Number.isFinite(price) ? [...(old?.history ?? []).slice(-29), price] : (old?.history ?? []),
+          };
+        }));
+      } catch { /* giữ giá cũ khi Binance chặn */ }
+    };
+    load();
+    const timer = setInterval(() => { if (!document.hidden) load(); }, 15000);
+    return () => { stop = true; clearInterval(timer); };
+  }, []);
 
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
 
@@ -65,20 +98,23 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
                 onDragStart={(e) => handleDragStart(e, i)}
                 onDragOver={(e) => handleDragOver(e, i)}
                 onDrop={(e) => handleDrop(e, i)}
-                className="flex flex-col cursor-move group relative"
+                onClick={() => setChartSymbol(t.id)}
+                title="Bấm để xem biểu đồ"
+                className={`flex flex-col cursor-pointer group relative rounded px-1 ${chartSymbol === t.id ? 'bg-red-600/10 outline outline-1 outline-red-600/40' : ''}`}
               >
                 <span className="text-gray-500 hover:text-black transition-colors">{t.symbol}</span>
                 <span className="text-xl font-bold">{t.price}</span>
-                <span className={t.change.startsWith('+') ? 'text-[#26a69a]' : 'text-[#ef5350]'}>
+                <span className={t.up ? 'text-[#26a69a]' : 'text-[#ef5350]'}>
                   {t.change}
                 </span>
                 
-                {/* Mini sparkline tooltip */}
+                {/* Mini sparkline tooltip — lịch sử giá thật từ các lần poll */}
+                {t.history.length >= 2 && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-[#111] p-2 pointer-events-none w-[80px] h-[40px] z-10 border border-white/20">
                   <svg viewBox="0 0 100 50" className="w-full h-full preserve-3d" aria-hidden="true">
                     <polyline
                       fill="none"
-                      stroke={t.change.startsWith('+') ? '#26a69a' : '#ef5350'}
+                      stroke={t.up ? '#26a69a' : '#ef5350'}
                       strokeWidth="2"
                       points={t.history.map((val, idx, arr) => {
                         const min = Math.min(...arr);
@@ -90,6 +126,7 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
                     />
                   </svg>
                 </div>
+                )}
               </div>
             ))}
           </div>

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import { Link } from '@/i18n/routing';
-import Decimal from 'decimal.js';
 
 // Quả cầu 3D chỉ tải khi browser (không SSR) → three.js không vào bundle trang.
 const BlockchainSphere = dynamic(() => import('./BlockchainSphere'), {
@@ -64,35 +63,53 @@ function Sparkline({ data, up }: { data: number[]; up: boolean }) {
   );
 }
 
-// Ticker crypto live mô phỏng — Decimal.js giữ chính xác giá
+// Ticker crypto giá THẬT — Binance 24hr ticker, poll 15s, dừng khi tab ẩn.
+// Lịch sử sparkline tích lũy từ các lần poll (không bịa sẵn, không random-walk).
+const TICK_SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'];
+type Tick = { sym: string; price: number; chg: number; hist: number[] };
 function CryptoTicker() {
-  const [ticks, setTicks] = useState([
-    { sym: 'BTC', price: new Decimal(65241), chg: new Decimal(2.4), hist: [64800, 64950, 65100, 65020, 65241] },
-    { sym: 'ETH', price: new Decimal(3450.5), chg: new Decimal(-1.2), hist: [3490, 3475, 3460, 3455, 3450.5] },
-    { sym: 'SOL', price: new Decimal(145.2), chg: new Decimal(5.6), hist: [138, 140, 143, 144, 145.2] },
-  ]);
+  const [ticks, setTicks] = useState<Tick[]>([]);
   useEffect(() => {
-    const id = setInterval(() => {
-      setTicks((prev) => prev.map((t) => {
-        const drift = new Decimal(Math.random() - 0.5).times(t.price.dividedBy(500));
-        const price = t.price.plus(drift);
-        const chg = t.chg.plus(new Decimal(Math.random() - 0.5).dividedBy(5));
-        const hist = [...t.hist.slice(-9), price.toNumber()];
-        return { ...t, price, chg, hist };
-      }));
-    }, 2000);
-    return () => clearInterval(id);
+    let stop = false;
+    const load = async () => {
+      try {
+        const r = await fetch(
+          `https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(TICK_SYMBOLS))}`,
+          { cache: 'no-store' }
+        );
+        if (!r.ok || stop) return;
+        const arr = await r.json();
+        if (stop || !Array.isArray(arr)) return;
+        setTicks((prev) => arr.map((d: any) => {
+          const price = Number(d.lastPrice);
+          const chg = Number(d.priceChangePercent);
+          const old = prev.find((p) => p.sym === String(d.symbol).replace('USDT', ''));
+          return {
+            sym: String(d.symbol).replace('USDT', ''),
+            price: Number.isFinite(price) ? price : (old?.price ?? 0),
+            chg: Number.isFinite(chg) ? chg : (old?.chg ?? 0),
+            hist: Number.isFinite(price) ? [...(old?.hist ?? []).slice(-9), price] : (old?.hist ?? []),
+          };
+        }));
+      } catch { /* giữ giá cũ khi Binance chặn */ }
+    };
+    load();
+    const id = setInterval(() => { if (!document.hidden) load(); }, 15000);
+    return () => { stop = true; clearInterval(id); };
   }, []);
+  if (ticks.length === 0) {
+    return <div className="mb-12 border border-green-400/20 rounded-full px-4 py-3 font-mono text-xs text-white/40 animate-pulse" aria-label="Loading crypto prices">Đang tải giá crypto trực tiếp…</div>;
+  }
   const row = [...ticks, ...ticks];
   return (
     <div className="mb-12 border border-green-400/20 rounded-full px-2 py-2 overflow-hidden bg-white/[0.02] shadow-[0_0_30px_rgba(0,255,150,0.08)]" aria-label="Crypto prices live">
       <motion.div className="flex gap-8 whitespace-nowrap w-max" animate={{ x: ['0%', '-50%'] }} transition={{ repeat: Infinity, ease: 'linear', duration: 25 }}>
         {row.map((t, i) => {
-          const up = t.chg.greaterThanOrEqualTo(0);
+          const up = t.chg >= 0;
           return (
             <span key={i} className="flex items-center gap-3 font-mono text-xs">
               <b className="text-white">{t.sym}</b>
-              <span className="text-white/80 tabular-nums">${t.price.toFixed(2)}</span>
+              <span className="text-white/80 tabular-nums">${t.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               <span className={up ? 'text-green-400' : 'text-red-400'}>{up ? '▲' : '▼'} {t.chg.toFixed(2)}%</span>
               <Sparkline data={t.hist} up={up} />
             </span>
@@ -103,7 +120,7 @@ function CryptoTicker() {
   );
 }
 
-const TiltCard = ({ article, spark }: { article: any; spark: number[] }) => {
+const TiltCard = ({ article }: { article: any }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -172,7 +189,6 @@ const TiltCard = ({ article, spark }: { article: any; spark: number[] }) => {
         <p className="font-mono text-xs text-white/50 max-w-sm mb-4">
           {article.excerpt}
         </p>
-        <Sparkline data={spark} up={(spark[0] ?? 0) <= (spark[spark.length - 1] ?? 0)} />
       </div>
     </motion.div>
   );
@@ -181,7 +197,6 @@ const TiltCard = ({ article, spark }: { article: any; spark: number[] }) => {
 export default function BlockchainTemplate({ articles }: { articles: any[] }) {
   // Use real AI data — không duplicate hack, hiện empty-state khi thiếu
   const cryptoArticles = articles && articles.length > 0 ? articles : [];
-  const sparks = cryptoArticles.map((_, i) => Array.from({ length: 12 }, (_, k) => 50 + Math.sin(k / 2 + i) * 12 + k * 2 + Math.random() * 6));
   
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number }[]>([]);
   let burstId = 0;
@@ -216,7 +231,7 @@ export default function BlockchainTemplate({ articles }: { articles: any[] }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 perspective-[1000px]">
           {cryptoArticles.slice(0, 6).map((article, i) => (
             <Link key={article.slug || i} href={`/blockchain/${article.slug}`} onClick={handleCTAClick}>
-               <TiltCard article={article} spark={sparks[i] || []} />
+               <TiltCard article={article} />
             </Link>
           ))}
         </div>
