@@ -17,7 +17,7 @@ interface Candle {
   close: number;
 }
 
-function toCandle(k: any[]): Candle {
+function toCandle(k: [number, string, string, string, string, ...any[]]): Candle {
   return {
     time: Math.floor(k[0] / 1000),
     open: new Decimal(k[1]).toNumber(),
