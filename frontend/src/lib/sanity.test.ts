@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 import { markdownToBlocks } from './sanity';
 
 describe('markdownToBlocks', () => {
-  let mathRandomSpy: jest.SpyInstance;
+  let mathRandomSpy: any;
   let mockRandomIndex = 0;
 
   beforeEach(() => {
