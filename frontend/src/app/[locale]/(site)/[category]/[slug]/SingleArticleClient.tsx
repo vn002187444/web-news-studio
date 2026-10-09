@@ -25,21 +25,24 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
 
   // Parse h2/h3 trong bài → Sticky TOC
   useEffect(() => {
-    const root = document.getElementById('article-content');
-    if (!root) return;
-    const heads = Array.from(root.querySelectorAll('h2, h3')) as HTMLElement[];
-    const items = heads.map((h, i) => {
-      const id = h.id || `sec-${i}`;
-      h.id = id;
-      return { id, text: h.innerText, level: h.tagName === 'H2' ? 2 : 3 };
-    });
-    setToc(items);
-    const obs = new IntersectionObserver(
-      (es) => { es.forEach((e) => { if (e.isIntersecting) setActiveId(e.target.id); }); },
-      { rootMargin: '-30% 0px -60% 0px' }
-    );
-    heads.forEach((h) => obs.observe(h));
-    return () => obs.disconnect();
+    const timer = setTimeout(() => {
+      const root = document.getElementById('article-content');
+      if (!root) return;
+      const heads = Array.from(root.querySelectorAll('h2, h3')) as HTMLElement[];
+      const items = heads.map((h, i) => {
+        const id = h.id || `sec-${i}`;
+        h.id = id;
+        return { id, text: h.innerText, level: h.tagName === 'H2' ? 2 : 3 };
+      });
+      setToc(items);
+      const obs = new IntersectionObserver(
+        (es) => { es.forEach((e) => { if (e.isIntersecting) setActiveId(e.target.id); }); },
+        { rootMargin: '-30% 0px -60% 0px' }
+      );
+      heads.forEach((h) => obs.observe(h));
+      return () => obs.disconnect();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [slug]);
 
   return (
