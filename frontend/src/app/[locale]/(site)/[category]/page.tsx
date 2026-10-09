@@ -12,6 +12,7 @@ import DefaultTemplate from './_templates/DefaultTemplate';
 
 import { Metadata } from 'next';
 import { getPostsByCategoryUnified } from '@/lib/posts';
+import { optimizeThumbnail } from '@/lib/image';
 
 const CATEGORIES = ['tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
 
@@ -68,7 +69,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
     title: post.meta.title,
     excerpt: (post.meta.excerpt || '').slice(0, 140),
     category: post.meta.category,
-    thumbnail: { url: post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80', alt: post.meta.title },
+    thumbnail: { url: optimizeThumbnail(post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80', 1200, 65), alt: post.meta.title },
     tags: post.meta.tags || [],
     publishedAt: post.meta.publishedAt
   }));

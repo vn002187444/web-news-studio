@@ -4,6 +4,7 @@ import BentoGrid from "@/components/ui/BentoGrid";
 import TrendingWidget from "@/components/ui/TrendingWidget";
 import CategorySections from "@/components/ui/CategorySections";
 import { getAllPostsUnified } from "@/lib/posts";
+import { optimizeThumbnail } from "@/lib/image";
 import type { Metadata } from 'next';
 
 // ISR 1h: bài mới từ autoblog hiện trong ≤1h mà không cần rebuild;
@@ -31,7 +32,7 @@ export default async function Home() {
     title: post.meta.title,
     excerpt: (post.meta.excerpt || '').slice(0, 140),
     category: post.meta.category,
-    thumbnail: { url: post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80', alt: post.meta.title },
+    thumbnail: { url: optimizeThumbnail(post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80', 1200, 65), alt: post.meta.title },
     publishedAt: post.meta.publishedAt
   }));
 

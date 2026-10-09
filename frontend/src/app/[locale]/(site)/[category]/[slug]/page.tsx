@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import SingleArticleClient from './SingleArticleClient';
 import { SITE_URL, absoluteUrl, escapeJsonLd } from '@/lib/site';
+import { optimizeThumbnail } from '@/lib/image';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string; category: string }> }): Promise<Metadata> {
   const { locale, slug, category } = await params;
@@ -79,12 +80,18 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     }));
 
   const pageUrl = `${SITE_URL}/${locale}/${category}/${slug}`;
+  // Ảnh hero nén tại nguồn (Sanity/Unsplash transform) — w=1600 cho màn retina
+  const heroThumb = optimizeThumbnail(
+    post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+    1600,
+    65
+  );
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: post.meta.title,
     description: post.meta.excerpt,
-    image: [post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80'],
+    image: [heroThumb],
     datePublished: post.meta.publishedAt,
     dateModified: post.meta.publishedAt,
     mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
@@ -106,7 +113,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: escapeJsonLd(JSON.stringify(jsonLd)) }}
       />
-      <SingleArticleClient meta={post.meta} slug={slug} allPosts={relatedPosts} content={post.content} body={post.body} />
+      <SingleArticleClient meta={{ ...post.meta, thumbnail: heroThumb }} slug={slug} allPosts={relatedPosts} content={post.content} body={post.body} />
     </>
   );
 }

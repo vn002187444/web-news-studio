@@ -51,7 +51,7 @@ export default function Header() {
   const allCategories = [
     { href: '/tech', key: 'tech', label: t('tech'), icon: '⚛', desc: 'Trí tuệ nhân tạo, thiết bị & phần mềm', badge: '3D WebGL' },
     { href: '/blockchain', key: 'blockchain', label: t('blockchain'), icon: '₿', desc: 'Web3, tiền mã hóa & hợp đồng thông minh', badge: 'Bloom' },
-    { href: '/finance', key: 'finance', label: t('finance'), icon: '📈', desc: 'Thị trường tài chính, chứng khoán & vĩ mô', badge: 'Live SSE' },
+    { href: '/finance', key: 'finance', label: t('finance'), icon: '📈', desc: 'Thị trường tài chính, chứng khoán & vĩ mô', badge: 'Live' },
     { href: '/game', key: 'game', label: t('game'), icon: '✜', desc: 'Đấu trường Esports, PC Master Race & Mobile', badge: 'Esports' },
     { href: '/lifestyle', key: 'lifestyle', label: t('lifestyle'), icon: '✦', desc: 'Phong cách sống đương đại, nghệ thuật sống', badge: 'Curated' },
     { href: '/sports', key: 'sports', label: t('sports'), icon: '⚽', desc: 'Tin tức thể thao đỉnh cao, bóng đá & giải đấu' },
@@ -60,8 +60,8 @@ export default function Header() {
     { href: '/science', key: 'science', label: t('science'), icon: '🔬', desc: 'Khám phá vũ trụ, phát minh & công nghệ sinh học' },
   ];
 
-  // Quick categories hiển thị trực tiếp trên thanh menu ngang
-  const quickCategories = allCategories.slice(0, 4);
+  // Quick categories: hiện đủ 9 chuyên mục trên thanh menu ngang (màn xl+)
+  const quickCategories = allCategories;
 
   const openSearch = () => {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
@@ -199,14 +199,14 @@ export default function Header() {
         </div>
         
         {/* Center: Quick Links on Large Desktops */}
-        <nav className="hidden xl:flex items-center gap-1 font-mono text-xs tracking-wider uppercase">
+        <nav className="hidden xl:flex items-center gap-0.5 font-mono text-xs tracking-wider uppercase">
           {quickCategories.map((cat) => {
             const isActive = pathname.startsWith(cat.href);
             return (
               <MagneticButton key={cat.href}>
                 <Link 
                   href={cat.href} 
-                  className={`relative px-3 py-1.5 rounded-full transition-all duration-200 block ${
+                  className={`relative px-2.5 py-1.5 rounded-full transition-all duration-200 block whitespace-nowrap ${
                     isActive 
                       ? 'text-red-500 font-bold bg-white/10' 
                       : 'text-white/80 hover:text-white hover:bg-white/5'

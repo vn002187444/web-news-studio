@@ -6,11 +6,14 @@ import { motion, useSpring } from 'framer-motion';
 export default function CustomCursor() {
   const [cursorText, setCursorText] = useState("");
   const [isHovered, setIsHovered] = useState(false);
+  const [isDown, setIsDown] = useState(false);
   const [enabled, setEnabled] = useState(false);
 
-  // Smooth springs for cursor movement
-  const cursorX = useSpring(0, { stiffness: 500, damping: 28 });
-  const cursorY = useSpring(0, { stiffness: 500, damping: 28 });
+  // Chấm đi nhanh bám sát chuột, vòng ngoài trễ hơn tạo vệt (trail)
+  const dotX = useSpring(0, { stiffness: 900, damping: 45, mass: 0.3 });
+  const dotY = useSpring(0, { stiffness: 900, damping: 45, mass: 0.3 });
+  const ringX = useSpring(0, { stiffness: 220, damping: 22, mass: 0.6 });
+  const ringY = useSpring(0, { stiffness: 220, damping: 22, mass: 0.6 });
 
   useEffect(() => {
     // Chỉ bật trên desktop có chuột mịn, tôn trọng reduced-motion
@@ -21,18 +24,16 @@ export default function CustomCursor() {
       if (!fine || reduced || (touch && !fine)) return;
     } catch { /* ignore */ }
     setEnabled(true);
-    // Không ép cursor:none toàn body qua JS để tránh kẹt trên mobile;
-    // CSS sẽ ẩn cursor khi có custom cursor.
     document.documentElement.classList.add('has-custom-cursor');
 
     const handleMouseMove = (e: MouseEvent) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
+      dotX.set(e.clientX);
+      dotY.set(e.clientY);
+      ringX.set(e.clientX);
+      ringY.set(e.clientY);
 
-      // Check if hovering over an element with data-cursor
       const target = e.target as HTMLElement;
       const cursorElem = target.closest('[data-cursor]');
-      
       if (cursorElem) {
         setIsHovered(true);
         setCursorText(cursorElem.getAttribute('data-cursor') || "");
@@ -41,39 +42,49 @@ export default function CustomCursor() {
         setCursorText("");
       }
     };
+    const handleDown = () => setIsDown(true);
+    const handleUp = () => setIsDown(false);
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mousedown', handleDown);
+    window.addEventListener('mouseup', handleUp);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousedown', handleDown);
+      window.removeEventListener('mouseup', handleUp);
       document.documentElement.classList.remove('has-custom-cursor');
     };
-  }, [cursorX, cursorY]);
+  }, [dotX, dotY, ringX, ringY]);
 
   if (!enabled) return null;
 
   return (
     <>
-      {/* Main Cursor Dot */}
+      {/* Vòng trail ngoài — viền đỏ dày, dễ thấy trên cả nền sáng/tối */}
       <motion.div
-        className="fixed top-0 left-0 w-4 h-4 bg-red-600 rounded-full pointer-events-none z-[1000] mix-blend-difference origin-center"
-        style={{
-          x: cursorX,
-          y: cursorY,
-          translateX: '-50%',
-          translateY: '-50%',
-        }}
+        className="fixed top-0 left-0 pointer-events-none z-[999] rounded-full border-2 border-red-600 origin-center flex items-center justify-center"
+        style={{ x: ringX, y: ringY, translateX: '-50%', translateY: '-50%' }}
         animate={{
-          scale: isHovered ? 4 : 1,
-          opacity: isHovered ? 0.8 : 1,
+          width: isHovered ? 76 : 36,
+          height: isHovered ? 76 : 36,
+          scale: isDown ? 0.85 : 1,
+          backgroundColor: isHovered ? 'rgba(220, 38, 38, 0.92)' : 'rgba(220, 38, 38, 0)',
+          borderColor: isHovered ? 'rgba(220, 38, 38, 1)' : 'rgba(220, 38, 38, 0.75)',
         }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        transition={{ type: 'spring', stiffness: 350, damping: 24 }}
       >
         {isHovered && (
-          <span className="absolute inset-0 flex items-center justify-center text-[4px] font-mono font-bold text-white uppercase tracking-widest scale-50">
+          <span className="font-mono text-[10px] font-bold text-white uppercase tracking-widest px-1 text-center leading-tight">
             {cursorText}
           </span>
         )}
       </motion.div>
+      {/* Chấm tâm đặc — luôn nhìn thấy vị trí chính xác */}
+      <motion.div
+        className="fixed top-0 left-0 w-2 h-2 bg-red-600 rounded-full pointer-events-none z-[1000] origin-center ring-2 ring-white/80"
+        style={{ x: dotX, y: dotY, translateX: '-50%', translateY: '-50%' }}
+        animate={{ scale: isDown ? 0.6 : 1 }}
+      />
     </>
   );
 }
