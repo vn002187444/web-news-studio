@@ -15,7 +15,7 @@ export function useArticleTracker(currentCategory?: string, currentSlug?: string
   useEffect(() => {
     // 1. Lấy profile cũ từ LocalStorage
     const stored = localStorage.getItem(PROFILE_KEY);
-    let currentProfile: UserProfile = stored ? JSON.parse(stored) : { categoryScores: {}, history: [] };
+    const currentProfile: UserProfile = stored ? JSON.parse(stored) : { categoryScores: {}, history: [] };
 
     // 2. Nếu đang đọc 1 bài cụ thể, cập nhật Profile
     if (currentCategory && currentSlug && !currentProfile.history.includes(currentSlug)) {

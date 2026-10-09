@@ -61,7 +61,7 @@ export async function GET(request: Request) {
   }
 
   // 2. Phân tích phân bố bài viết trên Sanity CMS để bù đắp các mục đói bài
-  let catCount: Record<string, number> = {};
+  const catCount: Record<string, number> = {};
   let recentArticles: { title: string; slug: string; category: string }[] = [];
   try {
     const existing = await sanity.fetch(`*[_type == "article"]{ category }`);
