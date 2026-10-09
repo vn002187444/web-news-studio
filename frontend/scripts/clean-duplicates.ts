@@ -6,18 +6,21 @@ import { getSanityClient } from '../src/lib/sanity';
 dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 dotenv.config();
 
-// Tính độ tương đồng đơn giản giữa 2 chuỗi từ ngữ (Jaccard similarity trên tập từ)
-function textSimilarity(s1: string, s2: string): number {
-  const words1 = new Set(s1.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter(Boolean));
-  const words2 = new Set(s2.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter(Boolean));
+function extractWords(s: string): Set<string> {
+  return new Set(s.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter(Boolean));
+}
+
+function setSimilarity(words1: Set<string>, words2: Set<string>): number {
   if (words1.size === 0 || words2.size === 0) return 0;
   
   let intersection = 0;
-  words1.forEach((w) => {
-    if (words2.has(w)) intersection++;
-  });
+  const [smaller, larger] = words1.size < words2.size ? [words1, words2] : [words2, words1];
   
-  const union = new Set([...words1, ...words2]).size;
+  for (const w of smaller) {
+    if (larger.has(w)) intersection++;
+  }
+
+  const union = words1.size + words2.size - intersection;
   return intersection / union;
 }
 
@@ -36,6 +39,9 @@ async function findAndCleanDuplicates(dryRun = true) {
   );
   console.log(`Tổng số bài trên Sanity CMS: ${sanityArticles.length}`);
 
+  // Pre-compute word sets for all articles
+  const articleWords = sanityArticles.map(a => extractWords(a.title || ''));
+
   // Tìm các nhóm bài trùng lặp
   const duplicatesToDelete: { keep: any; remove: any; reason: string }[] = [];
   const processedIds = new Set<string>();
@@ -44,13 +50,26 @@ async function findAndCleanDuplicates(dryRun = true) {
     const a = sanityArticles[i];
     if (processedIds.has(a._id)) continue;
 
+    const wordsA = articleWords[i];
+
     for (let j = i + 1; j < sanityArticles.length; j++) {
       const b = sanityArticles[j];
       if (processedIds.has(b._id)) continue;
 
-      const sim = textSimilarity(a.title, b.title);
+      let sim = 0;
+      let reason = '';
+      if (a.slug === b.slug) {
+        reason = 'Trùng Slug';
+      } else {
+        const wordsB = articleWords[j];
+        sim = setSimilarity(wordsA, wordsB);
+        if (sim >= 0.55) {
+          reason = `Tiêu đề giống ${(sim * 100).toFixed(0)}%`;
+        }
+      }
+
       // Nếu 2 bài có tiêu đề giống nhau >= 55% từ vựng hoặc có cùng slug
-      if (a.slug === b.slug || sim >= 0.55) {
+      if (reason) {
         // Giữ bài cũ hơn hay mới hơn? Giữ bài có publishedAt sớm hơn (bài gốc ban đầu) hoặc có nội dung hoàn chỉnh
         const keep = a;
         const remove = b;
@@ -58,7 +77,7 @@ async function findAndCleanDuplicates(dryRun = true) {
         duplicatesToDelete.push({
           keep,
           remove,
-          reason: a.slug === b.slug ? 'Trùng Slug' : `Tiêu đề giống ${(sim * 100).toFixed(0)}%`,
+          reason,
         });
       }
     }
