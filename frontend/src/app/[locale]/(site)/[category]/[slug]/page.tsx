@@ -64,6 +64,20 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     notFound();
   }
 
+  // Gợi ý "Dành cho bạn" chỉ cần 12 bài gọn nhẹ (slug + meta tối thiểu).
+  // KHÔNG truyền allPosts full (kèm content/body ~170 bài) → HTML/RSC phình ~440KB, chuyển trang chậm.
+  const relatedPosts = allPosts
+    .filter((p) => p.slug !== slug)
+    .sort(
+      (a, b) =>
+        (b.meta.category === category ? 1 : 0) - (a.meta.category === category ? 1 : 0)
+    )
+    .slice(0, 12)
+    .map((p) => ({
+      slug: p.slug,
+      meta: { title: p.meta.title, category: p.meta.category, thumbnail: p.meta.thumbnail },
+    }));
+
   const pageUrl = `${SITE_URL}/${locale}/${category}/${slug}`;
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -92,7 +106,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: escapeJsonLd(JSON.stringify(jsonLd)) }}
       />
-      <SingleArticleClient meta={post.meta} slug={slug} allPosts={allPosts} content={post.content} body={post.body} />
+      <SingleArticleClient meta={post.meta} slug={slug} allPosts={relatedPosts} content={post.content} body={post.body} />
     </>
   );
 }
