@@ -151,14 +151,16 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
 
           <figure className="mb-16">
             <div className="w-full h-[500px] relative overflow-hidden rounded-lg">
-              <Image 
-                src={meta.thumbnail || "https://images.unsplash.com/photo-1677442136019-21780ecad995"}
-                alt={meta.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 1200px"
-                className="object-cover"
-                priority
-              />
+<Image 
+  src={meta.thumbnail || "https://images.unsplash.com/photo-1677442136019-21780ecad995"}
+  alt={meta.title}
+  fill
+  sizes="(max-width: 768px) 100vw, 1200px"
+  className="object-cover"
+  priority
+  fetchPriority="high"
+  loading="eager"
+/>
             </div>
           </figure>
 
