@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Link } from '@/i18n/routing';
 
 // Quả cầu 3D chỉ tải khi browser (không SSR) → three.js không vào bundle trang.
@@ -18,31 +18,35 @@ function ParticleBurst({ x, y, onComplete }: { x: number; y: number; onComplete:
     return () => clearTimeout(timer);
   }, [onComplete]);
 
+  // Use useState to prevent calling Math.random() during render
+  const [particles] = useState(() => {
+    return Array.from({ length: 12 }).map((_, i) => {
+      const angle = (i * 360) / 12;
+      const velocity = 50 + Math.random() * 50;
+      return { id: i, angle, velocity };
+    });
+  });
+
   // Reduced motion check
   const isReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (isReduced) return null;
 
-  const particles = Array.from({ length: 12 });
   return (
     <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden" style={{ left: x, top: y }}>
-      {particles.map((_, i) => {
-        const angle = (i * 360) / particles.length;
-        const velocity = 50 + Math.random() * 50;
-        return (
-          <motion.div
-            key={i}
-            initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-            animate={{
-              x: Math.cos((angle * Math.PI) / 180) * velocity,
-              y: Math.sin((angle * Math.PI) / 180) * velocity,
-              opacity: 0,
-              scale: 0,
-            }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="absolute w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"
-          />
-        );
-      })}
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+          animate={{
+            x: Math.cos((p.angle * Math.PI) / 180) * p.velocity,
+            y: Math.sin((p.angle * Math.PI) / 180) * p.velocity,
+            opacity: 0,
+            scale: 0,
+          }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="absolute w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"
+        />
+      ))}
     </div>
   );
 }
