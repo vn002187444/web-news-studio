@@ -14,7 +14,8 @@
     "sync-posts": "tsx scripts/sync-posts.ts",
     "seed-taxonomy": "tsx scripts/seed-taxonomy.ts",
     "report": "tsx scripts/generate-report.ts",
-    "check-status": "tsx scripts/check-status.ts"
+    "check-status": "tsx scripts/check-status.ts",
+    "test": "tsx --test src/**/*.test.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
