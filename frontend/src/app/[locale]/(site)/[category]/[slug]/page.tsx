@@ -4,7 +4,6 @@ import { Metadata } from 'next';
 import SingleArticleClient from './SingleArticleClient';
 import { SITE_URL, absoluteUrl } from '@/lib/site';
 import { optimizeThumbnail } from '@/lib/image';
-import serialize from 'serialize-javascript';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string; category: string }> }): Promise<Metadata> {
   const { locale, slug, category } = await params;
@@ -112,7 +111,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serialize(jsonLd, { isJSON: true }) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
       <SingleArticleClient meta={{ ...post.meta, thumbnail: heroThumb }} slug={slug} allPosts={relatedPosts} content={post.content} body={post.body} />
     </>
