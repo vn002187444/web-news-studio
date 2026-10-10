@@ -195,7 +195,6 @@ const TiltCard = ({ article }: { article: any }) => {
 };
 
 export default function BlockchainTemplate({ articles }: { articles: any[] }) {
-  // Use real AI data — không duplicate hack, hiện empty-state khi thiếu
   const cryptoArticles = articles && articles.length > 0 ? articles : [];
   
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number }[]>([]);
