@@ -14,7 +14,7 @@ jobs:
   health-check:
     name: System Health & Build Integrity
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     defaults:
       run:
@@ -31,8 +31,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
+      - name: Update npm to latest (fix TS7 optional-deps EBADPLATFORM)
+        run: npm install -g npm@latest
+
       - name: Install Dependencies
-        run: npm ci
+        run: npm ci --no-audit --no-fund
 
       - name: Verify TypeScript & Code Quality
         run: npx tsc --noEmit
