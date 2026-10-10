@@ -23,9 +23,7 @@ export default function MagneticButton({ children, className }: { children: Reac
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     try {
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-          navigator.vibrate(10);
-        }
+        (navigator as any).vibrate?.(10);
       }
     } catch { /* noop */ }
   };

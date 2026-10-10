@@ -14,9 +14,7 @@ export default function MobileBottomNav() {
 
   const triggerSearch = () => {
     try {
-      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(10);
-      }
+      (navigator as any).vibrate?.(10);
     } catch {
       /* noop */
     }
