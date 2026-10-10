@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Link } from '@/i18n/routing';
@@ -228,23 +228,24 @@ export default function BlockchainTemplate({ articles }: { articles: any[] }) {
           <CryptoTicker />
         </div>
 
-        {cryptoArticles.length === 0 && (
-          <div className="flex flex-col items-center justify-center p-12 border border-dashed border-white/20 rounded-2xl bg-white/[0.02]">
+        {cryptoArticles.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 border border-dashed border-green-500/20 rounded-2xl bg-white/[0.02]">
             <p className="font-mono text-xs uppercase tracking-widest text-white/40 text-center">
               Chưa có bài viết Blockchain
             </p>
             <p className="font-mono text-[10px] uppercase tracking-widest text-white/20 text-center mt-2">
-              Hệ thống đang đồng bộ dữ liệu AI...
+              Chạy hệ thống Autoblog AI để tự động tạo nội dung.
             </p>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 perspective-[1000px]">
+            {cryptoArticles.slice(0, 6).map((article, i) => (
+              <Link key={article.slug || i} href={`/blockchain/${article.slug}`} onClick={handleCTAClick}>
+                 <TiltCard article={article} />
+              </Link>
+            ))}
+          </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 perspective-[1000px]">
-          {cryptoArticles.slice(0, 6).map((article, i) => (
-            <Link key={article.slug || i} href={`/blockchain/${article.slug}`} onClick={handleCTAClick}>
-               <TiltCard article={article} />
-            </Link>
-          ))}
-        </div>
       </div>
       {bursts.map(b => (
         <ParticleBurst key={b.id} x={b.x} y={b.y} onComplete={() => setBursts(prev => prev.filter(x => x.id !== b.id))} />
