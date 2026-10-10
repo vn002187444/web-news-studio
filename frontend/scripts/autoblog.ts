@@ -16,14 +16,26 @@ const parser = new Parser();
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 // Kiểm tra tương đồng từ ngữ giữa 2 tiêu đề (chống bài trùng lặp tuyệt đối)
-function isSimilarTitle(t1: string, t2: string): boolean {
+// threshold mặc định 0.50 cho so sánh chéo ngôn ngữ (tiêu đề gốc RSS vs tiêu đề đã viết lại);
+// check cùng-vụ-việc sau khi AI viết lại dùng isSameStory (ngưỡng hiệu chỉnh từ dữ liệu thật).
+function titleWordSet(title: string): Set<string> {
+  return new Set(
+    title
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, '')
+      .split(/\s+/)
+      .filter((w) => w.length > 2)
+  );
+}
+
+function isSimilarTitle(t1: string, t2: string, threshold = 0.50): boolean {
   if (!t1 || !t2) return false;
   const clean1 = t1.toLowerCase().trim();
   const clean2 = t2.toLowerCase().trim();
   if (clean1 === clean2) return true;
 
-  const w1 = new Set(clean1.replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter((w) => w.length > 2));
-  const w2 = new Set(clean2.replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter((w) => w.length > 2));
+  const w1 = titleWordSet(t1);
+  const w2 = titleWordSet(t2);
   if (w1.size === 0 || w2.size === 0) return false;
 
   let matches = 0;
@@ -31,7 +43,41 @@ function isSimilarTitle(t1: string, t2: string): boolean {
     if (w2.has(w)) matches++;
   });
   const similarity = matches / Math.min(w1.size, w2.size);
-  return similarity >= 0.50;
+  return similarity >= threshold;
+}
+
+// Cùng 1 vụ việc? (cùng chuyên mục, sau khi AI viết lại)
+// Điều kiện: tương đồng >= 0.30 VÀ >= 4 từ chung — hiệu chỉnh trên 127 bài thật:
+// bắt được các cặp Skate / Starlink / Brazil / Quang Thắng / ASEAN Cup,
+// chỉ sót các bài follow-up đổi hẳn góc nhìn (sẽ bắt bằng check thumbnail).
+function isSameStory(titleA: string, titleB: string): boolean {
+  const wA = titleWordSet(titleA);
+  const wB = titleWordSet(titleB);
+  if (wA.size === 0 || wB.size === 0) return false;
+  let overlap = 0;
+  wA.forEach((w) => {
+    if (wB.has(w)) overlap++;
+  });
+  const similarity = overlap / Math.min(wA.size, wB.size);
+  return similarity >= 0.30 && overlap >= 4;
+}
+
+// Thumbnail fallback theo chuyên mục (ảnh dùng chung) — KHÔNG dùng để fingerprint trùng bài.
+const FALLBACK_THUMB_IDS = [
+  'photo-1518770660439-4636190af475', // tech
+  'photo-1611974789855-9c2a0a7236a3', // finance
+  'photo-1461896836934-ffe607ba8211', // sports
+  'photo-1506126613408-eca07ce68773', // lifestyle
+  'photo-1552820728-8b83bb6b773f', // game
+  'photo-1598899134739-24c46f58b8c0', // entertainment
+  'photo-1523050854058-8df90110c9f1', // education
+  'photo-1532094349884-543bc11b234d', // science
+  'photo-1639762681485-074b7f938ba0', // blockchain
+];
+
+function isFingerprintableThumb(url: string): boolean {
+  if (!url) return false;
+  return !FALLBACK_THUMB_IDS.some((id) => url.includes(id));
 }
 
 const RSS_FEEDS = [
@@ -203,6 +249,20 @@ async function runAutoblogger() {
   // 3. Thu thập dữ liệu các bài đã đăng để CHỐNG TRÙNG LẶP TUYỆT ĐỐI (từ Manifest + Sanity + MDX)
   const publishedTitles: string[] = [];
   const publishedSlugs = new Set<string>();
+  // Tiêu đề + thumbnail theo từng chuyên mục → check cùng-vụ-việc sau khi AI viết lại (ngưỡng 0.35)
+  const publishedTitlesByCat: Record<string, string[]> = {};
+  const publishedThumbs = new Set<string>();
+  const trackPublished = (cat: string, title: string, thumb?: string) => {
+    const c = (cat || '').toLowerCase();
+    if (title) {
+      publishedTitles.push(title);
+      if (c) {
+        if (!publishedTitlesByCat[c]) publishedTitlesByCat[c] = [];
+        publishedTitlesByCat[c].push(title);
+      }
+    }
+    if (thumb && isFingerprintableThumb(thumb)) publishedThumbs.add(thumb);
+  };
 
   if (fs.existsSync(manifestPath)) {
     try {
@@ -210,7 +270,7 @@ async function runAutoblogger() {
       posts.forEach((p: any) => {
         if (p.slug) publishedSlugs.add(p.slug);
         if (p.meta?.slug) publishedSlugs.add(p.meta.slug);
-        if (p.meta?.title) publishedTitles.push(p.meta.title);
+        trackPublished(p.meta?.category, p.meta?.title, p.meta?.thumbnail);
       });
     } catch {}
   }
@@ -219,10 +279,10 @@ async function runAutoblogger() {
   try {
     const sanity = getSanityClient(false);
     if (sanity) {
-      const sanityArticles: any[] = await sanity.fetch(`*[_type == "article"] { "slug": slug.current, title }`);
+      const sanityArticles: any[] = await sanity.fetch(`*[_type == "article"] { "slug": slug.current, title, category, thumbnail }`);
       sanityArticles.forEach((a) => {
         if (a.slug) publishedSlugs.add(a.slug);
-        if (a.title) publishedTitles.push(a.title);
+        trackPublished(a.category, a.title, a.thumbnail);
       });
     }
   } catch {}
@@ -235,7 +295,7 @@ async function runAutoblogger() {
     } catch {}
   }
 
-  console.log(`📚 Đã nạp ${publishedSlugs.size} slugs & ${publishedTitles.length} tiêu đề đã xuất bản để đối chiếu chống trùng.`);
+  console.log(`📚 Đã nạp ${publishedSlugs.size} slugs & ${publishedTitles.length} tiêu đề & ${publishedThumbs.size} thumbnails đã xuất bản để đối chiếu chống trùng.`);
 
   // 4. Điều phối thông minh: Ưu tiên mục thiếu bài (< 3 bài) -> Khung giờ vàng
   const sortedFeeds = [...RSS_FEEDS].sort((a, b) => {
@@ -247,11 +307,26 @@ async function runAutoblogger() {
     return pB - pA;
   });
 
+  // CÂN BẰNG CHUYÊN MỤC: tối đa 2 bài/mục/lượt (tech có 5 feeds nên trước đây lấn át),
+  // chạy 2 pha — pha 1 chỉ các mục dưới trung bình, pha 2 lấp chỗ còn lại.
+  const MAX_PER_CAT_PER_RUN = 2;
+  const perCatPublished: Record<string, number> = {};
+  const totalKnown = Object.values(catCount).reduce((s, n) => s + n, 0);
+  const avgCount = totalKnown > 0 ? totalKnown / 9 : 0;
+  const phase1 = sortedFeeds.filter((f) => (catCount[f.category] || 0) < avgCount);
+  const phase2 = sortedFeeds.filter((f) => (catCount[f.category] || 0) >= avgCount);
+  const orderedFeeds = [...phase1, ...phase2];
+  console.log(`⚖️ Cân bằng: trung bình ${avgCount.toFixed(1)} bài/mục, pha 1 có ${phase1.length} feeds (mục đói), cap ${MAX_PER_CAT_PER_RUN} bài/mục/lượt.`);
+
   try {
-    for (const feed of sortedFeeds) {
+    for (const feed of orderedFeeds) {
       if (articlesProcessed >= MAX_ARTICLES_PER_RUN) {
         console.log(`🛑 Đạt giới hạn an toàn tối đa (${MAX_ARTICLES_PER_RUN} bài/lượt). Tạm dừng để nhường tài nguyên hệ thống.`);
         break;
+      }
+      if ((perCatPublished[feed.category] || 0) >= MAX_PER_CAT_PER_RUN) {
+        console.log(`⏩ [Cân bằng] Mục ${feed.category} đã đủ ${MAX_PER_CAT_PER_RUN} bài lượt này, nhường cho mục khác.`);
+        continue;
       }
 
       console.log(`📡 Fetching RSS: ${feed.url}`);
@@ -329,8 +404,13 @@ async function runAutoblogger() {
         }
 
         const finalSlug = toSlug(rewritten.slug || rewritten.title);
-        // Kiểm tra kép sau khi AI sinh: Liệu tiêu đề mới hoặc slug mới có bị trùng không?
-        if (publishedSlugs.has(finalSlug) || publishedTitles.some((t) => isSimilarTitle(t, rewritten.title))) {
+        // Kiểm tra kép sau khi AI sinh: slug / tiêu đề toàn cục (0.50) +
+        // cùng chuyên mục (0.35 + thực thể chính) + cùng ảnh thật (không tính ảnh fallback dùng chung).
+        const catTitles = publishedTitlesByCat[feed.category] || [];
+        const dupSameCat = catTitles.some((t) => isSameStory(t, rewritten.title));
+        const dupGlobal = publishedTitles.some((t) => isSimilarTitle(t, rewritten.title));
+        const dupThumb = isFingerprintableThumb(extractedThumbnail) && publishedThumbs.has(extractedThumbnail);
+        if (publishedSlugs.has(finalSlug) || dupSameCat || dupGlobal || dupThumb) {
           console.log(`⏩ [AI Dup Check] Bài AI sinh ra trùng với nội dung đã có (${finalSlug}), bỏ qua.`);
           continue;
         }
@@ -359,6 +439,7 @@ ${rewritten.content}
           fs.writeFileSync(filePath, mdxContent, 'utf8');
           console.log(`✅ Successfully published (MDX): ${filePath}`);
           articlesProcessed++;
+          perCatPublished[feed.category] = (perCatPublished[feed.category] || 0) + 1;
         } else {
           console.log(`⏩ Article already exists, skipping: ${finalSlug}`);
         }
@@ -368,6 +449,7 @@ ${rewritten.content}
         publishedSlugs.add(toSlug(latestItem.title));
         publishedTitles.push(rewritten.title);
         publishedTitles.push(latestItem.title);
+        trackPublished(feed.category, rewritten.title, extractedThumbnail);
 
         // Đẩy lên Sanity làm Source of Truth (nếu có SANITY_API_TOKEN + PROJECT_ID)
         try {

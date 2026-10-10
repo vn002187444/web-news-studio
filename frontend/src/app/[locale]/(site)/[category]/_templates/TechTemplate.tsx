@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { Suspense, useState } from 'react';
 import { motion } from 'framer-motion';
+import { toSlug } from '@/lib/site';
 
 // Lazy 3D để không chặn TTI — đúng chuẩn GĐ3/GĐ8
 const ParticleNetwork = dynamic(() => import('@/components/3d/ParticleNetwork'), {
@@ -69,9 +70,13 @@ export default function TechTemplate({ articles }: { articles: any[] }) {
                 style={{ minHeight: 200 }}
               >
                 <div className={`p-6 h-full flex ${isActive ? 'flex-col' : 'md:flex-col'} gap-4`}>
-                  <span className="font-mono text-xs text-cyan-400 uppercase tracking-widest bg-cyan-900/30 px-3 py-1 rounded-full border border-cyan-500/30 w-fit">
-                    {topic}
-                  </span>
+                  <Link
+                    href={`/tag/${toSlug(topic)}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="font-mono text-xs text-cyan-400 uppercase tracking-widest bg-cyan-900/30 px-3 py-1 rounded-full border border-cyan-500/30 w-fit hover:bg-cyan-800/40 transition-colors"
+                  >
+                    {topic} →
+                  </Link>
                   {isActive ? (
                     <div className="flex flex-col gap-4 mt-2">
                       {articlesByTopic[ti].length > 0 ? articlesByTopic[ti].map((article: any) => (
