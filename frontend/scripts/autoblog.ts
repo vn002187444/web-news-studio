@@ -131,7 +131,7 @@ async function rewriteArticle(title: string, content: string, category: string) 
 
       REQUIREMENTS (bắt buộc đủ cấu trúc gửi Sanity):
       1. MUST output the article in VIETNAMESE language, regardless of the source language.
-      2. Create a catchy, click-worthy Title in Vietnamese (≤150 chars).
+      2. Create a catchy, click-worthy Title in Vietnamese (60-75 chars for SEO).
       3. Generate an SEO-friendly URL slug in English or unaccented Vietnamese (kebab-case).
       4. Write a 1-2 sentence excerpt/meta description in Vietnamese (≤200 chars).
       5. "tags": 3-5 tag ngắn gọn.
@@ -140,7 +140,7 @@ async function rewriteArticle(title: string, content: string, category: string) 
       8. Format the "content" in Markdown (.mdx), 800-1500 từ, BẮT BUỘC theo thứ tự:
          - Dòng đầu tiên của content PHẢI là: ## Những điểm chính (Key Takeaways)
            tiếp theo là bullet list copy NGUYÊN VĂN từng phần tử của trường "takeaways".
-         - Thân bài ## / ### với 2-3 internal link dạng [text](/${category}/slug-gia-dinh).
+          - Thân bài ## / ### với 2-3 internal link BẮT BUỘC có tiền tố locale /vi/ dạng [text](/vi/${category}/slug-gia-dinh). KHÔNG viết link thiếu /vi/.
          - Mục "## Câu hỏi thường gặp (FAQ)" từ faq.
          - Ghi rõ nguồn gốc tin (VD: Theo VnExpress/SCMP...) ở cuối bài — yêu cầu Attribution & Citation cho GEO.
       9. Do not hallucinate facts. Maintain the original core news.

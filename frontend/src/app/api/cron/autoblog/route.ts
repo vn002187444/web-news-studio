@@ -90,7 +90,7 @@ export async function GET(request: Request) {
   });
 
   const internalLinksHint = recentArticles.length > 0
-    ? recentArticles.map((a) => `- [${a.title}](/${a.category}/${a.slug})`).join('\n')
+    ? recentArticles.map((a) => `- [${a.title}](/vi/${a.category}/${a.slug})`).join('\n')
     : '- [Trang chủ tin tức](/)';
 
   const Parser = (await import('rss-parser')).default;
