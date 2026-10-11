@@ -10,7 +10,6 @@
     "deploy": "npx wrangler deploy",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
     "autoblog": "tsx scripts/autoblog.ts",
     "sync-posts": "tsx scripts/sync-posts.ts",
     "seed-taxonomy": "tsx scripts/seed-taxonomy.ts",
@@ -51,16 +50,10 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.186.0",
-    "@vitest/coverage-v8": "^2.1.8",
-    "dotenv": "^18.0.7",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
-    "postprocessing": "^6.39.5",
-    "styled-components": "^6.5.3",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
-    "typescript": "^5",
-    "vite": "^5.4.14",
-    "vitest": "^2.1.8"
+    "typescript": "^7.0.2"
   }
 }
