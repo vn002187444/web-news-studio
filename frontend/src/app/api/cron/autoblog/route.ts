@@ -105,11 +105,19 @@ export async function GET(request: Request) {
       let item: any = null;
       let slug = '';
 
-      for (const candidate of ((data.items || []) as any[]).slice(0, 4)) {
-        if (!candidate?.title) continue;
+      const candidates = ((data.items || []) as any[]).slice(0, 4).filter(c => c?.title);
+      if (candidates.length === 0) continue;
+
+      const candidateSlugs = candidates.map(c => toSlug(c.title));
+      const existingDocs = await sanity.fetch(
+        `*[_type == "article" && slug.current in $slugs]{ "slug": slug.current }`,
+        { slugs: candidateSlugs }
+      );
+      const existingSlugs = new Set((existingDocs || []).map((doc: any) => doc.slug));
+
+      for (const candidate of candidates) {
         const s = toSlug(candidate.title);
-        const exists = await sanity.fetch(`*[_type == "article" && slug.current == $slug][0]._id`, { slug: s });
-        if (exists) continue;
+        if (existingSlugs.has(s)) continue;
         item = candidate;
         slug = s;
         break;
