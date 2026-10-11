@@ -33,12 +33,14 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
         if (!r.ok || stop) return;
         const arr = await r.json();
         if (stop || !Array.isArray(arr)) return;
-        setTickers((prev) => arr.map((d: any) => {
-          const id = String(d.symbol);
-          const price = Number(d.lastPrice);
-          const pct = Number(d.priceChangePercent);
-          const old = prev.find((p) => p.id === id);
-          return {
+        setTickers((prev) => {
+          const prevMap = new Map(prev.map(p => [p.id, p]));
+          return arr.map((d: any) => {
+            const id = String(d.symbol);
+            const price = Number(d.lastPrice);
+            const pct = Number(d.priceChangePercent);
+            const old = prevMap.get(id);
+            return {
             id,
             symbol: id.replace('USDT', '') + '/USD',
             price: Number.isFinite(price)
@@ -48,7 +50,8 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
             up: pct >= 0,
             history: Number.isFinite(price) ? [...(old?.history ?? []).slice(-29), price] : (old?.history ?? []),
           };
-        }));
+          });
+        });
       } catch { /* giữ giá cũ khi Binance chặn */ }
     };
     load();

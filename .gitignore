@@ -5,3 +5,13 @@ frontend/.open-next
 .env.local
 .DS_Store
 autoblog.lock
+# local helper scripts (untracked)
+analyze.mjs
+check_meta.mjs
+check_posts.mjs
+check_thumb.mjs
+check_thumbs.mjs
+count_unsplash.mjs
+dist_hosts.mjs
+migrate-thumbs.mjs
+verify.mjs
