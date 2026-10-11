@@ -4,7 +4,7 @@ import { getAllPostsUnified } from '@/lib/posts';
 import BentoGrid from '@/components/ui/BentoGrid';
 
 export default async function NotFound() {
-  const t = await getTranslations('NotFound');
+  // const t = await getTranslations('NotFound');
 
   // Lấy 5 bài viết nổi bật
   const allPosts = await getAllPostsUnified();
@@ -23,9 +23,9 @@ export default async function NotFound() {
     <div className="container mx-auto px-4 py-16 max-w-4xl">
       <div className="text-center mb-12">
         <h1 className="text-6xl font-bold mb-4">404</h1>
-        <h2 className="text-2xl font-semibold mb-6">{t('title') || 'Không tìm thấy trang'}</h2>
+        <h2 className="text-2xl font-semibold mb-6">Không tìm thấy trang</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-8">
-          {t('description') || 'Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.'}
+          Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.
         </p>
 
         {/* Thanh tìm kiếm giả/gợi ý */}
