@@ -61,6 +61,7 @@ describe('escapeJsonLd', () => {
 
     assert.strictEqual(escapeJsonLd(jsonLdPayload), expected);
   });
+});
 describe('toSlug', () => {
   test('should convert normal strings to lowercase with hyphens', () => {
     assert.strictEqual(toSlug('Hello World'), 'hello-world');
