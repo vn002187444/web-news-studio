@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 interface TrendingItem {
   slug: string;
@@ -24,6 +24,9 @@ export default function TrendingWidget({ articles }: { articles: TrendingItem[] 
     }).catch(() => {});
   }, []);
 
+  // Cache Date.now() outside useMemo to comply with React purity rules
+  const [now] = useState(() => Date.now());
+
   // Xếp theo views 7 ngày (ở đây là views hiện có) + recency decay, không slice cứng
   const trending = useMemo(() => {
     const list = [...(articles || [])];
@@ -31,15 +34,25 @@ export default function TrendingWidget({ articles }: { articles: TrendingItem[] 
     if (!hasViews) return list.slice(0, 5);
     return list
       .map((a) => {
-        const ageDays = Math.max(0, (Date.now() - new Date(a.publishedAt).getTime()) / 86400000);
+        const ageDays = Math.max(0, (now - new Date(a.publishedAt).getTime()) / 86400000);
         const score = (viewMap[a.slug] || 0) / (1 + ageDays / 7);
         return { a, score };
       })
       .sort((x, y) => y.score - x.score)
       .slice(0, 5)
       .map((x) => x.a);
-  }, [articles, viewMap]);
-  const [hoverImg, setHoverImg] = useState<{ x: number; y: number; url: string } | null>(null);
+  }, [articles, viewMap, now]);
+
+  // Use framer-motion motion values to avoid re-rendering on mouse move
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Restore the trailing animation effect
+  const springConfig = { damping: 25, stiffness: 200, mass: 0.5 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  const [hoverUrl, setHoverUrl] = useState<string | null>(null);
 
   if (trending.length === 0) return null;
 
@@ -56,8 +69,12 @@ export default function TrendingWidget({ articles }: { articles: TrendingItem[] 
               href={`/${a.category}/${a.slug}`}
               className="flex gap-4 py-4 items-start"
               data-cursor="HOT"
-              onMouseMove={(e: React.MouseEvent) => setHoverImg({ x: e.clientX, y: e.clientY, url: a.thumbnail.url })}
-              onMouseLeave={() => setHoverImg(null)}
+              onMouseMove={(e: React.MouseEvent) => {
+                mouseX.set(e.clientX + 16);
+                mouseY.set(e.clientY + 16);
+                setHoverUrl(a.thumbnail.url);
+              }}
+              onMouseLeave={() => setHoverUrl(null)}
             >
               <span
                 aria-hidden="true"
@@ -79,15 +96,13 @@ export default function TrendingWidget({ articles }: { articles: TrendingItem[] 
         ))}
       </ol>
       {/* Custom cursor thumbnail bám theo chuột — desktop only */}
-      {hoverImg && (
+      {hoverUrl && (
         <motion.div
           aria-hidden="true"
           className="hidden lg:block fixed z-[90] w-40 h-24 pointer-events-none overflow-hidden rounded-lg shadow-2xl"
-          style={{ left: 0, top: 0 }}
-          animate={{ x: hoverImg.x + 16, y: hoverImg.y + 16 }}
-          transition={{ type: 'tween', duration: 0.08 }}
+          style={{ left: 0, top: 0, x: smoothX, y: smoothY }}
         >
-          <Image src={hoverImg.url} alt="" fill className="object-cover" />
+          <Image src={hoverUrl} alt="" fill className="object-cover" />
         </motion.div>
       )}
     </aside>
