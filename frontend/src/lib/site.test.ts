@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { absoluteUrl, SITE_URL, escapeJsonLd, toSlug } from './site';
+import { absoluteUrl, SITE_URL, escapeJsonLd, toSlug, smartTruncate } from './site';
 
 test('absoluteUrl utility', async (t) => {
   await t.test('prepends SITE_URL to paths starting with /', () => {
@@ -59,8 +59,6 @@ test('returns the same string if there are no special characters', () => {
 
     assert.strictEqual(escapeJsonLd(jsonLdPayload), expected);
   });
-});
-
 describe('toSlug', () => {
   test('should convert normal strings to lowercase with hyphens', () => {
     assert.strictEqual(toSlug('Hello World'), 'hello-world');
@@ -102,5 +100,33 @@ describe('toSlug', () => {
 
   test('should handle complex mixed inputs', () => {
     assert.strictEqual(toSlug('  The Quick, Bờ Râu! Fox Cầm $100% Đi Bộ???  '), 'the-quick-bo-rau-fox-cam-100-i-bo');
+  });
+});
+
+describe('smartTruncate', () => {
+  test('returns empty string for falsy input', () => {
+    assert.strictEqual(smartTruncate(null), '');
+    assert.strictEqual(smartTruncate(undefined), '');
+    assert.strictEqual(smartTruncate(''), '');
+  });
+
+  test('returns original string if length is less than or equal to maxLength', () => {
+    const text = 'This is a short text.';
+    assert.strictEqual(smartTruncate(text, 50), text);
+  });
+
+  test('truncates at nearest space and appends ellipsis', () => {
+    const text = 'This is a long text that needs to be truncated.';
+    assert.strictEqual(smartTruncate(text, 20), 'This is a long text...');
+  });
+
+  test('truncates at nearest punctuation and appends ellipsis', () => {
+    const text = 'This is a text. It has punctuation.';
+    assert.strictEqual(smartTruncate(text, 16), 'This is a text...');
+  });
+
+  test('falls back to hard truncate if no space or punctuation found', () => {
+    const text = 'Thisisalongtextwithoutspacesorpunctuation';
+    assert.strictEqual(smartTruncate(text, 10), 'Thisisalon...');
   });
 });
