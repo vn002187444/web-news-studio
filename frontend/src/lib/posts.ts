@@ -1,5 +1,6 @@
 import { getAllPosts as getMdxPosts, getPostBySlug as getMdxPost, type PostMeta } from './mdx';
 import { fetchSanityPosts, fetchSanityPost, fetchSanityByCategory, type SanityArticle } from './sanity';
+import { toSlug } from './site';
 import { cache } from 'react';
 
 export interface UnifiedPost {
@@ -98,4 +99,36 @@ export async function searchPostsUnified(query: string, limit = 10): Promise<{ t
     )
     .slice(0, limit)
     .map((p) => ({ title: p.meta.title, slug: p.slug, category: p.meta.category }));
+}
+
+/** Chuẩn hóa tag thành slug URL: "KBO League" → "kbo-league". */
+export function tagToSlug(tag: string): string {
+  return toSlug(tag);
+}
+
+/** Lấy bài theo tag (so khớp slug hóa, không phân biệt hoa thường). Tag không tồn tại → []. */
+export async function getPostsByTagUnified(tagSlug: string): Promise<{ tag: string; posts: UnifiedPost[] }> {
+  const slug = (tagSlug || '').toLowerCase().trim().slice(0, 80);
+  const all = await getAllPostsUnified();
+  const matched = all.filter((p) => (p.meta.tags || []).some((t) => tagToSlug(t) === slug));
+  const tag = matched[0]?.meta.tags?.find((t) => tagToSlug(t) === slug) || tagSlug;
+  return { tag, posts: matched };
+}
+
+/** Liệt kê mọi tag đang có bài (kèm số lượng) — dùng cho generateStaticParams + tag cloud. */
+export async function getAllTagsUnified(): Promise<{ tag: string; slug: string; count: number }[]> {
+  const all = await getAllPostsUnified();
+  const map = new Map<string, { tag: string; count: number }>();
+  for (const p of all) {
+    for (const t of p.meta.tags || []) {
+      const slug = tagToSlug(t);
+      if (!slug) continue;
+      const cur = map.get(slug);
+      if (cur) cur.count++;
+      else map.set(slug, { tag: t, count: 1 });
+    }
+  }
+  return [...map.entries()]
+    .map(([slug, v]) => ({ ...v, slug }))
+    .sort((a, b) => b.count - a.count);
 }

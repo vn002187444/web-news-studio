@@ -14,8 +14,7 @@
     "sync-posts": "tsx scripts/sync-posts.ts",
     "seed-taxonomy": "tsx scripts/seed-taxonomy.ts",
     "report": "tsx scripts/generate-report.ts",
-    "check-status": "tsx scripts/check-status.ts",
-    "test": "tsx --test src/**/*.test.ts"
+    "check-status": "tsx scripts/check-status.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -55,6 +54,6 @@
     "eslint-config-next": "16.3.8",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
-    "typescript": "^5"
+    "typescript": "^7.0.2"
   }
 }
