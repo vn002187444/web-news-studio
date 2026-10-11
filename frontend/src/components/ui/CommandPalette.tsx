@@ -3,11 +3,18 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from '@/i18n/routing';
+import { useSearch } from './SearchProvider';
+
+interface SearchResult {
+  title: string;
+  slug: string;
+  category: string;
+}
 
 export default function CommandPalette() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen } = useSearch();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 

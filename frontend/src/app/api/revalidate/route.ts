@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { secureCompare } from '@/lib/security';
 
 // Sanity Webhook → POST /api/revalidate?secret=... {slug, category}
 // Cấu hình trong Sanity Manage → API → Webhooks (on create/update/delete article).
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const secret = url.searchParams.get('secret') || request.headers.get('x-webhook-secret') || '';
-  if (!process.env.SANITY_WEBHOOK_SECRET || secret !== process.env.SANITY_WEBHOOK_SECRET) {
+  const expected = process.env.SANITY_WEBHOOK_SECRET || '';
+  if (!expected || !secureCompare(secret, expected)) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

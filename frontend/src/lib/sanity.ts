@@ -45,13 +45,37 @@ export function getSanityClient(withToken = false): SanityClient | null {
   return publicClient;
 }
 
+export interface PortableTextSpan {
+  _type: 'span';
+  _key: string;
+  text: string;
+  marks?: string[];
+  _href?: string;
+}
+
+export interface PortableTextMarkDef {
+  _type: 'link';
+  _key: string;
+  href: string;
+}
+
+export interface PortableTextBlock {
+  _type: 'block';
+  _key: string;
+  style: string;
+  children: PortableTextSpan[];
+  markDefs?: PortableTextMarkDef[];
+  listItem?: string;
+  level?: number;
+}
+
 export interface SanityArticle {
   _id: string;
   slug: string;
   title: string;
   excerpt: string;
   content: string; // markdown (cũ — fallback)
-  body?: any[]; // Portable Text (mới — ưu tiên render)
+  body?: PortableTextBlock[]; // Portable Text (mới — ưu tiên render)
   category: 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science';
   tags: string[];
   thumbnail: string;
@@ -111,16 +135,16 @@ export async function fetchSanityByCategory(category: string): Promise<SanityArt
 }
 
 /** Chuyển markdown (bot AI sinh) sang Portable Text blocks để lưu field `body`. */
-export function markdownToBlocks(md: string): any[] {
+export function markdownToBlocks(md: string): PortableTextBlock[] {
   const key = () => Math.random().toString(36).slice(2, 10);
-  const parseSpans = (text: string): { children: any[] } => {
-    const children: any[] = [];
+  const parseSpans = (text: string): { children: PortableTextSpan[], markDefs: PortableTextMarkDef[] } => {
+    const children: PortableTextSpan[] = [];
     const linkRe = /\[([^\]]+)\]\(([^)]+)\)/g;
     let last = 0;
     let m: RegExpExecArray | null;
     const pushText = (t: string, mark?: string) => {
       if (!t) return;
-      const span: any = { _type: 'span', _key: key(), text: t };
+      const span: PortableTextSpan = { _type: 'span', _key: key(), text: t };
       if (mark) span.marks = [mark];
       children.push(span);
     };
@@ -133,32 +157,32 @@ export function markdownToBlocks(md: string): any[] {
       });
       last = m.index + m[0].length;
       // lưu tạm href vào def
-      (children[children.length - 1] as any)._href = m[2];
+      children[children.length - 1]._href = m[2];
     }
     pushText(text.slice(last));
-    const defs = (children.filter((c) => c._href) as any[]).map((c) => {
-      const d = { _type: 'link', _key: c.marks[0], href: c._href };
+    const defs = children.filter((c) => c._href).map((c) => {
+      const d: PortableTextMarkDef = { _type: 'link', _key: c.marks![0], href: c._href! };
       delete c._href;
       return d;
     });
-    return { children, markDefs: defs } as any;
+    return { children, markDefs: defs };
   };
 
-  const blocks: any[] = [];
+  const blocks: PortableTextBlock[] = [];
   for (const rawLine of (md || '').split('\n')) {
     const line = rawLine.trim();
     if (!line || line === '---') continue;
     if (line.startsWith('### ')) {
-      const { children, markDefs } = parseSpans(line.slice(4)) as any;
+      const { children, markDefs } = parseSpans(line.slice(4));
       blocks.push({ _type: 'block', _key: key(), style: 'h3', children, markDefs });
     } else if (line.startsWith('## ')) {
-      const { children, markDefs } = parseSpans(line.slice(3)) as any;
+      const { children, markDefs } = parseSpans(line.slice(3));
       blocks.push({ _type: 'block', _key: key(), style: 'h2', children, markDefs });
     } else if (/^[-*]\s+/.test(line)) {
-      const { children, markDefs } = parseSpans(line.replace(/^[-*]\s+/, '')) as any;
+      const { children, markDefs } = parseSpans(line.replace(/^[-*]\s+/, ''));
       blocks.push({ _type: 'block', _key: key(), style: 'normal', listItem: 'bullet', level: 1, children, markDefs });
     } else {
-      const { children, markDefs } = parseSpans(line.replace(/^\d+\.\s+/, '')) as any;
+      const { children, markDefs } = parseSpans(line.replace(/^\d+\.\s+/, ''));
       if (children.length === 0) continue;
       blocks.push({ _type: 'block', _key: key(), style: 'normal', children, markDefs });
     }
@@ -173,7 +197,7 @@ export async function pushArticleToSanity(doc: Omit<SanityArticle, '_id'>): Prom
   try {
     const body = doc.body && doc.body.length > 0 ? doc.body : markdownToBlocks(doc.content || '');
     const cat = (doc.category || 'tech') as string;
-    const refs: any = {};
+    const refs: { authorRef?: { _type: string, _ref: string }, categoryRef?: { _type: string, _ref: string } } = {};
     // Seed S3 dùng _id cố định author-<cat> / category-<cat>
     refs.authorRef = { _type: 'reference', _ref: `author-${cat}` };
     refs.categoryRef = { _type: 'reference', _ref: `category-${cat}` };

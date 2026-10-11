@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { toSlug } from '@/lib/site';
+import { secureCompare } from '@/lib/security';
 import { markdownToBlocks } from '@/lib/sanity';
 import { withTimeout, GEMINI_TIMEOUT_MS, GEMINI_RACE_MS } from '@/lib/gemini';
 
@@ -33,9 +34,10 @@ function validRewrite(j: any): { title: string; excerpt: string; content: string
 }
 
 export async function GET(request: Request) {
-  const cronSecret = process.env.CRON_SECRET || 'news_studio_cron_secret_2026';
+  const cronSecret = process.env.CRON_SECRET || '';
+  if (!cronSecret) return NextResponse.json({ ok: false, reason: 'cron-secret-not-configured' }, { status: 500 });
   const got = request.headers.get('authorization')?.replace('Bearer ', '') || '';
-  if (got !== cronSecret) return NextResponse.json({ ok: false, reason: 'unauthorized' }, { status: 401 });
+  if (!secureCompare(got, cronSecret)) return NextResponse.json({ ok: false, reason: 'unauthorized' }, { status: 401 });
 
   const geminiKey = process.env.GEMINI_API_KEY || '';
   const geminiModel = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';

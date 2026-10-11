@@ -1,8 +1,8 @@
-import { getPostUnified, getAllPostsUnified } from '@/lib/posts';
+import { getPostUnified, getAllPostsUnified, UnifiedPost } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import SingleArticleClient from './SingleArticleClient';
-import { SITE_URL, absoluteUrl, escapeJsonLd } from '@/lib/site';
+import { SITE_URL, absoluteUrl } from '@/lib/site';
 import { optimizeThumbnail } from '@/lib/image';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string; category: string }> }): Promise<Metadata> {
@@ -77,7 +77,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     .map((p) => ({
       slug: p.slug,
       meta: { title: p.meta.title, category: p.meta.category, thumbnail: p.meta.thumbnail },
-    }));
+    })) as unknown as UnifiedPost[];
 
   const pageUrl = `${SITE_URL}/${locale}/${category}/${slug}`;
   // Ảnh hero nén tại nguồn (Sanity/Unsplash transform) — w=1600 cho màn retina
@@ -111,7 +111,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: escapeJsonLd(JSON.stringify(jsonLd)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
       <SingleArticleClient meta={{ ...post.meta, thumbnail: heroThumb }} slug={slug} allPosts={relatedPosts} content={post.content} body={post.body} />
     </>
