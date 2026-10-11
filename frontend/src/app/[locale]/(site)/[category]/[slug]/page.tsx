@@ -2,7 +2,7 @@ import { getPostUnified, getAllPostsUnified, UnifiedPost } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import SingleArticleClient from './SingleArticleClient';
-import { SITE_URL, absoluteUrl } from '@/lib/site';
+import { SITE_URL, absoluteUrl, smartTruncate } from '@/lib/site';
 import { optimizeThumbnail } from '@/lib/image';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string; category: string }> }): Promise<Metadata> {
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
   return {
     title: post.meta.title,
-    description: post.meta.excerpt?.slice(0, 160) || post.meta.title,
+    description: smartTruncate(post.meta.excerpt, 155) || post.meta.title,
     alternates: {
       canonical: url,
       languages: {
@@ -107,11 +107,40 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     },
   };
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: locale === 'vi' ? 'Trang chủ' : 'Home',
+        item: `${SITE_URL}/${locale}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: post.meta.category,
+        item: `${SITE_URL}/${locale}/${category}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.meta.title,
+        item: pageUrl,
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c') }}
       />
       <SingleArticleClient meta={{ ...post.meta, thumbnail: heroThumb }} slug={slug} allPosts={relatedPosts} content={post.content} body={post.body} />
     </>

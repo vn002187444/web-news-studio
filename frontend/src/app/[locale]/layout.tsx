@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       alternateLocale: [other === 'vi' ? 'vi_VN' : 'en_US'],
       type: 'website',
     },
-    robots: { index: true, follow: true },
+    robots: locale === 'en' ? { index: false, follow: true } : { index: true, follow: true },
   };
 }
 

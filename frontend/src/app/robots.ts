@@ -5,9 +5,9 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
-      allow: '/',
-      disallow: ['/api/', '/admin/'],
+      allow: ['/', '/api/og'],
+      disallow: ['/api/', '/admin/', '/studio/'],
     },
-    sitemap: absoluteUrl('/sitemap.xml'),
+    sitemap: [absoluteUrl('/sitemap.xml'), absoluteUrl('/sitemap-news.xml')],
   };
 }
