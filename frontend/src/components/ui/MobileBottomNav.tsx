@@ -1,9 +1,11 @@
 'use client';
 
 import { Link, usePathname } from '@/i18n/routing';
+import { useSearch } from './SearchProvider';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
+  const { openSearch } = useSearch();
 
   const navItems = [
     { name: 'Trang chủ', href: '/', icon: '⌂' },
@@ -18,7 +20,7 @@ export default function MobileBottomNav() {
     } catch {
       /* noop */
     }
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+    openSearch();
   };
 
   return (

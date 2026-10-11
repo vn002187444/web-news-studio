@@ -5,6 +5,7 @@ import { Link, usePathname } from '@/i18n/routing';
 import MagneticButton from './MagneticButton';
 import { useTranslations, useLocale } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearch } from './SearchProvider';
 
 export default function Header() {
   const t = useTranslations('Header');
@@ -63,9 +64,7 @@ export default function Header() {
   // Quick categories: hiện đủ 9 chuyên mục trên thanh menu ngang (màn xl+)
   const quickCategories = allCategories;
 
-  const openSearch = () => {
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
-  };
+  const { openSearch } = useSearch();
 
   return (
     <header 
