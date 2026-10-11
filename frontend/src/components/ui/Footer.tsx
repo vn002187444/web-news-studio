@@ -10,7 +10,11 @@ export default function Footer() {
   const subscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.includes('@')) return;
-    try { (navigator as any).vibrate?.(15); } catch { /* noop */ }
+    try {
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate(15);
+      }
+    } catch { /* noop */ }
     try { localStorage.setItem('newsletter-email', email); } catch { /* noop */ }
     setDone(true);
   };

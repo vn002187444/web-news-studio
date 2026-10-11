@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import VelocitySkew from './VelocitySkew';
+import { Article } from '@/types';
 
 interface BentoGridProps {
-  articles: any[];
+  articles: Pick<Article, 'slug' | 'title' | 'excerpt' | 'category' | 'thumbnail'>[];
 }
 
 const CATEGORY_NAMES: Record<string, string> = {
