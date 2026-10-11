@@ -1,4 +1,4 @@
-import { getPostUnified, getAllPostsUnified } from '@/lib/posts';
+import { getPostUnified, getAllPostsUnified, UnifiedPost } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import SingleArticleClient from './SingleArticleClient';
@@ -77,7 +77,7 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
     .map((p) => ({
       slug: p.slug,
       meta: { title: p.meta.title, category: p.meta.category, thumbnail: p.meta.thumbnail },
-    }));
+    })) as unknown as UnifiedPost[];
 
   const pageUrl = `${SITE_URL}/${locale}/${category}/${slug}`;
   // Ảnh hero nén tại nguồn (Sanity/Unsplash transform) — w=1600 cho màn retina

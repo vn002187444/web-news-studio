@@ -5,15 +5,19 @@ import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { useArticleTracker } from '@/hooks/useArticleTracker';
 import { useTranslations } from 'next-intl';
+import { UnifiedPost } from '@/lib/posts';
 
-export default function RecommendedArticles({ recentPosts, currentSlug, currentCategory }: { recentPosts: any[], currentSlug: string, currentCategory: string }) {
+export default function RecommendedArticles({ recentPosts, currentSlug, currentCategory }: { recentPosts: UnifiedPost[], currentSlug: string, currentCategory: string }) {
   const t = useTranslations('Common');
   // Kích hoạt Tracker: Ghi nhận bài đang đọc vào não bộ (LocalStorage)
   const profile = useArticleTracker(currentCategory, currentSlug);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Thuật toán Recommendation Engine
