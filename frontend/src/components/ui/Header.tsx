@@ -95,13 +95,14 @@ export default function Header() {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`flex items-center gap-2 font-mono text-xs uppercase px-3.5 py-1.5 rounded-full border transition-all duration-200 ${
+              className={`flex items-center gap-2 font-mono text-xs uppercase px-3.5 py-1.5 rounded-full border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
                 isDropdownOpen 
                   ? 'bg-red-600 border-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
                   : 'bg-white/5 border-white/20 text-white/90 hover:bg-white/10 hover:text-white'
               }`}
               aria-expanded={isDropdownOpen}
               aria-haspopup="true"
+              aria-controls="category-dropdown"
               aria-label="Mở danh sách chuyên mục"
             >
               <span className="text-sm">☰</span>
@@ -119,6 +120,7 @@ export default function Header() {
             <AnimatePresence>
               {isDropdownOpen && (
                 <motion.div
+                  id="category-dropdown"
                   initial={{ opacity: 0, y: 12, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 8, scale: 0.98 }}
