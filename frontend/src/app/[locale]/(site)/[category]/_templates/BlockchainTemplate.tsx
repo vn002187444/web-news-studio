@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Link } from '@/i18n/routing';
 
 // Quả cầu 3D chỉ tải khi browser (không SSR) → three.js không vào bundle trang.
@@ -18,31 +18,35 @@ function ParticleBurst({ x, y, onComplete }: { x: number; y: number; onComplete:
     return () => clearTimeout(timer);
   }, [onComplete]);
 
+  // Use useState to prevent calling Math.random() during render
+  const [particles] = useState(() => {
+    return Array.from({ length: 12 }).map((_, i) => {
+      const angle = (i * 360) / 12;
+      const velocity = 50 + Math.random() * 50;
+      return { id: i, angle, velocity };
+    });
+  });
+
   // Reduced motion check
   const isReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (isReduced) return null;
 
-  const particles = Array.from({ length: 12 });
   return (
     <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden" style={{ left: x, top: y }}>
-      {particles.map((_, i) => {
-        const angle = (i * 360) / particles.length;
-        const velocity = 50 + Math.random() * 50;
-        return (
-          <motion.div
-            key={i}
-            initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-            animate={{
-              x: Math.cos((angle * Math.PI) / 180) * velocity,
-              y: Math.sin((angle * Math.PI) / 180) * velocity,
-              opacity: 0,
-              scale: 0,
-            }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="absolute w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"
-          />
-        );
-      })}
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+          animate={{
+            x: Math.cos((p.angle * Math.PI) / 180) * p.velocity,
+            y: Math.sin((p.angle * Math.PI) / 180) * p.velocity,
+            opacity: 0,
+            scale: 0,
+          }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="absolute w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"
+        />
+      ))}
     </div>
   );
 }
@@ -195,7 +199,6 @@ const TiltCard = ({ article }: { article: any }) => {
 };
 
 export default function BlockchainTemplate({ articles }: { articles: any[] }) {
-  // Use real AI data — không duplicate hack, hiện empty-state khi thiếu
   const cryptoArticles = articles && articles.length > 0 ? articles : [];
   
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number }[]>([]);
@@ -225,16 +228,24 @@ export default function BlockchainTemplate({ articles }: { articles: any[] }) {
           <CryptoTicker />
         </div>
 
-        {cryptoArticles.length === 0 && (
-          <p className="font-mono text-xs uppercase tracking-widest text-white/40 border border-dashed border-white/20 rounded-2xl p-8 text-center">Chưa có bài Blockchain — chạy autoblog để sinh nội dung.</p>
+        {cryptoArticles.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 border border-dashed border-green-500/20 rounded-2xl bg-white/[0.02]">
+            <p className="font-mono text-xs uppercase tracking-widest text-white/40 text-center">
+              Chưa có bài viết Blockchain
+            </p>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-white/20 text-center mt-2">
+              Chạy hệ thống Autoblog AI để tự động tạo nội dung.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 perspective-[1000px]">
+            {cryptoArticles.slice(0, 6).map((article, i) => (
+              <Link key={article.slug || i} href={`/blockchain/${article.slug}`} onClick={handleCTAClick}>
+                 <TiltCard article={article} />
+              </Link>
+            ))}
+          </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 perspective-[1000px]">
-          {cryptoArticles.slice(0, 6).map((article, i) => (
-            <Link key={article.slug || i} href={`/blockchain/${article.slug}`} onClick={handleCTAClick}>
-               <TiltCard article={article} />
-            </Link>
-          ))}
-        </div>
       </div>
       {bursts.map(b => (
         <ParticleBurst key={b.id} x={b.x} y={b.y} onComplete={() => setBursts(prev => prev.filter(x => x.id !== b.id))} />

@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { Link } from '@/i18n/routing';
+import Image from 'next/image';
 
 export default function LifestyleTemplate({ articles }: { articles: any[] }) {
   const targetRef = useRef<HTMLDivElement>(null);
@@ -50,13 +51,15 @@ export default function LifestyleTemplate({ articles }: { articles: any[] }) {
                 <div className="w-full h-full relative overflow-hidden mb-6">
                   {/* Ken Burns auto 5%/10s + parallax Y theo scroll */}
                   <motion.div style={{ y: imgY }} className="absolute -inset-[6%]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.thumbnail?.url}
-                      alt={item.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover animate-kenburns-slow"
-                    />
+                    {item.thumbnail?.url && (
+                      <Image
+                        src={item.thumbnail.url}
+                        alt={item.title || 'Lifestyle Article'}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover animate-kenburns-slow"
+                      />
+                    )}
                   </motion.div>
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-700" />
                 </div>
