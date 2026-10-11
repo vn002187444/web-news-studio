@@ -77,7 +77,7 @@ export async function GET(request: Request) {
       }
     );
   } catch (e: any) {
-    console.log(`${e.message}`);
+    console.error(`Failed to generate OG image: ${e.message}`);
     return new Response('Failed to generate image', { status: 500 });
   }
 }
