@@ -2,29 +2,31 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { absoluteUrl, SITE_URL, escapeJsonLd, toSlug } from './site';
 
-test('absoluteUrl utility', async (t) => {
-  await t.test('prepends SITE_URL to paths starting with /', () => {
+describe('absoluteUrl utility', () => {
+  test('prepends SITE_URL to paths starting with /', () => {
     const path = '/about';
     const expected = `${SITE_URL}${path}`;
     const result = absoluteUrl(path);
     assert.strictEqual(result, expected);
   });
 
-  await t.test('prepends SITE_URL and / to paths not starting with /', () => {
+  test('prepends SITE_URL and / to paths not starting with /', () => {
     const path = 'contact';
     const expected = `${SITE_URL}/${path}`;
     const result = absoluteUrl(path);
     assert.strictEqual(result, expected);
   });
 
-  await t.test('handles empty path correctly', () => {
+  test('handles empty path correctly', () => {
     const path = '';
     const expected = `${SITE_URL}/`;
     const result = absoluteUrl(path);
     assert.strictEqual(result, expected);
   });
 });
-test('returns the same string if there are no special characters', () => {
+
+describe('escapeJsonLd', () => {
+  test('returns the same string if there are no special characters', () => {
     const input = '{"name": "John Doe", "job": "Software Engineer"}';
     assert.strictEqual(escapeJsonLd(input), input);
   });
@@ -35,13 +37,13 @@ test('returns the same string if there are no special characters', () => {
 
   test('escapes <, >, and & characters properly', () => {
     const input = '<script>alert("XSS") & "eval"</script>';
-    const expected = '\\\\u003cscript\\\\u003ealert("XSS") \\\\u0026 "eval"\\\\u003c/script\\\\u003e';
+    const expected = '\\u003cscript\\u003ealert("XSS") \\u0026 "eval"\\u003c/script\\u003e';
     assert.strictEqual(escapeJsonLd(input), expected);
   });
 
   test('handles multiple consecutive special characters', () => {
     const input = '<<>>&&';
-    const expected = '\\\\u003c\\\\u003c\\\\u003e\\\\u003e\\\\u0026\\\\u0026';
+    const expected = '\\u003c\\u003c\\u003e\\u003e\\u0026\\u0026';
     assert.strictEqual(escapeJsonLd(input), expected);
   });
 
@@ -53,9 +55,9 @@ test('returns the same string if there are no special characters', () => {
       "description": "A description containing & special > characters <."
     });
     const expected = jsonLdPayload
-      .replace(/</g, '\\\\u003c')
-      .replace(/>/g, '\\\\u003e')
-      .replace(/&/g, '\\\\u0026');
+      .replace(/</g, '\\u003c')
+      .replace(/>/g, '\\u003e')
+      .replace(/&/g, '\\u0026');
 
     assert.strictEqual(escapeJsonLd(jsonLdPayload), expected);
   });
@@ -72,9 +74,6 @@ describe('toSlug', () => {
     assert.strictEqual(toSlug('Tiếng Việt'), 'tieng-viet');
 
     // Note: This tests the current implementation's behavior.
-    // 'Đ' becomes 'đ' (lowercase). 'đ' is not a basic a-z character.
-    // The current regex /[^a-z0-9]+/g replaces 'đ' with '-'.
-    // So 'Đường' -> 'đường' -> 'uong' (đ becomes -, ường becomes uong, then -uong becomes uong after trim).
     assert.strictEqual(toSlug('Đường'), 'uong');
   });
 
@@ -93,9 +92,6 @@ describe('toSlug', () => {
     assert.strictEqual(toSlug(longString), 'a'.repeat(80));
     assert.strictEqual(toSlug(longString).length, 80);
 
-    // Ensure that if truncation leaves a trailing hyphen, it should arguably be removed,
-    // but the current implementation slices AFTER removing trailing hyphens,
-    // so a hyphen at index 79 could theoretically remain. Let's test this behavior.
     const trickyString = 'a'.repeat(79) + '-' + 'b'.repeat(20);
     assert.strictEqual(toSlug(trickyString), 'a'.repeat(79) + '-');
   });

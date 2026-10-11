@@ -21,5 +21,5 @@ export function toSlug(s: string): string {
 
 export function escapeJsonLd(json: string): string {
   // Ngăn break-out khỏi <script>: </script> / <!-- trong title/content
-  return json.replace(/</g, '\\\\u003c').replace(/>/g, '\\\\u003e').replace(/&/g, '\\\\u0026');
+  return json.replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 }
