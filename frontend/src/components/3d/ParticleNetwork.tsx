@@ -120,7 +120,7 @@ export default function ParticleNetwork() {
   const [disabled, setDisabled] = useState(false);
   useEffect(() => {
     try {
-      const conn = (navigator as any).connection;
+      const conn = navigator.connection;
       const saveData = conn?.saveData;
       const weakNet = conn && (conn.effectiveType === '2g' || conn.effectiveType === 'slow-2g');
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
