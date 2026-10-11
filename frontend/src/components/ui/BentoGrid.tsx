@@ -11,6 +11,7 @@ interface BentoGridProps {
 }
 
 const CATEGORY_NAMES: Record<string, string> = {
+  world: 'Thời Sự',
   tech: 'Công Nghệ',
   blockchain: 'Blockchain',
   game: 'Esports',

@@ -24,7 +24,9 @@ test('absoluteUrl utility', async (t) => {
     assert.strictEqual(result, expected);
   });
 });
-test('returns the same string if there are no special characters', () => {
+
+describe('escapeJsonLd', () => {
+  test('returns the same string if there are no special characters', () => {
     const input = '{"name": "John Doe", "job": "Software Engineer"}';
     assert.strictEqual(escapeJsonLd(input), input);
   });

@@ -6,7 +6,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
   const locales = ['vi', 'en'];
 
-  const categoryRoutes = ['tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'].flatMap((cat) =>
+  const categoryRoutes = ['world', 'tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'].flatMap((cat) =>
     locales.map((locale) => ({
       url: `${baseUrl}/${locale}/${cat}`,
       lastModified: new Date(),

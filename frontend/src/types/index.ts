@@ -9,7 +9,7 @@ export interface Article {
     avatar: string;
     role?: string;
   };
-  category: 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science';
+  category: 'world' | 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science';
   tags: string[];
   thumbnail: {
     url: string;

@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import WorldTemplate from './_templates/WorldTemplate';
 import TechTemplate from './_templates/TechTemplate';
 import BlockchainTemplate from './_templates/BlockchainTemplate';
 import GameTemplate from './_templates/GameTemplate';
@@ -14,9 +15,10 @@ import { Metadata } from 'next';
 import { getPostsByCategoryUnified } from '@/lib/posts';
 import { optimizeThumbnail } from '@/lib/image';
 
-const CATEGORIES = ['tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
+const CATEGORIES = ['world', 'tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
 
 const CATEGORY_META: Record<string, { title: string; description: string }> = {
+  world: { title: 'Thời Sự & Thế Giới — Tin Tức Quốc Tế, Chính Trị', description: 'Tin thời sự quốc tế, chính trị, địa chính trị và toàn cầu mới nhất.' },
   tech: { title: 'Công Nghệ — AI, Smartphone, Startup', description: 'Tin công nghệ, AI, smartphone và startup mới nhất.' },
   blockchain: { title: 'Blockchain — Web3, Bitcoin, DeFi', description: 'Giá Bitcoin, Web3, NFT và DeFi cập nhật.' },
   game: { title: 'Game — Esports, PC, Mobile', description: 'Esports, review game PC/Console và mobile.' },
@@ -55,7 +57,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   const { category } = await params;
   
   // Validate category
-  const validCategories = ['tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
+  const validCategories = ['world', 'tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
   if (!validCategories.includes(category)) {
     notFound();
   }
@@ -76,6 +78,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
   // Render specific template based on category
   switch (category) {
+    case 'world':
+      return <WorldTemplate articles={articles} />;
     case 'tech':
       return <TechTemplate articles={articles} />;
     case 'blockchain':

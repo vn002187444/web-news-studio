@@ -50,6 +50,7 @@ export default function Header() {
 
   // Danh mục đầy đủ với mô tả & icon
   const allCategories = [
+    { href: '/world', key: 'world', label: t('world'), icon: '🌐', desc: 'Thời sự, địa chính trị & tin tức toàn cầu', badge: 'Hot' },
     { href: '/tech', key: 'tech', label: t('tech'), icon: '⚛', desc: 'Trí tuệ nhân tạo, thiết bị & phần mềm', badge: '3D WebGL' },
     { href: '/blockchain', key: 'blockchain', label: t('blockchain'), icon: '₿', desc: 'Web3, tiền mã hóa & hợp đồng thông minh', badge: 'Bloom' },
     { href: '/finance', key: 'finance', label: t('finance'), icon: '📈', desc: 'Thị trường tài chính, chứng khoán & vĩ mô', badge: 'Live' },
@@ -136,11 +137,11 @@ export default function Header() {
                       </span>
                     </div>
                     <span className="font-mono text-[10px] text-white/40 uppercase hidden sm:inline">
-                      9 Chuyên Mục Chuyên Sâu
+                      10 Chuyên Mục Chuyên Sâu
                     </span>
                   </div>
 
-                  {/* Grid 9 Chuyên Mục */}
+                  {/* Grid 10 Chuyên Mục */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 max-h-[65vh] overflow-y-auto pr-1">
                     {allCategories.map((cat) => {
                       const isActive = pathname.startsWith(cat.href);

@@ -76,7 +76,7 @@ export interface SanityArticle {
   excerpt: string;
   content: string; // markdown (cũ — fallback)
   body?: PortableTextBlock[]; // Portable Text (mới — ưu tiên render)
-  category: 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science';
+  category: 'world' | 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science';
   tags: string[];
   thumbnail: string;
   author: string;

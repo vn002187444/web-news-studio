@@ -13,6 +13,7 @@ interface SectionArticle {
 }
 
 const CATEGORY_ORDER = [
+  'world',
   'tech',
   'finance',
   'blockchain',
@@ -25,6 +26,7 @@ const CATEGORY_ORDER = [
 ];
 
 const CATEGORY_NAMES: Record<string, string> = {
+  world: 'Thời Sự',
   tech: 'Công Nghệ',
   blockchain: 'Blockchain',
   game: 'Game',

@@ -51,6 +51,7 @@ export default function Footer() {
         <div>
           <h3 className="font-mono text-xs uppercase text-white/40 mb-6">Chuyên mục</h3>
           <ul className="flex flex-col gap-4 font-medium">
+            <li><Link href="/world" className="hover:text-red-400 transition-colors">Thời Sự & Thế Giới</Link></li>
             <li><Link href="/tech" className="hover:text-red-400 transition-colors">Công Nghệ</Link></li>
             <li><Link href="/blockchain" className="hover:text-red-400 transition-colors">Blockchain</Link></li>
             <li><Link href="/game" className="hover:text-red-400 transition-colors">Esports & Gaming</Link></li>
