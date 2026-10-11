@@ -1,10 +1,8 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
 import { getAllPostsUnified } from '@/lib/posts';
 import BentoGrid from '@/components/ui/BentoGrid';
 
 export default async function NotFound() {
-  // const t = await getTranslations('NotFound');
 
   // Lấy 5 bài viết nổi bật
   const allPosts = await getAllPostsUnified();
