@@ -71,18 +71,21 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
         </div>
 
         {/* Right: Parallax Image — ảnh bài mới nhất */}
-        <div className="lg:col-span-5 h-[500px] lg:h-[700px] w-full relative overflow-hidden bg-gray-200">
+        <div className="lg:col-span-5 h-[500px] lg:h-[700px] w-full relative overflow-hidden bg-gray-200 group">
+          {article && (
+            <Link href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" data-cursor="READ" aria-label={article.title} />
+          )}
           <motion.div style={{ y }} className="w-full h-[120%] -top-[10%] relative">
             <Image 
               src={article?.thumbnail.url || FALLBACK_IMG}
               alt={article?.thumbnail.alt || 'Retro Tech Setup'}
               fill
-              className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
+              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
               priority
             />
           </motion.div>
           {article && (
-            <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/80 to-transparent z-10 pointer-events-none">
               <span className="font-mono text-[10px] uppercase tracking-widest bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-white">
                 {article.category}
               </span>

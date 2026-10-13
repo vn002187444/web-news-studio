@@ -83,19 +83,24 @@ export default function BentoGrid({ articles }: BentoGridProps) {
             ))}
             
             {/* A purely decorative Bento Box */}
-            <motion.div 
-               className="bg-[#111111] text-white p-8 flex flex-col justify-between cursor-pointer border border-white/10 rounded-none hover:bg-neutral-900 transition-colors"
+            <motion.button 
+               onClick={() => {
+                 document.getElementById('newsletter-email')?.focus();
+                 document.getElementById('newsletter-email')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+               }}
+               className="bg-[#111111] text-white p-8 flex flex-col justify-between cursor-pointer border border-white/10 rounded-none hover:bg-neutral-900 transition-colors text-left w-full h-full"
                initial={{ opacity: 0 }}
                whileInView={{ opacity: 1 }}
                viewport={{ once: true }}
                data-cursor="JOIN"
+               aria-label="Đăng ký nhận báo cáo phân tích"
             >
                <div>
                  <span className="font-mono text-[10px] text-red-500 uppercase tracking-widest block mb-2">Đặc Quyền Độc Giả</span>
                  <h3 className="font-serif text-3xl italic">Bản Tin Chuyên Sâu</h3>
                </div>
                <p className="font-mono text-xs uppercase opacity-60 mt-auto">Đăng ký nhận báo cáo phân tích công nghệ & tài chính mỗi sáng.</p>
-            </motion.div>
+            </motion.button>
           </div>
         </VelocitySkew>
       </div>

@@ -5,6 +5,7 @@ import CustomCursor from "@/components/ui/CustomCursor";
 import CommandPalette from "@/components/ui/CommandPalette";
 import MobileBottomNav from "@/components/ui/MobileBottomNav";
 import { SearchProvider } from "@/components/ui/SearchProvider";
+import HomepagePreloader from "@/components/ui/HomepagePreloader";
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, Space_Mono } from "next/font/google";
 import "../globals.css";
@@ -32,6 +33,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { SITE_URL, SITE_NAME } from '@/lib/site';
+import NextTopLoader from 'nextjs-toploader';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -94,7 +96,20 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
         <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="anonymous" />
       </head>
       <body className="min-h-full flex flex-col bg-[#F4F4F0] text-[#111111]">
+        <NextTopLoader 
+          color="#DC2626"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 12px rgba(220,38,38,0.9)"
+          zIndex={99999}
+        />
         <NextIntlClientProvider messages={messages}>
+          <HomepagePreloader />
           <CustomCursor />
           <SmoothScrollProvider>
             <SearchProvider>

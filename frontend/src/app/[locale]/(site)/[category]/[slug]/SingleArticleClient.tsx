@@ -22,6 +22,7 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
   });
   const [toc, setToc] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState('');
+  const [copied, setCopied] = useState(false);
 
   // Parse h2/h3 trong bài → Sticky TOC
   useEffect(() => {
@@ -78,9 +79,35 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
             )}
             <h4 className="font-mono text-xs uppercase tracking-widest text-gray-500 mb-6">Chia sẻ</h4>
             <div className="mt-4">
-              <div className="flex gap-4">
-                <button aria-label="Chia sẻ qua X" className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors">X</button>
-                <button aria-label="Chia sẻ qua LinkedIn" className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors">in</button>
+              <div className="flex flex-wrap gap-4">
+                <button 
+                  onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(meta.title)}&url=${encodeURIComponent(window.location.href)}`, '_blank')}
+                  aria-label="Chia sẻ qua X" 
+                  className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+                >
+                  X
+                </button>
+                <button 
+                  onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank')}
+                  aria-label="Chia sẻ qua LinkedIn" 
+                  className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+                >
+                  in
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  aria-label="Sao chép liên kết"
+                  className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors relative"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  {copied && (
+                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] py-1 px-2 rounded whitespace-nowrap">Đã sao chép!</span>
+                  )}
+                </button>
               </div>
             </div>
           </div>

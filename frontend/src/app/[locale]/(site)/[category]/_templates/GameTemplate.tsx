@@ -46,7 +46,7 @@ export default function GameTemplate({ articles }: { articles: any[] }) {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050505] text-white overflow-hidden md:cursor-none">
+    <div className="relative min-h-screen bg-[#050505] text-white overflow-hidden">
       {/* Custom Crosshair Cursor */}
       <motion.div
         className="hidden md:block fixed top-0 left-0 w-8 h-8 pointer-events-none z-[999] mix-blend-difference"
