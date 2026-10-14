@@ -4,6 +4,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
     // Custom loader (src/lib/imgLoader.ts): ảnh remote tải trực tiếp từ CDN gốc,
     // không qua `/_next/image` (tránh Cloudflare Images trả phí + TTFB ~2.4s ở LCP).
@@ -44,6 +45,9 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     const security = [
+      { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+      { key: 'X-XSS-Protection', value: '1; mode=block' },
+      { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
       { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
