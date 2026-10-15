@@ -14,7 +14,7 @@ const CATEGORY_NAMES: Record<string, string> = {
   world: 'Thời Sự',
   tech: 'Công Nghệ',
   blockchain: 'Blockchain',
-  game: 'Esports',
+  game: 'Game & Esports',
   finance: 'Tài Chính',
   lifestyle: 'Đời Sống',
   sports: 'Thể Thao',

@@ -53,8 +53,17 @@ export function generateStaticParams() {
   return ['vi', 'en'].flatMap((locale) => CATEGORIES.map((category) => ({ locale, category })));
 }
 
-export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+import Pagination from '@/components/ui/Pagination';
+
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ category: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const { category } = await params;
+  const searchParamsValue = await searchParams;
   
   // Validate category
   const validCategories = ['world', 'tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
@@ -62,10 +71,20 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
     notFound();
   }
 
+  // Xử lý phân trang
+  const pageStr = searchParamsValue?.page;
+  const currentPage = typeof pageStr === 'string' ? parseInt(pageStr, 10) || 1 : 1;
+  const itemsPerPage = 12;
+
   // Fetch real articles — Sanity-first, MDX fallback.
   // Excerpt cắt 140 ký tự (card line-clamp, không đổi giao diện) → nhẹ HTML/RSC payload.
   const rawPosts = await getPostsByCategoryUnified(category);
-  const articles = rawPosts.map(post => ({
+  const totalItems = rawPosts.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedPosts = rawPosts.slice(startIndex, startIndex + itemsPerPage);
+
+  const articles = paginatedPosts.map(post => ({
     id: post.slug,
     slug: post.slug,
     title: post.meta.title,
@@ -77,28 +96,46 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   }));
 
   // Render specific template based on category
+  let TemplateComponent = null;
   switch (category) {
     case 'world':
-      return <WorldTemplate articles={articles} />;
+      TemplateComponent = <WorldTemplate articles={articles} />;
+      break;
     case 'tech':
-      return <TechTemplate articles={articles} />;
+      TemplateComponent = <TechTemplate articles={articles} />;
+      break;
     case 'blockchain':
-      return <BlockchainTemplate articles={articles} />;
+      TemplateComponent = <BlockchainTemplate articles={articles} />;
+      break;
     case 'game':
-      return <GameTemplate articles={articles} />;
+      TemplateComponent = <GameTemplate articles={articles} />;
+      break;
     case 'finance':
-      return <FinanceTemplate articles={articles} />;
+      TemplateComponent = <FinanceTemplate articles={articles} />;
+      break;
     case 'lifestyle':
-      return <LifestyleTemplate articles={articles} />;
+      TemplateComponent = <LifestyleTemplate articles={articles} />;
+      break;
     case 'sports':
-      return <SportsTemplate articles={articles} />;
+      TemplateComponent = <SportsTemplate articles={articles} />;
+      break;
     case 'entertainment':
-      return <EntertainmentTemplate articles={articles} />;
+      TemplateComponent = <EntertainmentTemplate articles={articles} />;
+      break;
     case 'education':
-      return <EducationTemplate articles={articles} />;
+      TemplateComponent = <EducationTemplate articles={articles} />;
+      break;
     case 'science':
-      return <ScienceTemplate articles={articles} />;
+      TemplateComponent = <ScienceTemplate articles={articles} />;
+      break;
     default:
-      return <DefaultTemplate category={category} articles={articles} />;
+      TemplateComponent = <DefaultTemplate category={category} articles={articles} />;
   }
+
+  return (
+    <>
+      {TemplateComponent}
+      <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/${category}`} />
+    </>
+  );
 }

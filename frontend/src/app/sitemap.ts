@@ -1,35 +1,57 @@
 import { MetadataRoute } from 'next';
-import { getAllPostsUnified } from '@/lib/posts';
+import { getAllPostsUnified, getAllTagsUnified } from '@/lib/posts';
 import { SITE_URL } from '@/lib/site';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
   const locales = ['vi', 'en'];
 
-  const categoryRoutes = ['world', 'tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'].flatMap((cat) =>
-    locales.map((locale) => ({
+  let posts: Awaited<ReturnType<typeof getAllPostsUnified>> = [];
+  try {
+    posts = await getAllPostsUnified();
+  } catch {
+    posts = [];
+  }
+
+  const categories = ['world', 'tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
+  
+  const categoryRoutes: MetadataRoute.Sitemap = categories.flatMap((cat) => {
+    // Posts are already sorted by publishedAt descending in getAllPostsUnified
+    const catPosts = posts.filter(p => p.meta.category.toLowerCase() === cat);
+    const lastPost = catPosts.length > 0 ? catPosts[0] : null;
+    const lastModified = lastPost ? new Date(lastPost.meta.publishedAt) : new Date();
+
+    return locales.map((locale) => ({
       url: `${baseUrl}/${locale}/${cat}`,
-      lastModified: new Date(),
+      lastModified,
       changeFrequency: 'daily' as const,
       priority: 0.8,
+    }));
+  });
+
+  const articleRoutes: MetadataRoute.Sitemap = posts.flatMap((article) =>
+    locales.map((locale) => ({
+      url: `${baseUrl}/${locale}/${article.meta.category}/${article.slug}`,
+      lastModified: new Date(article.meta.publishedAt),
+      changeFrequency: 'never' as const,
+      priority: 0.6,
     }))
   );
 
-  // Dùng posts thật — Sanity-first, MDX fallback
-  let articleRoutes: MetadataRoute.Sitemap = [];
+  let tags: Awaited<ReturnType<typeof getAllTagsUnified>> = [];
   try {
-    const posts = await getAllPostsUnified();
-    articleRoutes = posts.flatMap((article) =>
-      locales.map((locale) => ({
-        url: `${baseUrl}/${locale}/${article.meta.category}/${article.slug}`,
-        lastModified: new Date(article.meta.publishedAt),
-        changeFrequency: 'never' as const,
-        priority: 0.6,
-      }))
-    );
+    tags = await getAllTagsUnified();
   } catch {
-    articleRoutes = [];
+    tags = [];
   }
+
+  const tagRoutes: MetadataRoute.Sitemap = tags.flatMap((tagObj) =>
+    locales.map((locale) => ({
+      url: `${baseUrl}/${locale}/tag/${tagObj.slug}`,
+      changeFrequency: 'weekly' as const,
+      priority: 0.5,
+    }))
+  );
 
   const homeRoutes: MetadataRoute.Sitemap = locales.map((locale) => ({
     url: `${baseUrl}/${locale}`,
@@ -38,5 +60,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1,
   }));
 
-  return [...homeRoutes, ...categoryRoutes, ...articleRoutes];
+  return [...homeRoutes, ...categoryRoutes, ...tagRoutes, ...articleRoutes];
 }
