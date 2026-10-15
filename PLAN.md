@@ -2,33 +2,23 @@
 
 > **Mục tiêu**: Hợp nhất và tinh gọn các hạng mục kỹ thuật, SEO, E-E-A-T và UX. Loại bỏ trùng lặp giữa các task cùng file tác động, tích hợp đồng bộ các pipeline mới (Content Allocator, Image Processor, OpenCode Jev, CF Sentinel) nhằm tối ưu chỉ số tín nhiệm của Google và trải nghiệm người dùng.
 > **Thời gian cập nhật**: 2026-10-15
-> **Trạng thái tổng thể**: Đã hoàn thành 55% khối lượng công việc — Sẵn sàng thực thi 3 Sprint gom nhóm.
+> **Trạng thái tổng thể**: ĐÃ HOÀN THÀNH 100% — Tất cả 3 Sprint đã được thẩm định QC, kiểm thử không lỗi và đồng bộ lên master.
 
 ```mermaid
 flowchart TD
-    subgraph DONE["Đã Hoàn Thành & Đã Kiểm Thử (Completed)"]
-        D1["Task 0.1 & 0.2: Lọc bài trùng & Chuyên mục World"]
-        D2["Task 1.1: robots.txt mở khóa /api/og"]
-        D3["Task 1.2: layout.tsx noindex nhánh /en"]
-        D4["Task 3.1: Schema BreadcrumbList & NewsArticle"]
-        D5["Task 3.2: Google News Sitemap /sitemap-news.xml"]
-        D6["Task 4.4: Trang 404 thương hiệu not-found.tsx"]
-        D7["Pipeline mới: OpenCode Jev + CF Guard + Image Processor + Allocator"]
+    subgraph C1["Sprint 1: E-E-A-T & Trang Chính Sách (ĐÃ HOÀN THÀNH - d3471af)"]
+        T_EEAT["Tạo editorial-guidelines/page.tsx + Nối 5 link chính sách thật vào Footer.tsx"]
     end
 
-    subgraph S1["Sprint 1: Hoàn Thiện Minh Bạch E-E-A-T & Trang Chính Sách"]
-        T_EEAT["Tạo editorial-guidelines.tsx + Nối 5 link chính sách vào Footer.tsx"]
+    subgraph C2["Sprint 2: FAQ Accordion, Nguồn Gốc & Tác Giả (ĐÃ HOÀN THÀNH - 44d0ad5)"]
+        T_ART["SingleArticleClient.tsx + autoblog.ts + migrate-faq-style.ts:\n- Cải tiến FAQ sang semantic details/summary Accordion\n- Hộp trích dẫn nguồn & Cảnh báo biên tập\n- Tác giả Ban Biên Tập News Studio & logo /icon-192x192.png\n- Nút chia sẻ Zalo, Facebook, 𝕏\n- An toàn trên Cloudflare Workers với rehype-raw"]
     end
 
-    subgraph S2["Sprint 2: Chuẩn Hóa Bài Viết, Tác Giả & Tương Tác Mạng Xã Hội"]
-        T_ART["SingleArticleClient.tsx + autoblog.ts:\n- Tác giả Ban Biên Tập & logo avatar\n- Hộp trích dẫn nguồn gốc (Attribution Box)\n- Nút chia sẻ Zalo, Facebook, X\n- Title & Meta description thông minh"]
+    subgraph C3["Sprint 3: Sitemap Tags, Phân Trang & UI (ĐÃ HOÀN THÀNH - b8ee996)"]
+        T_PAG["sitemap.ts + Pagination.tsx + [category]/page.tsx + BentoGrid:\n- Sitemap lastmod thật từ bài mới nhất & Tag URLs\n- Phân trang 12 bài/trang (?page=X) chuẩn SEO\n- Đồng bộ nhãn Game & Esports toàn hệ thống"]
     end
 
-    subgraph S3["Sprint 3: Tối Ưu Thu Thập Dữ Liệu & Trải Nghiệm Độc Giả"]
-        T_PAG["sitemap.ts + [category]/page.tsx + BentoGrid:\n- Sitemap lastmod thật & Tag URLs\n- Phân trang 12 bài/trang\n- Đồng bộ nhãn Game & Esports"]
-    end
-
-    DONE --> S1 --> S2 --> S3
+    C1 --> C2 --> C3
 ```
 
 ---
@@ -110,10 +100,10 @@ Thay vì thực hiện 14 task lẻ tẻ gây xung đột mã nguồn và chỉn
 ---
 
 ## 📊 MA TRẬN TIẾN ĐỘ THỰC THI GOM NHÓM
-
-| Sprint | Phạm Vi Gom Nhóm | Các Task Gốc | Trạng Thái | File Trọng Tâm |
+ 
+| Sprint | Phạm Vi Gom Nhóm | Các Task Gốc | Trạng Thái | Commit / Bằng Chứng |
 | :--- | :--- | :--- | :---: | :--- |
-| **Đã Xong** | Hạ tầng, Dead links, AI Pipelines | Task 0.1, 0.2, 1.1, 1.2, 3.1, 3.2, 4.4 + Pipelines mới | 🟢 ĐÃ XONG | `robots.ts`, `layout.tsx`, `not-found.tsx`, `sitemap-news.xml` |
-| **Sprint 1** | Minh bạch E-E-A-T & Footer Links | Task 2.1, 2.2 | 🟡 SẴN SÀNG | `editorial-guidelines/page.tsx`, `Footer.tsx` |
-| **Sprint 2** | Bài viết, Tác giả, Nguồn & Social | Task 2.3, 2.4, 3.3, 4.2 | 🟡 TIẾP THEO | `SingleArticleClient.tsx`, `autoblog.ts`, `[slug]/page.tsx` |
-| **Sprint 3** | Sitemap Tags, Phân trang & UI | Task 1.3, 4.1, 4.3 | 🟡 TIẾP THEO | `sitemap.ts`, `[category]/page.tsx`, `BentoGrid.tsx` |
+| **Hạ tầng nền tảng** | Hạ tầng, Dead links, AI Pipelines | Task 0.1, 0.2, 1.1, 1.2, 3.1, 3.2, 4.4 + Pipelines mới | 🟢 ĐÃ XONG | `robots.ts`, `layout.tsx`, `not-found.tsx`, `sitemap-news.xml` |
+| **Sprint 1** | Minh bạch E-E-A-T & Footer Links | Task 2.1, 2.2 | 🟢 ĐÃ HOÀN THÀNH | Commit `d3471af` |
+| **Sprint 2** | FAQ Accordion, Tác giả & Social | Task 2.3, 2.4, 3.3, 4.2 + Redesign FAQ | 🟢 ĐÃ HOÀN THÀNH | Commit `44d0ad5` (259 bài migrated) |
+| **Sprint 3** | Sitemap Tags, Phân trang & UI | Task 1.3, 4.1, 4.3 | 🟢 ĐÃ HOÀN THÀNH | Commit `b8ee996` |
