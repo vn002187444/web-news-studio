@@ -143,15 +143,39 @@ async function rewriteArticle(title: string, content: string, category: string, 
       5. "tags": 3-5 tag ngắn gọn.
       6. "takeaways": 3-5 điểm chính ngắn (AEO).
       7. "faq": 3 cặp {"q","a"} hỏi-đáp trực diện (Google AI Overviews).
-      8. Format the "content" in Markdown (.mdx), 800-1500 từ, BẮT BUỘC theo thứ tự:
+      8. "sourceName": Tên nguồn báo gốc (ví dụ: VnExpress, TechCrunch, Bloomberg).
+      9. "sourceUrl": URL của bài viết gốc (hoặc rỗng nếu không rõ).
+      10. Format the "content" in Markdown (.mdx), 800-1500 từ, BẮT BUỘC theo thứ tự:
          - Dòng đầu tiên của content PHẢI là: ## Những điểm chính (Key Takeaways)
            tiếp theo là bullet list copy NGUYÊN VĂN từng phần tử của trường "takeaways".
-          - Thân bài ## / ###: Nếu chèn liên kết nội bộ, CHỈ ĐƯỢC dùng các đường dẫn có thật sau:
+         - Thân bài ## / ###: Nếu chèn liên kết nội bộ, CHỈ ĐƯỢC dùng các đường dẫn có thật sau:
 ${candidateLinksText}
            TUYỆT ĐỐI KHÔNG tự bịa đặt slug giả định. Nếu không có slug phù hợp, chỉ liên kết về trang chuyên mục [Tên chuyên mục](/vi/${category}) hoặc KHÔNG tạo link.
-         - Mục "## Câu hỏi thường gặp (FAQ)" từ faq.
-         - Ghi rõ nguồn gốc tin (VD: Theo VnExpress/SCMP...) ở cuối bài — yêu cầu Attribution & Citation cho GEO.
-      9. Do not hallucinate facts. Maintain the original core news.
+         - Mục "## Câu hỏi thường gặp (FAQ)" từ faq. Bắt buộc format mỗi câu hỏi/đáp dưới dạng HTML semantic Accordion như sau:
+           <details className="group rounded-xl border border-gray-200 bg-gray-50/50 p-4 mb-4">
+             <summary className="flex cursor-pointer items-center justify-between font-medium text-gray-900">
+               <div className="flex items-center gap-2"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-600">Q</span>{câu hỏi}</div>
+             </summary>
+             <div className="mt-4 flex gap-2 border-t border-gray-100 pt-4 text-gray-600">
+               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-xs font-bold text-green-600">A</span>
+               <p>{câu trả lời}</p>
+             </div>
+           </details>
+         - Ghi rõ nguồn gốc tin ở cuối bài bằng Attribution & Disclaimer Box HTML sau:
+           <div className="mt-8 flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 p-4">
+             <div className="flex items-center gap-3">
+               <span className="text-2xl">📰</span>
+               <div><p className="text-sm font-medium text-gray-900">Nguồn tin gốc: {sourceName}</p></div>
+             </div>
+             <a href="{sourceUrl}" target="_blank" rel="nofollow noopener" className="text-sm font-medium text-red-600 hover:underline">Xem bài gốc ↗</a>
+           </div>
+           <div className="mt-4 rounded-xl border border-amber-200/60 bg-amber-50/50 p-4 text-sm text-amber-900/80">
+             <div className="flex items-start gap-3">
+               <span className="text-xl">🛡️</span>
+               <p><strong>Lưu ý biên tập:</strong> Bài viết được tổng hợp và biên dịch tự động. Độc giả vui lòng tự kiểm chứng nội dung.</p>
+             </div>
+           </div>
+      11. Do not hallucinate facts. Maintain the original core news.
 
       Output the result STRICTLY as a JSON object with this schema:
       {
@@ -161,6 +185,8 @@ ${candidateLinksText}
         "tags": ["String"],
         "takeaways": ["String"],
         "faq": [{"q": "String", "a": "String"}],
+        "sourceName": "String",
+        "sourceUrl": "String",
         "content": "String (Markdown format)"
       }
     `;
@@ -430,6 +456,9 @@ async function runAutoblogger() {
           ? (rewritten as any).tags.map(String).slice(0, 6)
           : ['AI', 'AutoBlogger', 'News'];
 
+        const sourceNameSafe = (rewritten as any).sourceName ? yamlEscape((rewritten as any).sourceName) : '';
+        const sourceUrlSafe = (rewritten as any).sourceUrl ? yamlEscape((rewritten as any).sourceUrl) : '';
+
         const mdxContent = `---
 title: "${yamlEscape(rewritten.title).slice(0, 200)}"
 excerpt: "${yamlEscape(rewritten.excerpt).slice(0, 500)}"
@@ -437,8 +466,10 @@ category: "${feed.category}"
 publishedAt: "${new Date().toISOString()}"
 thumbnail: "${extractedThumbnail}"
 tags: ${JSON.stringify(aiTags)}
-author: "AI Autobot"
+author: "Ban Biên Tập News Studio"
 slug: "${finalSlug}"
+sourceName: "${sourceNameSafe}"
+sourceUrl: "${sourceUrlSafe}"
 ---
 
 ${rewritten.content}
@@ -472,7 +503,7 @@ ${rewritten.content}
             category: feed.category as 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science',
             tags: aiTags,
             thumbnail: extractedThumbnail,
-            author: 'AI Autobot',
+            author: 'Ban Biên Tập News Studio',
             publishedAt: new Date().toISOString(),
           });
           console.log(ok ? `☁️ Pushed to Sanity: ${finalSlug}` : `💾 Sanity chưa cấu hình — giữ MDX local: ${finalSlug}`);

@@ -81,18 +81,25 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
             <div className="mt-4">
               <div className="flex flex-wrap gap-4">
                 <button 
-                  onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(meta.title)}&url=${encodeURIComponent(window.location.href)}`, '_blank')}
-                  aria-label="Chia sẻ qua X" 
-                  className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+                  onClick={() => window.open(`https://zalo.me/share?url=${encodeURIComponent(window.location.href)}`, '_blank')}
+                  aria-label="Chia sẻ qua Zalo" 
+                  className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-blue-500 hover:border-blue-500 hover:text-white transition-colors font-bold text-xs"
                 >
-                  X
+                  Zalo
                 </button>
                 <button 
-                  onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank')}
-                  aria-label="Chia sẻ qua LinkedIn" 
-                  className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+                  onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')}
+                  aria-label="Chia sẻ qua Facebook" 
+                  className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-colors font-bold"
                 >
-                  in
+                  f
+                </button>
+                <button 
+                  onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(meta.title)}&url=${encodeURIComponent(window.location.href)}`, '_blank')}
+                  aria-label="Chia sẻ qua X" 
+                  className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors font-bold font-sans"
+                >
+                  𝕏
                 </button>
                 <button
                   onClick={() => {
@@ -203,15 +210,15 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
           {/* Author Tag — hồ sơ tác giả từ Sanity (S3), fallback avatar mặc định */}
           <div className="mt-20 pt-10 border-t border-gray-200 flex items-center gap-6">
             <Image 
-              src={meta.authorAvatar || "https://i.pravatar.cc/150?u=author"}
-              alt={meta.author || "AI Author"}
+              src={meta.authorAvatar || "/icon-192x192.png"}
+              alt={meta.author || "Ban Biên Tập News Studio"}
               width={80}
               height={80}
               className="rounded-full grayscale"
             />
             <div>
-              <h4 className="font-bold uppercase tracking-wider text-sm mb-1">{meta.author || "AI Biên Tập Viên"}</h4>
-              <p className="font-mono text-xs text-gray-500 uppercase">{meta.authorRole || "Hệ thống Tự Động Hóa News Studio"}</p>
+              <h4 className="font-bold uppercase tracking-wider text-sm mb-1">{meta.author || "Ban Biên Tập News Studio"}</h4>
+              <p className="font-mono text-xs text-gray-500 uppercase">{meta.authorRole || "Bộ phận Kiểm duyệt & Xuất bản Tin tức"}</p>
               {meta.authorBio && <p className="mt-2 text-sm text-gray-600 max-w-xl">{meta.authorBio}</p>}
             </div>
           </div>
