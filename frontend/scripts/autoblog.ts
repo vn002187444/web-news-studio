@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { pushArticleToSanity, getSanityClient } from '../src/lib/sanity';
 import { cleanContentLinks } from './clean-broken-links';
+import { analyzeContentWithJev, ContentAnalysisResult } from '../src/lib/opencode';
 import dotenv from 'dotenv';
 
 // Load biến môi trường từ .env.local và .env
@@ -109,7 +110,7 @@ function yamlEscape(s: string) {
 
 const POSTS_DIR = path.join(process.cwd(), 'src/data/posts');
 
-async function rewriteArticle(title: string, content: string, category: string, candidateSlugs: string[] = []) {
+async function rewriteArticle(title: string, content: string, category: string, candidateSlugs: string[] = [], jevAnalysis?: ContentAnalysisResult) {
   // ... (giữ nguyên hàm rewriteArticle)
   if (API_KEY === 'MOCK_KEY') {
     console.log('[MOCK] No API Key found, skipping Gemini API call. Returning mock rewritten content.');
@@ -124,12 +125,13 @@ async function rewriteArticle(title: string, content: string, category: string, 
   try {
     const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
     const candidateLinksText = candidateSlugs.length > 0 ? candidateSlugs.map(s => `- /vi/${category}/${s}`).join('\n') : `- /vi/${category}`;
+    const jevFactsBlock = jevAnalysis ? ('\\n       Dữ kiện cốt lõi: ' + jevAnalysis.keyFacts.join('; ') + '\\n       Góc nhìn phân tích: ' + jevAnalysis.angle) : '';
     const prompt = `
       You are an elite Vietnamese Journalist and SEO/GEO/AEO Expert.
       Rewrite the following article to be 100% unique (avoid plagiarism).
 
       Original Title: ${title}
-      Original Content (Snippet/HTML): ${content}
+      Original Content (Snippet/HTML): ${content}${jevFactsBlock}
 
       REQUIREMENTS (bắt buộc đủ cấu trúc gửi Sanity):
       1. MUST output the article in VIETNAMESE language, regardless of the source language.
