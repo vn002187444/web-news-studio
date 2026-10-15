@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
 import { pushArticleToSanity, getSanityClient } from '../src/lib/sanity';
+import { cleanContentLinks } from './clean-broken-links';
 import dotenv from 'dotenv';
 
 // Load biến môi trường từ .env.local và .env
@@ -108,7 +109,7 @@ function yamlEscape(s: string) {
 
 const POSTS_DIR = path.join(process.cwd(), 'src/data/posts');
 
-async function rewriteArticle(title: string, content: string, category: string) {
+async function rewriteArticle(title: string, content: string, category: string, candidateSlugs: string[] = []) {
   // ... (giữ nguyên hàm rewriteArticle)
   if (API_KEY === 'MOCK_KEY') {
     console.log('[MOCK] No API Key found, skipping Gemini API call. Returning mock rewritten content.');
@@ -122,6 +123,7 @@ async function rewriteArticle(title: string, content: string, category: string) 
 
   try {
     const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+    const candidateLinksText = candidateSlugs.length > 0 ? candidateSlugs.map(s => `- /vi/${category}/${s}`).join('\n') : `- /vi/${category}`;
     const prompt = `
       You are an elite Vietnamese Journalist and SEO/GEO/AEO Expert.
       Rewrite the following article to be 100% unique (avoid plagiarism).
@@ -140,7 +142,9 @@ async function rewriteArticle(title: string, content: string, category: string) 
       8. Format the "content" in Markdown (.mdx), 800-1500 từ, BẮT BUỘC theo thứ tự:
          - Dòng đầu tiên của content PHẢI là: ## Những điểm chính (Key Takeaways)
            tiếp theo là bullet list copy NGUYÊN VĂN từng phần tử của trường "takeaways".
-          - Thân bài ## / ### với 2-3 internal link BẮT BUỘC có tiền tố locale /vi/ dạng [text](/vi/${category}/slug-gia-dinh). KHÔNG viết link thiếu /vi/.
+          - Thân bài ## / ###: Nếu chèn liên kết nội bộ, CHỈ ĐƯỢC dùng các đường dẫn có thật sau:
+${candidateLinksText}
+           TUYỆT ĐỐI KHÔNG tự bịa đặt slug giả định. Nếu không có slug phù hợp, chỉ liên kết về trang chuyên mục [Tên chuyên mục](/vi/${category}) hoặc KHÔNG tạo link.
          - Mục "## Câu hỏi thường gặp (FAQ)" từ faq.
          - Ghi rõ nguồn gốc tin (VD: Theo VnExpress/SCMP...) ở cuối bài — yêu cầu Attribution & Citation cho GEO.
       9. Do not hallucinate facts. Maintain the original core news.
@@ -249,6 +253,14 @@ async function runAutoblogger() {
   // 3. Thu thập dữ liệu các bài đã đăng để CHỐNG TRÙNG LẶP TUYỆT ĐỐI (từ Manifest + Sanity + MDX)
   const publishedTitles: string[] = [];
   const publishedSlugs = new Set<string>();
+  const publishedSlugsByCat: Record<string, string[]> = {};
+  const trackSlug = (cat?: string, slug?: string) => {
+    const c = (cat || "").toLowerCase();
+    if (slug && c) {
+      if (!publishedSlugsByCat[c]) publishedSlugsByCat[c] = [];
+      if (!publishedSlugsByCat[c].includes(slug)) publishedSlugsByCat[c].push(slug);
+    }
+  };
   // Tiêu đề + thumbnail theo từng chuyên mục → check cùng-vụ-việc sau khi AI viết lại (ngưỡng 0.35)
   const publishedTitlesByCat: Record<string, string[]> = {};
   const publishedThumbs = new Set<string>();
@@ -268,8 +280,8 @@ async function runAutoblogger() {
     try {
       const posts = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
       posts.forEach((p: any) => {
-        if (p.slug) publishedSlugs.add(p.slug);
-        if (p.meta?.slug) publishedSlugs.add(p.meta.slug);
+        if (p.slug) { publishedSlugs.add(p.slug); trackSlug(p.meta?.category, p.slug); }
+        if (p.meta?.slug) { publishedSlugs.add(p.meta.slug); trackSlug(p.meta?.category, p.meta.slug); }
         trackPublished(p.meta?.category, p.meta?.title, p.meta?.thumbnail);
       });
     } catch {}
@@ -281,7 +293,7 @@ async function runAutoblogger() {
     if (sanity) {
       const sanityArticles: any[] = await sanity.fetch(`*[_type == "article"] { "slug": slug.current, title, category, thumbnail }`);
       sanityArticles.forEach((a) => {
-        if (a.slug) publishedSlugs.add(a.slug);
+        if (a.slug) { publishedSlugs.add(a.slug); trackSlug(a.category, a.slug); }
         trackPublished(a.category, a.title, a.thumbnail);
       });
     }
@@ -291,7 +303,7 @@ async function runAutoblogger() {
   if (fs.existsSync(POSTS_DIR)) {
     try {
       const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.mdx'));
-      files.forEach(f => publishedSlugs.add(f.replace(/\.mdx$/, '')));
+      files.forEach(f => { const s = f.replace(/\.mdx$/, ''); publishedSlugs.add(s); });
     } catch {}
   }
 
@@ -395,7 +407,8 @@ async function runAutoblogger() {
 
         console.log('✨ Rewriting and Optimizing with Gemini AI (GEO/AEO)...');
         
-        const rewritten = await rewriteArticle(latestItem.title!, latestItem.content || latestItem.contentSnippet || '', feed.category);
+        const catSlugs = (publishedSlugsByCat[feed.category] || []).slice(-5);
+        const rewritten = await rewriteArticle(latestItem.title!, latestItem.content || latestItem.contentSnippet || '', feed.category, catSlugs);
 
         if (!rewritten) continue;
         if (!rewritten.title || !rewritten.slug || !rewritten.content) {

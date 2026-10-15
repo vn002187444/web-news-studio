@@ -1,5 +1,5 @@
 import { getPostUnified, getAllPostsUnified, UnifiedPost } from '@/lib/posts';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 import SingleArticleClient from './SingleArticleClient';
 import { SITE_URL, absoluteUrl, smartTruncate } from '@/lib/site';
