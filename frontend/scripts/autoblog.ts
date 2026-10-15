@@ -5,6 +5,8 @@ import path from 'path';
 import { pushArticleToSanity, getSanityClient } from '../src/lib/sanity';
 import { cleanContentLinks } from './clean-broken-links';
 import { analyzeContentWithJev, ContentAnalysisResult } from '../src/lib/opencode';
+import { resolveSmartThumbnail } from '../src/lib/image-processor';
+import { dispatchArticleWebhooks } from '../src/lib/syndication';
 import dotenv from 'dotenv';
 
 // Load biến môi trường từ .env.local và .env
@@ -377,35 +379,29 @@ async function runAutoblogger() {
 
         console.log(`📰 Found article: ${latestItem.title}`);
         
-        // Bóc tách hình ảnh từ RSS — đa nguồn: enclosure / media:content / media:thumbnail / <img>
-        const CATEGORY_FALLBACK: Record<string, string> = {
-          tech: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
-          finance: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80',
-          sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80',
-          lifestyle: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80',
-          game: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=1200&q=80',
-          entertainment: 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=800&q=80',
-          education: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80',
-          science: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80',
-          blockchain: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1200&q=80',
-        };
-        let extractedThumbnail = CATEGORY_FALLBACK[feed.category] || CATEGORY_FALLBACK.tech;
+        // Bóc tách hình ảnh từ RSS & phân bổ qua Image Pipeline
+        let rawThumbUrl: string | undefined = undefined;
         const anyItem = latestItem as any;
         const mediaContent = anyItem['media:content']?.url || anyItem['media:content']?.$?.url;
         const mediaThumb = anyItem['media:thumbnail']?.url || anyItem['media:thumbnail']?.$?.url;
         if (latestItem.enclosure && latestItem.enclosure.url) {
-          extractedThumbnail = latestItem.enclosure.url;
+          rawThumbUrl = latestItem.enclosure.url;
         } else if (mediaContent) {
-          extractedThumbnail = mediaContent;
+          rawThumbUrl = mediaContent;
         } else if (mediaThumb) {
-          extractedThumbnail = mediaThumb;
+          rawThumbUrl = mediaThumb;
         } else {
           const htmlSrc = `${latestItem.content || ''} ${latestItem['content:encoded'] || ''} ${latestItem.summary || ''}`;
           const imgMatch = htmlSrc.match(/<img[^>]+src=["']([^"'\s>]+)["']/i);
           if (imgMatch && imgMatch[1]) {
-            extractedThumbnail = imgMatch[1];
+            rawThumbUrl = imgMatch[1];
           }
         }
+
+        // Tối ưu hóa & phân bổ ảnh thumbnail thông minh (đa dạng hóa, chống trùng ảnh liên tiếp)
+        const candidateSlug = toSlug(latestItem.title);
+        const resolvedImage = resolveSmartThumbnail(rawThumbUrl, feed.category, candidateSlug, latestItem.title);
+        const extractedThumbnail = resolvedImage.url;
 
         console.log('✨ Rewriting and Optimizing with Gemini AI (GEO/AEO)...');
         

@@ -5,6 +5,7 @@ import TrendingWidget from "@/components/ui/TrendingWidget";
 import CategorySections from "@/components/ui/CategorySections";
 import { getAllPostsUnified } from "@/lib/posts";
 import { optimizeThumbnail } from "@/lib/image";
+import { allocateHomepageContent } from "@/lib/content-allocator";
 import type { Metadata } from 'next';
 import { Article } from "@/types";
 
@@ -25,8 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function Home() {
   const posts = await getAllPostsUnified();
   
-  // Map MDX meta to the format expected by UI components.
-  // Excerpt cắt 140 ký tự (card CSS line-clamp nên không đổi giao diện) → giảm ~60KB HTML.
+  // Map MDX meta sang format chuẩn cho UI components.
+  // Excerpt cắt 140 ký tự (card CSS line-clamp) → giảm ~60KB HTML.
   const articles = posts.map(post => ({
     id: post.slug,
     slug: post.slug,
@@ -37,19 +38,22 @@ export default async function Home() {
     publishedAt: post.meta.publishedAt
   }));
 
+  // Phân bổ nội dung thông minh: Tính điểm biên tập, đa dạng chuyên mục trong Bento, cân bằng Hero
+  const allocated = allocateHomepageContent(articles);
+
   return (
     <>
       <div className="pt-24 bg-[#F4F4F0]">
-        <NewsTicker articles={articles.map((a) => ({ title: a.title, slug: a.slug, category: a.category }))} />
+        <NewsTicker articles={allocated.ticker} />
       </div>
-      <HeroSection article={articles[0]} />
+      <HeroSection article={allocated.hero as unknown as Article} />
       <div className="bg-white">
         <div className="max-w-[1600px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-9 min-w-0">
-            <BentoGrid articles={articles} />
+            <BentoGrid articles={allocated.bento as unknown as Article[]} />
           </div>
           <div className="lg:col-span-3 py-20">
-            <TrendingWidget articles={articles} />
+            <TrendingWidget articles={allocated.trending as unknown as Article[]} />
           </div>
         </div>
       </div>
