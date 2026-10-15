@@ -15,6 +15,14 @@ export interface CfAiAnalysis {
   usedAi: boolean;
 }
 
+export interface NewsAnalysisResult {
+  isWorthy: boolean;
+  score: number;
+  category: string;
+  keyFacts: string[];
+  angle: string;
+}
+
 export interface WorkerEnv {
   AI?: any; // Cloudflare Workers AI binding
   CACHE_KV?: any; // Cloudflare KV binding để lưu lượng neuron tiêu thụ
@@ -102,4 +110,117 @@ function runFastHeuristicFilter(title: string, snippet: string): CfAiAnalysis {
     neuronsEstimated: 0,
     usedAi: false,
   };
+}
+
+/**
+ * Phân tích chuyên sâu tin tức thay thế Jev bằng Cloudflare Workers AI
+ * Hỗ trợ 2 môi trường:
+ * 1. Cloudflare Worker Edge (env.AI binding)
+ * 2. Node.js / GitHub Actions (Cloudflare REST API qua CF_ACCOUNT_ID và CF_API_TOKEN)
+ * 3. Fallback Heuristic tự động an toàn khi chưa cấu hình token hoặc chạm quota
+ */
+export async function analyzeNewsWithWorkersAi(
+  title: string,
+  snippet: string,
+  category: string,
+  env?: WorkerEnv
+): Promise<NewsAnalysisResult> {
+  const accountId = process.env.CF_ACCOUNT_ID;
+  const apiToken = process.env.CF_API_TOKEN;
+
+  // Fallback heuristic function
+  const fallback = (): NewsAnalysisResult => {
+    const isSpam = /quảng cáo|khuyến mãi|mua ngay|liên hệ|sale|voucher/i.test(title + ' ' + snippet);
+    return {
+      isWorthy: !isSpam && title.length > 15,
+      score: isSpam ? 3.0 : 7.5,
+      category,
+      keyFacts: [title],
+      angle: 'Phân tích tổng quan và tác động thực tế',
+    };
+  };
+
+  const promptMessages = [
+    {
+      role: 'system',
+      content: 'You are a rigorous news analyzer. Analyze the provided news and extract facts. Return ONLY a valid JSON object: {"isWorthy": boolean, "score": number, "category": string, "keyFacts": string[], "angle": string}. isWorthy is true if score >= 7.0 and not spam/ad.',
+    },
+    {
+      role: 'user',
+      content: `Title: ${title}\nSnippet: ${snippet.slice(0, 300)}\nSuggested Category: ${category}`,
+    },
+  ];
+
+  try {
+    let responseText = '';
+
+    if (env?.AI) {
+      // 1. Chạy trong môi trường Cloudflare Worker (Edge Runtime)
+      const dateKey = new Date().toISOString().slice(0, 10);
+      const quotaKey = `cf_ai_neurons_${dateKey}`;
+      let currentNeurons = 0;
+      if (env.CACHE_KV) {
+        try {
+          const stored = await env.CACHE_KV.get(quotaKey);
+          currentNeurons = stored ? parseInt(stored, 10) : 0;
+        } catch {}
+      }
+
+      if (currentNeurons + ESTIMATED_NEURONS_PER_CALL > DAILY_NEURON_HARD_LIMIT) {
+        console.log(`🛡️ [Quota Guard] Neurons hôm nay: ${currentNeurons}/${DAILY_NEURON_HARD_LIMIT}. Sử dụng Heuristic fallback.`);
+        return fallback();
+      }
+
+      const aiRes = await env.AI.run('@cf/meta/llama-3.2-1b-instruct', {
+        messages: promptMessages,
+        max_tokens: 150,
+      });
+      responseText = aiRes?.response || '{}';
+
+      if (env.CACHE_KV) {
+        await env.CACHE_KV.put(quotaKey, String(currentNeurons + ESTIMATED_NEURONS_PER_CALL), {
+          expirationTtl: 86400 * 2,
+        });
+      }
+    } else if (accountId && apiToken) {
+      // 2. Chạy trong môi trường Node.js / GitHub Actions qua Cloudflare REST API
+      const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/meta/llama-3.2-1b-instruct`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiToken}`,
+        },
+        body: JSON.stringify({
+          messages: promptMessages,
+          max_tokens: 150,
+        }),
+      });
+
+      if (!res.ok) {
+        console.warn(`⚠️ [Workers AI] REST API Error ${res.status}. Fallback heuristic.`);
+        return fallback();
+      }
+
+      const data: any = await res.json();
+      responseText = data.result?.response || '{}';
+    } else {
+      console.log('ℹ️ [Workers AI] Chưa cấu hình CF_ACCOUNT_ID/CF_API_TOKEN. Sử dụng fallback heuristic.');
+      return fallback();
+    }
+
+    const cleanedText = responseText.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(cleanedText);
+
+    return {
+      isWorthy: Boolean(parsed.isWorthy ?? true),
+      score: Number(parsed.score ?? 7.5),
+      category: String(parsed.category || category),
+      keyFacts: Array.isArray(parsed.keyFacts) && parsed.keyFacts.length > 0 ? parsed.keyFacts : [title],
+      angle: String(parsed.angle || 'Phân tích tổng quan và tác động thực tế'),
+    };
+  } catch (e) {
+    console.warn('⚠️ [Workers AI] Lỗi phân tích AI, chuyển sang fallback heuristic:', e);
+    return fallback();
+  }
 }

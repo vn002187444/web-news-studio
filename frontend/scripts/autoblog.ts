@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { pushArticleToSanity, getSanityClient } from '../src/lib/sanity';
 import { cleanContentLinks } from './clean-broken-links';
-import { analyzeContentWithJev, ContentAnalysisResult } from '../src/lib/opencode';
+import { analyzeNewsWithWorkersAi, NewsAnalysisResult } from '../src/lib/cf-ai';
 import { resolveSmartThumbnail } from '../src/lib/image-processor';
 import { dispatchArticleWebhooks } from '../src/lib/syndication';
 import dotenv from 'dotenv';
@@ -112,7 +112,7 @@ function yamlEscape(s: string) {
 
 const POSTS_DIR = path.join(process.cwd(), 'src/data/posts');
 
-async function rewriteArticle(title: string, content: string, category: string, candidateSlugs: string[] = [], jevAnalysis?: ContentAnalysisResult) {
+async function rewriteArticle(title: string, content: string, category: string, candidateSlugs: string[] = [], keyFacts?: string[], angle?: string) {
   // ... (giữ nguyên hàm rewriteArticle)
   if (API_KEY === 'MOCK_KEY') {
     console.log('[MOCK] No API Key found, skipping Gemini API call. Returning mock rewritten content.');
@@ -127,13 +127,13 @@ async function rewriteArticle(title: string, content: string, category: string, 
   try {
     const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
     const candidateLinksText = candidateSlugs.length > 0 ? candidateSlugs.map(s => `- /vi/${category}/${s}`).join('\n') : `- /vi/${category}`;
-    const jevFactsBlock = jevAnalysis ? ('\\n       Dữ kiện cốt lõi: ' + jevAnalysis.keyFacts.join('; ') + '\\n       Góc nhìn phân tích: ' + jevAnalysis.angle) : '';
+    const factsBlock = keyFacts && keyFacts.length > 0 ? ('\n       Dữ kiện cốt lõi (Fact Anchors): ' + keyFacts.join('; ') + (angle ? '\n       Góc nhìn phân tích: ' + angle : '')) : '';
     const prompt = `
       You are an elite Vietnamese Journalist and SEO/GEO/AEO Expert.
       Rewrite the following article to be 100% unique (avoid plagiarism).
 
       Original Title: ${title}
-      Original Content (Snippet/HTML): ${content}${jevFactsBlock}
+      Original Content (Snippet/HTML): ${content}${factsBlock}
 
       REQUIREMENTS (bắt buộc đủ cấu trúc gửi Sanity):
       1. MUST output the article in VIETNAMESE language, regardless of the source language.
@@ -429,10 +429,20 @@ async function runAutoblogger() {
         const resolvedImage = resolveSmartThumbnail(rawThumbUrl, feed.category, candidateSlug, latestItem.title);
         const extractedThumbnail = resolvedImage.url;
 
-        console.log('✨ Rewriting and Optimizing with Gemini AI (GEO/AEO)...');
-        
+        // Giai đoạn 1: Thẩm định giá trị tin tức & Trích xuất dữ kiện qua Cloudflare Workers AI
+        console.log('🔍 [Stage 1] Analyzing news quality & facts with Workers AI...');
+        const snippet = (latestItem.content || latestItem.contentSnippet || '').slice(0, 300);
+        const analysis = await analyzeNewsWithWorkersAi(latestItem.title!, snippet, feed.category);
+
+        if (!analysis.isWorthy || analysis.score < 7.0) {
+          console.log(`⏩ [Workers AI Filter] Bài viết không đạt chuẩn chất lượng (Score: ${analysis.score}/10). Bỏ qua.`);
+          continue;
+        }
+
+        // Giai đoạn 2: Viết bài chi tiết với Gemini AI (GEO/AEO) neo theo Fact của Stage 1
+        console.log(`✨ [Stage 2] Rewriting and Optimizing with Gemini AI (GEO/AEO) [Score: ${analysis.score}/10, Facts: ${analysis.keyFacts.length}]...`);
         const catSlugs = (publishedSlugsByCat[feed.category] || []).slice(-5);
-        const rewritten = await rewriteArticle(latestItem.title!, latestItem.content || latestItem.contentSnippet || '', feed.category, catSlugs);
+        const rewritten = await rewriteArticle(latestItem.title!, latestItem.content || latestItem.contentSnippet || '', feed.category, catSlugs, analysis.keyFacts, analysis.angle);
 
         if (!rewritten) continue;
         if (!rewritten.title || !rewritten.slug || !rewritten.content) {
