@@ -68,6 +68,7 @@ export default function Footer() {
           <h3 className="font-mono text-xs uppercase text-white/40 mb-6">Thông tin</h3>
           <ul className="flex flex-col gap-4 font-medium">
             <li><Link href="/about" className="hover:text-red-400 transition-colors">Về Chúng Tôi</Link></li>
+            <li><Link href="/editorial-guidelines" className="hover:text-red-400 transition-colors">Quy Chuẩn Biên Tập</Link></li>
             <li><Link href="/terms" className="hover:text-red-400 transition-colors">Điều Khoản Dịch Vụ</Link></li>
             <li><Link href="/privacy" className="hover:text-red-400 transition-colors">Chính Sách Bảo Mật</Link></li>
             <li><Link href="/contact" className="hover:text-red-400 transition-colors">Liên Hệ Tòa Soạn</Link></li>
