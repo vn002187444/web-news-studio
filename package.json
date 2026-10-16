@@ -6,6 +6,7 @@
     "build": "npm --prefix frontend run build",
     "build:worker": "npm --prefix frontend run build:worker",
     "cloudflare:build": "npm --prefix frontend run cloudflare:build",
-    "start": "npm --prefix frontend run start"
+    "start": "npm --prefix frontend run start",
+    "typecheck": "node ./frontend/node_modules/typescript/bin/tsc --noEmit -p frontend/tsconfig.json"
   }
 }
