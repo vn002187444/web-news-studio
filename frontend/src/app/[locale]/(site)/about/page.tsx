@@ -26,4 +26,8 @@ export default function AboutPage() {
       </div>
     </div>
   );
-export function generateStaticParams() { return [{ locale: 'vi' }, { locale: 'en' }]; }
+}
+
+export function generateStaticParams() {
+  return [{ locale: 'vi' }, { locale: 'en' }];
+}

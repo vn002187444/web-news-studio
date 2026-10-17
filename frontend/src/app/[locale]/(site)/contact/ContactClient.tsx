@@ -42,7 +42,7 @@ export default function ContactClient() {
             <div className="bg-green-50 border border-green-200 p-6 rounded-md">
               <p className="text-green-700 font-medium">Cảm ơn bạn! Thông điệp của bạn đã được gửi đến ban biên tập.</p>
             </div>
-          ) : (\
+          ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-sans">
               <div>
                 <label htmlFor="name" className="sr-only">Họ và tên</label>
