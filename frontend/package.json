@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@opennextjs/cloudflare": "^1.20.12",
+    "@opennextjs/cloudflare": "^1.20.8",
     "@portabletext/react": "^8.0.1",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.1",
@@ -47,11 +47,11 @@
     "styled-components": "^6.6.0",
     "tailwind-merge": "^3.7.0",
     "three": "^0.186.1",
-    "wrangler": "^4.151.1"
+    "wrangler": "^4.147.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20.19.43",
+    "@types/node": "^26.6.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.186.0",
