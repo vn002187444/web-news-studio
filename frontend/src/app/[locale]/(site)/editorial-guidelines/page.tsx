@@ -30,3 +30,4 @@ export default function EditorialGuidelinesPage() {
     </div>
   );
 }
+export function generateStaticParams() { return [{ locale: 'vi' }, { locale: 'en' }]; }

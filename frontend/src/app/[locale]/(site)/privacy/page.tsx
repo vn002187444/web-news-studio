@@ -26,3 +26,4 @@ export default function PrivacyPage() {
     </div>
   );
 }
+export function generateStaticParams() { return [{ locale: 'vi' }, { locale: 'en' }]; }
