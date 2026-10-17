@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 
@@ -15,6 +15,20 @@ interface MatchItem {
   score2: number | null;
   status: "LIVE" | "FT" | "UPCOMING";
   time: string;
+}
+
+export function detectSportSubCategory(article: { title?: string; excerpt?: string; tags?: string[]; subCategory?: string }): string {
+  if (article.subCategory) return article.subCategory;
+  const text = `${article.title || ''} ${(article.tags || []).join(' ')} ${article.excerpt || ''}`.toLowerCase();
+  
+  if (/f1|formula 1|đua xe|verstappen|hamilton|ferrari|motogp|grand prix|tay đua/.test(text)) return 'Đua Xe F1';
+  if (/esports|thể thao điện tử|liên minh|lmht|dota|t1|faker|cs2|valorant|lck|vcs|cktg|game thủ/.test(text)) return 'Esports';
+  if (/tennis|quần vợt|alcaraz|djokovic|sabalenka|nadal|federer|atp|wta|thượng hải masters|us open|wimbledon|roland garros|sinner|banh nỉ/.test(text)) return 'Quần Vợt';
+  if (/bóng rổ|nba|lakers|warriors|curry|lebron|celtics|vba|basketball/.test(text)) return 'Bóng Rổ';
+  if (/hậu trường|vạ miệng|nghĩa vụ quân sự|scandal|tẩy chay|đời tư|lương|chỉ trích|chia tay|bạn gái|vợ|huyền thoại romario/.test(text)) return 'Hậu Trường';
+  if (/bóng đá|champions league|v-league|football|soccer|la liga|premier league|bundesliga|man utd|chelsea|arsenal|barca|real madrid|bayern|ronaldo|messi|kane|fifa|asean cup|công an hà nội|inter miami/.test(text)) return 'Bóng Đá';
+  
+  return 'Bóng Đá';
 }
 
 export default function SportsTemplate({ articles }: { articles: any[] }) {
@@ -47,6 +61,21 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
     return () => clearInterval(intervalId);
   }, []);
 
+  // Đếm số bài viết phân bổ theo từng chuyên mục con
+  const subCategoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { "Tất cả": sportsArticles.length };
+    SPORT_FILTERS.slice(1).forEach(sub => {
+      counts[sub] = sportsArticles.filter(a => detectSportSubCategory(a) === sub).length;
+    });
+    return counts;
+  }, [sportsArticles]);
+
+  // Lọc bài viết theo chuyên mục con đang được chọn
+  const filteredArticles = useMemo(() => {
+    if (activeSportFilter === "Tất cả") return sportsArticles;
+    return sportsArticles.filter(a => detectSportSubCategory(a) === activeSportFilter);
+  }, [sportsArticles, activeSportFilter]);
+
   const filteredMatches = activeLeagueFilter === "Tất cả" 
     ? matches 
     : matches.filter(m => m.league === activeLeagueFilter);
@@ -57,19 +86,37 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
         
         {/* Header & Sport Filters */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
-          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter">
-            Live <span className="text-[#00F59B]">Sports</span>
-          </h1>
+          <div>
+            <span className="text-xs uppercase font-extrabold tracking-widest text-[#00F59B] block mb-2">
+              Sports Network 24/7
+            </span>
+            <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter">
+              Live <span className="text-[#00F59B]">Sports</span>
+            </h1>
+          </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide max-w-full">
-             {SPORT_FILTERS.map(filter => (
-               <button
-                 key={filter}
-                 onClick={() => setActiveSportFilter(filter)}
-                 className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold uppercase transition-colors ${activeSportFilter === filter ? 'bg-[#FF5722] text-white' : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'}`}
-               >
-                 {filter}
-               </button>
-             ))}
+             {SPORT_FILTERS.map(filter => {
+               const count = subCategoryCounts[filter] || 0;
+               const isActive = activeSportFilter === filter;
+               return (
+                 <button
+                   key={filter}
+                   onClick={() => setActiveSportFilter(filter)}
+                   className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold uppercase transition-all flex items-center gap-2 ${
+                     isActive 
+                       ? 'bg-[#FF5722] text-white shadow-lg shadow-[#FF5722]/30 scale-105' 
+                       : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                   }`}
+                 >
+                   <span>{filter}</span>
+                   <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-semibold ${
+                     isActive ? 'bg-black/30 text-white' : 'bg-white/10 text-white/40'
+                   }`}>
+                     {count}
+                   </span>
+                 </button>
+               );
+             })}
           </div>
         </div>
         
@@ -128,15 +175,15 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
         {/* Grid Articles */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="col-span-1 lg:col-span-3">
-            {sportsArticles.length > 0 ? (
+            {filteredArticles.length > 0 ? (
                <div className="flex flex-col gap-8">
                   {/* Hero Spotlight (First Article) */}
-                  <Link href={`/sports/${sportsArticles[0].slug}`} className="group block relative overflow-hidden rounded-2xl bg-black border border-white/10 hover:border-[#00F59B]/50 transition-colors">
+                  <Link href={`/sports/${filteredArticles[0].slug}`} className="group block relative overflow-hidden rounded-2xl bg-black border border-white/10 hover:border-[#00F59B]/50 transition-colors">
                      <div className="relative aspect-video w-full overflow-hidden">
-                        {sportsArticles[0].thumbnail?.url && (
+                        {filteredArticles[0].thumbnail?.url && (
                           <Image
-                            src={sportsArticles[0].thumbnail.url}
-                            alt={sportsArticles[0].thumbnail.alt || sportsArticles[0].title}
+                            src={filteredArticles[0].thumbnail.url}
+                            alt={filteredArticles[0].thumbnail.alt || filteredArticles[0].title}
                             fill
                             sizes="(max-width: 1024px) 100vw, 75vw"
                             className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
@@ -145,55 +192,83 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
                         <div className="absolute inset-0 bg-gradient-to-t from-[#08090C] via-[#08090C]/50 to-transparent" />
                      </div>
                      <div className="absolute bottom-0 left-0 w-full p-8 md:p-12">
-                       <span className="inline-block bg-[#00F59B] text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1 mb-4 rounded-full">
-                         Tâm Điểm
-                       </span>
+                       <div className="flex items-center gap-2 mb-4">
+                         <span className="inline-block bg-[#00F59B] text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                           Tâm Điểm
+                         </span>
+                         <span className="inline-block bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                           {detectSportSubCategory(filteredArticles[0])}
+                         </span>
+                       </div>
                        <h2 className="text-3xl md:text-5xl font-black text-white group-hover:text-[#00F59B] transition-colors uppercase leading-tight max-w-4xl">
-                         {sportsArticles[0].title}
+                         {filteredArticles[0].title}
                        </h2>
                        <p className="mt-4 text-base md:text-lg text-white/70 line-clamp-2 max-w-3xl">
-                         {sportsArticles[0].excerpt}
+                         {filteredArticles[0].excerpt}
                        </p>
                      </div>
                   </Link>
 
                   {/* Bento Grid (Remaining Articles) */}
-                  {sportsArticles.length > 1 && (
+                  {filteredArticles.length > 1 && (
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {sportsArticles.slice(1).map((article, i) => (
-                           <Link key={i} href={`/sports/${article.slug}`} className="group flex flex-col border border-white/10 bg-white/5 rounded-2xl overflow-hidden hover:border-[#00F59B]/30 hover:bg-white/10 transition-all">
-                              <div className="relative aspect-video w-full overflow-hidden">
-                                {article.thumbnail?.url ? (
-                                  <Image
-                                    src={article.thumbnail.url}
-                                    alt={article.thumbnail.alt || article.title}
-                                    fill
-                                    sizes="(max-width: 768px) 100vw, 35vw"
-                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full bg-white/5" />
-                                )}
-                              </div>
-                              <div className="p-6 flex flex-col flex-grow">
-                                <h3 className="text-xl font-bold text-white group-hover:text-[#00F59B] transition-colors uppercase leading-tight line-clamp-2">
-                                  {article.title}
-                                </h3>
-                                <p className="mt-3 text-sm text-white/60 line-clamp-2">
-                                  {article.excerpt}
-                                </p>
-                                <div className="mt-auto pt-4 text-xs font-bold text-white/40 uppercase tracking-widest">
-                                  Đọc tiếp →
-                                </div>
-                              </div>
-                           </Link>
-                        ))}
+                        {filteredArticles.slice(1).map((article, i) => {
+                           const subCat = detectSportSubCategory(article);
+                           return (
+                            <Link key={i} href={`/sports/${article.slug}`} className="group flex flex-col border border-white/10 bg-white/5 rounded-2xl overflow-hidden hover:border-[#00F59B]/30 hover:bg-white/10 transition-all">
+                               <div className="relative aspect-video w-full overflow-hidden">
+                                 {article.thumbnail?.url ? (
+                                   <Image
+                                     src={article.thumbnail.url}
+                                     alt={article.thumbnail.alt || article.title}
+                                     fill
+                                     sizes="(max-width: 768px) 100vw, 35vw"
+                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                   />
+                                 ) : (
+                                   <div className="w-full h-full bg-white/5" />
+                                 )}
+                                 <div className="absolute top-3 left-3">
+                                   <span className="inline-block bg-black/70 backdrop-blur-md text-[#00F59B] border border-[#00F59B]/30 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+                                     {subCat}
+                                   </span>
+                                 </div>
+                               </div>
+                               <div className="p-6 flex flex-col flex-grow">
+                                 <h3 className="text-xl font-bold text-white group-hover:text-[#00F59B] transition-colors uppercase leading-tight line-clamp-2">
+                                   {article.title}
+                                 </h3>
+                                 <p className="mt-3 text-sm text-white/60 line-clamp-2">
+                                   {article.excerpt}
+                                 </p>
+                                 <div className="mt-auto pt-4 flex items-center justify-between text-xs font-bold text-white/40 uppercase tracking-widest">
+                                   <span className="text-[#00F59B]/80 font-medium">{subCat}</span>
+                                   <span className="group-hover:text-white transition-colors">Đọc tiếp →</span>
+                                 </div>
+                               </div>
+                            </Link>
+                           );
+                        })}
                      </div>
                   )}
                </div>
             ) : (
-               <div className="border border-white/10 rounded-2xl p-12 text-center text-white/50">
-                  Chưa có bài viết thể thao nào.
+               <div className="border border-white/10 bg-white/5 rounded-2xl p-16 text-center">
+                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 text-2xl">
+                    ⚡
+                  </div>
+                  <h3 className="text-xl font-bold text-white uppercase mb-2">
+                    Chuyên mục {activeSportFilter} đang được cập nhật
+                  </h3>
+                  <p className="text-white/50 text-sm max-w-md mx-auto mb-6">
+                    Ban biên tập đang liên tục tổng hợp các tin tức, diễn biến mới nhất về {activeSportFilter}. Vui lòng quay lại sau ít phút hoặc xem các môn thể thao khác.
+                  </p>
+                  <button 
+                    onClick={() => setActiveSportFilter("Tất cả")}
+                    className="px-6 py-2.5 rounded-full bg-[#00F59B] text-black font-bold uppercase text-xs hover:bg-white transition-colors"
+                  >
+                    Xem tất cả tin thể thao
+                  </button>
                </div>
             )}
           </div>

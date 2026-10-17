@@ -85,10 +85,13 @@ function isFingerprintableThumb(url: string): boolean {
 }
 
 const RSS_FEEDS = [
-  // Interleaved để MAX_ARTICLES_PER_RUN luôn phủ đủ 9 chuyên mục
   { url: 'https://vnexpress.net/rss/so-hoa.rss', category: 'tech' },
   { url: 'https://vnexpress.net/rss/kinh-doanh.rss', category: 'finance' },
   { url: 'https://vnexpress.net/rss/the-thao.rss', category: 'sports' },
+  { url: 'https://vnexpress.net/rss/bong-da.rss', category: 'sports' },
+  { url: 'https://vnexpress.net/rss/tennis.rss', category: 'sports' },
+  { url: 'https://vnexpress.net/rss/cac-mon-khac.rss', category: 'sports' },
+  { url: 'https://vnexpress.net/rss/hau-truong.rss', category: 'sports' },
   { url: 'https://vnexpress.net/rss/doi-song.rss', category: 'lifestyle' },
   { url: 'https://www.eurogamer.net/feed/news', category: 'game' },
   { url: 'https://vnexpress.net/rss/giai-tri.rss', category: 'entertainment' },
@@ -462,9 +465,28 @@ async function runAutoblogger() {
           continue;
         }
 
-        const aiTags = Array.isArray((rewritten as any).tags) && (rewritten as any).tags.length > 0
+        let aiTags = Array.isArray((rewritten as any).tags) && (rewritten as any).tags.length > 0
           ? (rewritten as any).tags.map(String).slice(0, 6)
           : ['AI', 'AutoBlogger', 'News'];
+
+        // Tự động bổ sung tag chuyên mục con thể thao chính xác
+        if (feed.category === 'sports') {
+          const lowerFeed = feed.url.toLowerCase();
+          const fullText = `${rewritten.title} ${rewritten.excerpt} ${(rewritten.content || '').slice(0, 300)}`.toLowerCase();
+          if (lowerFeed.includes('tennis') || /tennis|quần vợt|alcaraz|djokovic|sinner/.test(fullText)) {
+            if (!aiTags.includes('Quần Vợt')) aiTags.unshift('Quần Vợt');
+          } else if (lowerFeed.includes('hau-truong') || /hậu trường|vạ miệng|đời tư|scandal/.test(fullText)) {
+            if (!aiTags.includes('Hậu Trường')) aiTags.unshift('Hậu Trường');
+          } else if (/f1|formula 1|đua xe|verstappen|hamilton|ferrari/.test(fullText)) {
+            if (!aiTags.includes('Đua Xe F1')) aiTags.unshift('Đua Xe F1');
+          } else if (/bóng rổ|nba|lakers|warriors|curry|lebron/.test(fullText)) {
+            if (!aiTags.includes('Bóng Rổ')) aiTags.unshift('Bóng Rổ');
+          } else if (/esports|thể thao điện tử|liên minh|lmht|faker|t1/.test(fullText)) {
+            if (!aiTags.includes('Esports')) aiTags.unshift('Esports');
+          } else {
+            if (!aiTags.includes('Bóng Đá')) aiTags.unshift('Bóng Đá');
+          }
+        }
 
         const sourceNameSafe = (rewritten as any).sourceName ? yamlEscape((rewritten as any).sourceName) : '';
         const sourceUrlSafe = (rewritten as any).sourceUrl ? yamlEscape((rewritten as any).sourceUrl) : '';
