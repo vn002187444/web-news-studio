@@ -82,6 +82,6 @@ export async function GET(request: Request) {
     } else {
       console.error(`Failed to generate OG image: ${e}`);
     }
-    return new Response('Failed to generate image', { status: 500 });
+    return Response.redirect(new URL('/icon-512x512.png', request.url), 302);
   }
 }

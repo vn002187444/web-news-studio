@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   if (!post) return {};
 
   const url = `/${locale}/${category}/${slug}`;
-  const ogImageUrl = absoluteUrl(`/api/og?title=${encodeURIComponent(post.meta.title)}&category=${encodeURIComponent(post.meta.category)}`);
+  const ogImageUrl = post.meta.thumbnail ? absoluteUrl(post.meta.thumbnail) : absoluteUrl('/icon-512x512.png');
 
   return {
     title: post.meta.title,
