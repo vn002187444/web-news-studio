@@ -37,7 +37,7 @@ jobs:
 
       - name: Install Dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
+        run: npm install --prefer-offline --no-audit --no-fund
 
       - name: Build OpenNext Worker
         env:
