@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -10,6 +11,12 @@ import rehypeRaw from 'rehype-raw';
  * Nội dung autoblog chỉ dùng markdown chuẩn (headings, lists, bold, links, tables) và HTML an toàn.
  */
 export default function MarkdownBody({ content }: { content: string }) {
+  // Chuẩn hóa className -> class cho raw HTML để Tailwind CSS nhận diện chính xác
+  const normalizedContent = useMemo(() => {
+    if (!content) return '';
+    return content.replace(/\bclassName\s*=/g, 'class=');
+  }, [content]);
+
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -21,7 +28,7 @@ export default function MarkdownBody({ content }: { content: string }) {
         ),
       }}
     >
-      {content}
+      {normalizedContent}
     </ReactMarkdown>
   );
 }
