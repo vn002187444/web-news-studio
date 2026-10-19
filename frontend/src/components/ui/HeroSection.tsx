@@ -80,6 +80,7 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
               src={article?.thumbnail.url || FALLBACK_IMG}
               alt={article?.thumbnail.alt || 'Retro Tech Setup'}
               fill
+              sizes="(max-width: 1024px) 100vw, 42vw"
               className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
               priority
             />
