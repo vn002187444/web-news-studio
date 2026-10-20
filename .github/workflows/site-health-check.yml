@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [ master, main ]
   schedule:
-    # Chạy kiểm tra định kỳ lúc 00:00 Chủ Nhật hàng tuần
-    - cron: '0 0 * * 0'
+    # Chạy kiểm tra bảo trì & kiểm toán tự động định kỳ hàng ngày lúc 00:00 UTC (07:00 sáng giờ Việt Nam)
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:

@@ -49,24 +49,50 @@ async function auditWorkers() {
 }
 
 async function auditArticles() {
-  console.log('\n--- 2. AUDITING ARTICLES STATS (24H) ---');
+  console.log('\n--- 2. AUDITING ARTICLES STATS (LAST 3 DAYS) ---');
   try {
     const manifestPath = './frontend/src/data/posts-manifest.json';
     if (fs.existsSync(manifestPath)) {
       const posts = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
       const now = new Date();
-      const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      const recent = posts.filter(p => new Date(p.meta.publishedAt || p.meta.date) >= past24h);
+      const msInDay = 24 * 60 * 60 * 1000;
 
       console.log(`📊 Total Local Posts in Manifest: ${posts.length}`);
-      console.log(`📊 Published in last 24h: ${recent.length}`);
+
+      const dailyStats = [];
+      let totalLast3Days = 0;
+
+      for (let i = 0; i < 3; i++) {
+        const targetDate = new Date(now.getTime() - i * msInDay);
+        const dateStr = targetDate.toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+        const label = i === 0 ? `Hôm nay (${dateStr})` : i === 1 ? `Hôm qua (${dateStr})` : `2 ngày trước (${dateStr})`;
+
+        const parts = dateStr.split('/');
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        const startOfDay = new Date(Date.UTC(year, month, day, -7, 0, 0, 0));
+        const endOfDay = new Date(Date.UTC(year, month, day, 16, 59, 59, 999));
+
+        const dayPosts = posts.filter(p => {
+          const d = new Date(p.meta.publishedAt || p.meta.date);
+          return d >= startOfDay && d <= endOfDay;
+        });
+
+        dailyStats.push({ label, dateStr, count: dayPosts.length });
+        totalLast3Days += dayPosts.length;
+        console.log(`  📅 [${label}]: ${dayPosts.length} bài viết`);
+      }
+
+      console.log(`📈 Tổng số bài đã tạo/đăng thành công 3 ngày gần nhất: ${totalLast3Days} bài`);
       if (posts.length > 0) {
         console.log(`📰 Latest Article: "${posts[0].meta.title}" (${posts[0].meta.publishedAt || posts[0].meta.date})`);
       }
 
       return {
         total: posts.length,
-        last24h: recent.length,
+        totalLast3Days,
+        dailyStats,
         latest: posts[0] ? { title: posts[0].meta.title, slug: posts[0].slug } : null
       };
     }
