@@ -81,7 +81,7 @@ async function runLighthouseAudit() {
   try {
     const reportPath = './lighthouse-daily-report.json';
     execSync(
-      `npx lighthouse ${WEB_BASE} --chrome-flags="--headless=new --no-sandbox" --output=json --output-path=${reportPath} --quiet`,
+      `npx lighthouse ${WEB_BASE}/vi --chrome-flags="--headless=new --no-sandbox" --output=json --output-path=${reportPath} --quiet`,
       { cwd: process.cwd(), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 60000 }
     );
     if (fs.existsSync(reportPath)) {
