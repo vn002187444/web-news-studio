@@ -10,14 +10,20 @@ Dự án này áp dụng quy trình phát triển phần mềm chuẩn hóa 6 gi
   - Tiếp nhận yêu cầu từ người dùng, làm rõ yêu cầu (`/grill-me`, `interview-me`).
   - Viết tài liệu đặc tả `implementation_plan.md`, `task.md` và xây dựng Type Contracts / API schemas.
   - Phân công nhiệm vụ cho các agent con và là chốt chặn phê duyệt cuối cùng.
+  - **Giám sát & Báo cáo Sáng (Morning Report):** Nhận tín hiệu kiểm tra từ xa từ Jules, kích hoạt phân tích từ khóa AI (Gemini), xuất bản và gửi Báo cáo Vận hành Buổi Sáng (07:00 AM VN) cho Người Dùng.
 
 - **OpenCode CLI (`opencode-frontend` - Chuyên gia Frontend & UI/UX Đỉnh cao):**
   - Đảm nhận toàn bộ mã nguồn Frontend, UI components (React, Next.js, Vue, Vite, Tailwind CSS).
   - Định hình phong cách thiết kế độc bản, hiện đại, mang đẳng cấp quốc tế theo chuẩn **Awwwards & Dribbble**.
 
-- **Jules (`jules-cloud-worker` - Điều phối viên Cloud Async):**
+- **Jules (`jules-cloud-worker` - Điều phối viên Cloud Async & Bảo trì từ xa):**
   - Chuyên xử lý tác vụ nền đám mây qua Jules MCP.
   - Tự động tạo nhánh và mở Pull Request trên GitHub cho các tác vụ backend, viết integration test suites lớn, hoặc nâng cấp thư viện mà không làm nghẽn máy cục bộ.
+  - **Đảm nhiệm tiến trình kiểm tra & bảo trì từ xa (Remote Daily Maintenance):**
+    + Đo kiểm độ trễ & tính sẵn sàng của Cloudflare Edge Workers, Sanity Studio, RSS API.
+    + Thực thi định kỳ Log Archival trên Cloudflare D1 (xóa bản ghi `agent_runs` và `reader_events` cũ hơn 30 ngày để tối ưu gói Cloudflare Free-tier).
+    + Quét liên kết hỏng (dead links) và bài viết trùng lặp.
+    + Thống kê số lượng bài đã tạo/đăng thành công 3 ngày gần nhất.
 
 - **CommandCode CLI (`commandcode-ops` - QC/QA & DevOps Gatekeeper):**
   - Chuyên viên thực thi terminal: Chạy test suite thực tế (`npm test`, `pytest`), linter, typecheck. Bắt log lỗi thực tế, không chấp nhận kết quả phỏng đoán.
@@ -55,3 +61,37 @@ Mọi sản phẩm giao diện do **OpenCode CLI** thực hiện BẮT BUỘC ph
 ## 4. Quy tắc giao tiếp & bảo tồn Context
 - Các subagent làm việc độc lập và chỉ gửi **Bản tóm tắt ngắn (Summary-Only Protocol)** về cho Lead Agent: (1) Trạng thái Pass/Fail, (2) Danh sách file thay đổi, (3) Lỗi cụ thể nếu có. Toàn bộ chi tiết lưu vào file `walkthrough.md`.
 - Giữ context của Antigravity Lead luôn nhẹ và sắc bén để đưa ra quyết định kiến trúc chính xác.
+
+---
+
+## 5. Quy Trình Bảo Trì & Báo Cáo Buổi Sáng Tự Động (Daily Morning Routine)
+
+Mỗi ngày vào lúc **00:00 UTC (07:00 sáng giờ Việt Nam)**, quy trình bảo trì kép được kích hoạt:
+
+```mermaid
+flowchart TD
+    CRON["⏰ GitHub Actions Cron: 00:00 UTC (07:00 AM VN)"] --> JULES["🤖 Jules Cloud Worker (Remote Maintenance)"]
+    
+    subgraph S1["Tiến trình Bảo Trì Nền (Jules Remote)"]
+        JULES --> D1["1. D1 Log Archival: Xóa logs > 30 ngày (agent_runs, reader_events)"]
+        JULES --> CF["2. Kiểm tra Cloudflare Workers: Homepage, /vi, /studio, /api/feed"]
+        JULES --> RSS["3. Kiểm định 9 nguồn cấp tin RSS Sentinel"]
+        JULES --> LNK["4. Quét & làm sạch Dead Links (clean-links) & Duplicate Check"]
+        JULES --> ST3["5. Thống kê bài viết 3 ngày gần nhất (Sanity + Local MDX)"]
+    end
+
+    S1 --> LEAD["🧠 Antigravity 2.0 (Tổng Hợp & Phân Tích)"]
+    
+    subgraph S2["Báo Cáo Sáng Cho Người Dùng"]
+        LEAD --> AI["6. Gọi Gemini AI phân tích Từ Khóa Nóng & Khung Giờ Vàng"]
+        LEAD --> MD["7. Xuất tệp báo cáo: frontend/reports/report-YYYY-MM-DD.md"]
+        LEAD --> ISS["8. Mở GitHub Issue & gửi tóm tắt buổi sáng cho Người Dùng"]
+    end
+```
+
+### Các chốt kiểm soát trong báo cáo hàng sáng:
+1. **Kiểm tra hạ tầng & độ trễ:** Đảm bảo tất cả HTTP status = 200, latency < 500ms.
+2. **Kiểm tra 9 nguồn RSS:** Phát hiện sớm nguồn tin bị chặn hoặc chậm để cảnh báo đội biên tập.
+3. **Thống kê số lượng bài 3 ngày gần nhất:** Theo dõi liên tục sản lượng bài viết trên Sanity CMS và kho lưu trữ tĩnh Local MDX.
+4. **Cảnh báo thiếu bài (Content Starvation):** Cảnh báo khẩn khi bất kỳ chuyên mục nào có dưới 2 bài mới.
+5. **Đề xuất từ khóa AI (Gemini Insights):** 10 từ khóa đắt giá kèm Search Intent và chiến lược khung giờ vàng đăng bài trong ngày.

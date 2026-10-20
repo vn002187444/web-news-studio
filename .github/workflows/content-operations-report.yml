@@ -15,7 +15,7 @@ on:
 
 jobs:
   report:
-    name: Generate Operations & Keyword Report
+    name: Generate Operations & Keyword Report (Jules Remote Protocol)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -42,14 +42,16 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Operations & Keyword Report Generator
+      - name: Run Maintenance Link Audit & Report Generator
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
           NEXT_PUBLIC_SANITY_DATASET: production
           SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
-        run: npm run report
+        run: |
+          npm run clean-links
+          npm run report
 
       - name: Commit and Push Report File
         run: |
@@ -71,7 +73,7 @@ jobs:
           REPORT_FILE="reports/report-$(date +'%Y-%m-%d').md"
           if [ -f "$REPORT_FILE" ]; then
             gh issue create \
-              --title "📊 [Báo Cáo Vận Hành] $(date +'%d/%m/%Y') - Kiểm Tra Bảo Trì & Đề Xuất Từ Khóa" \
+              --title "📊 [Báo Cáo Vận Hành Buổi Sáng] $(date +'%d/%m/%Y') - Kiểm Tra Bảo Trì & Thống Kê Nội Dung (Jules Remote)" \
               --body-file "$REPORT_FILE" \
               --label "report,analytics" || echo "Không thể tạo issue (vui lòng kiểm tra quyền Actions trong Settings > Actions > General > Workflow permissions)."
           fi
