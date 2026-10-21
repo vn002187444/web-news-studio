@@ -8,15 +8,21 @@ import { analyzeNewsWithWorkersAi, NewsAnalysisResult } from '../src/lib/cf-ai';
 import { resolveSmartThumbnail } from '../src/lib/image-processor';
 import { dispatchArticleWebhooks } from '../src/lib/syndication';
 import dotenv from 'dotenv';
+import { RSS_FEEDS } from '../src/data/rss-feeds';
 
 // Load biến môi trường từ .env.local và .env
 dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 dotenv.config();
 
 const API_KEY = process.env.GEMINI_API_KEY || 'MOCK_KEY'; 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite'; 
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash'; 
 
-const parser = new Parser();
+const parser = new Parser({
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+  },
+  timeout: 10000
+});
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 // Kiểm tra tương đồng từ ngữ giữa 2 tiêu đề (chống bài trùng lặp tuyệt đối)
@@ -84,27 +90,6 @@ function isFingerprintableThumb(url: string): boolean {
   return !FALLBACK_THUMB_IDS.some((id) => url.includes(id));
 }
 
-const RSS_FEEDS = [
-  { url: 'https://vnexpress.net/rss/so-hoa.rss', category: 'tech' },
-  { url: 'https://vnexpress.net/rss/kinh-doanh.rss', category: 'finance' },
-  { url: 'https://vnexpress.net/rss/the-thao.rss', category: 'sports' },
-  { url: 'https://vnexpress.net/rss/bong-da.rss', category: 'sports' },
-  { url: 'https://vnexpress.net/rss/tennis.rss', category: 'sports' },
-  { url: 'https://vnexpress.net/rss/cac-mon-khac.rss', category: 'sports' },
-  { url: 'https://vnexpress.net/rss/hau-truong.rss', category: 'sports' },
-  { url: 'https://vnexpress.net/rss/doi-song.rss', category: 'lifestyle' },
-  { url: 'https://www.eurogamer.net/feed/news', category: 'game' },
-  { url: 'https://vnexpress.net/rss/giai-tri.rss', category: 'entertainment' },
-  { url: 'https://vnexpress.net/rss/giao-duc.rss', category: 'education' },
-  { url: 'https://vnexpress.net/rss/khoa-hoc.rss', category: 'science' },
-  { url: 'https://cointelegraph.com/rss', category: 'blockchain' },
-  // Dự phòng quốc tế (chạy khi feed VN trùng bài)
-  { url: 'https://techcrunch.com/feed/', category: 'tech' },
-  { url: 'https://www.scmp.com/rss/91/feed', category: 'tech' },
-  { url: 'https://japantoday.com/feed/category/tech', category: 'tech' },
-  { url: 'https://en.yna.co.kr/RSS/news.xml', category: 'tech' },
-];
-
 function toSlug(s: string) {
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '').slice(0, 80);
 }
@@ -115,7 +100,7 @@ function yamlEscape(s: string) {
 
 const POSTS_DIR = path.join(process.cwd(), 'src/data/posts');
 
-async function rewriteArticle(title: string, content: string, category: string, candidateSlugs: string[] = [], keyFacts?: string[], angle?: string) {
+async function rewriteArticle(title: string, content: string, category: string, candidateSlugs: string[] = [], keyFacts?: string[], angle?: string, targetKeywords?: string[]) {
   // ... (giữ nguyên hàm rewriteArticle)
   if (API_KEY === 'MOCK_KEY') {
     console.log('[MOCK] No API Key found, skipping Gemini API call. Returning mock rewritten content.');
@@ -131,12 +116,13 @@ async function rewriteArticle(title: string, content: string, category: string, 
     const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
     const candidateLinksText = candidateSlugs.length > 0 ? candidateSlugs.map(s => `- /vi/${category}/${s}`).join('\n') : `- /vi/${category}`;
     const factsBlock = keyFacts && keyFacts.length > 0 ? ('\n       Dữ kiện cốt lõi (Fact Anchors): ' + keyFacts.join('; ') + (angle ? '\n       Góc nhìn phân tích: ' + angle : '')) : '';
+    const keywordsBlock = targetKeywords && targetKeywords.length > 0 ? ('\n       Từ khóa trọng tâm AEO/GEO cần tối ưu: ' + targetKeywords.join(', ')) : '';
     const prompt = `
       You are an elite Vietnamese Journalist and SEO/GEO/AEO Expert.
       Rewrite the following article to be 100% unique (avoid plagiarism).
 
       Original Title: ${title}
-      Original Content (Snippet/HTML): ${content}${factsBlock}
+      Original Content (Snippet/HTML): ${content}${factsBlock}${keywordsBlock}
 
       REQUIREMENTS (bắt buộc đủ cấu trúc gửi Sanity):
       1. MUST output the article in VIETNAMESE language, regardless of the source language.
@@ -258,18 +244,48 @@ async function runAutoblogger() {
   let articlesProcessed = 0;
   const MAX_ARTICLES_PER_RUN = 20;
 
-  // 1. Phân tích Khung Giờ Vàng hiện tại (Giờ VN UTC+7)
+  // 1. Phân tích Khung Giờ Vàng hiện tại (Giờ VN UTC+7) & Đề xuất AI Insights
   const now = new Date();
   const vnHour = (now.getUTCHours() + 7) % 24;
   let preferredCategories: string[] = [];
-  if (vnHour >= 6 && vnHour < 10) {
-    preferredCategories = ['finance', 'tech', 'blockchain'];
-  } else if (vnHour >= 11 && vnHour < 15) {
-    preferredCategories = ['game', 'lifestyle', 'entertainment'];
-  } else {
-    preferredCategories = ['sports', 'blockchain', 'science', 'tech'];
+
+  // Tự động tải từ khóa & khung giờ từ Daily Insights AI (nếu có)
+  const insightsPath = path.join(process.cwd(), 'src/data/daily-insights.json');
+  let dailyKeywords: Record<string, string[]> = {};
+  if (fs.existsSync(insightsPath)) {
+    try {
+      const insights = JSON.parse(fs.readFileSync(insightsPath, 'utf8'));
+      if (insights.goldenHours) {
+        if (vnHour >= 6 && vnHour < 10 && insights.goldenHours.morning) {
+          preferredCategories = insights.goldenHours.morning.categories || [];
+        } else if (vnHour >= 11 && vnHour < 15 && insights.goldenHours.lunch) {
+          preferredCategories = insights.goldenHours.lunch.categories || [];
+        } else if (vnHour >= 16 && vnHour < 20 && insights.goldenHours.afternoon) {
+          preferredCategories = insights.goldenHours.afternoon.categories || [];
+        } else if (insights.goldenHours.evening) {
+          preferredCategories = insights.goldenHours.evening.categories || [];
+        }
+      }
+      if (insights.keywords) {
+        Object.keys(insights.keywords).forEach((cat) => {
+          dailyKeywords[cat] = insights.keywords[cat].map((k: any) => typeof k === 'string' ? k : k.keyword);
+        });
+      }
+      console.log('💡 [AI Insights] Đã nạp từ khóa & khung giờ vàng cho ' + Object.keys(dailyKeywords).length + ' chuyên mục.');
+    } catch {}
   }
 
+  if (preferredCategories.length === 0) {
+    if (vnHour >= 6 && vnHour < 10) {
+      preferredCategories = ['finance', 'tech', 'blockchain', 'world'];
+    } else if (vnHour >= 11 && vnHour < 15) {
+      preferredCategories = ['tech', 'lifestyle', 'game'];
+    } else if (vnHour >= 16 && vnHour < 20) {
+      preferredCategories = ['entertainment', 'sports', 'lifestyle'];
+    } else {
+      preferredCategories = ['game', 'tech', 'science', 'blockchain'];
+    }
+  }
   // 2. Phân tích độ đói bài từ posts-manifest.json
   const catCount: Record<string, number> = {};
   const manifestPath = path.join(process.cwd(), 'src/data/posts-manifest.json');
@@ -357,7 +373,7 @@ async function runAutoblogger() {
   const MAX_PER_CAT_PER_RUN = 2;
   const perCatPublished: Record<string, number> = {};
   const totalKnown = Object.values(catCount).reduce((s, n) => s + n, 0);
-  const avgCount = totalKnown > 0 ? totalKnown / 9 : 0;
+  const avgCount = totalKnown > 0 ? totalKnown / 10 : 0;
   const phase1 = sortedFeeds.filter((f) => (catCount[f.category] || 0) < avgCount);
   const phase2 = sortedFeeds.filter((f) => (catCount[f.category] || 0) >= avgCount);
   const orderedFeeds = [...phase1, ...phase2];
@@ -445,7 +461,8 @@ async function runAutoblogger() {
         // Giai đoạn 2: Viết bài chi tiết với Gemini AI (GEO/AEO) neo theo Fact của Stage 1
         console.log(`✨ [Stage 2] Rewriting and Optimizing with Gemini AI (GEO/AEO) [Score: ${analysis.score}/10, Facts: ${analysis.keyFacts.length}]...`);
         const catSlugs = (publishedSlugsByCat[feed.category] || []).slice(-5);
-        const rewritten = await rewriteArticle(latestItem.title!, latestItem.content || latestItem.contentSnippet || '', feed.category, catSlugs, analysis.keyFacts, analysis.angle);
+        const targetKeywords = dailyKeywords[feed.category] || [];
+        const rewritten = await rewriteArticle(latestItem.title!, latestItem.content || latestItem.contentSnippet || '', feed.category, catSlugs, analysis.keyFacts, analysis.angle, targetKeywords);
 
         if (!rewritten) continue;
         if (!rewritten.title || !rewritten.slug || !rewritten.content) {

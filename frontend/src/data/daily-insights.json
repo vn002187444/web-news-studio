@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-21",
+  "generatedAt": "2026-10-21T21:26:25+07:00",
+  "goldenHours": {
+    "morning": { "hours": [6, 7, 8, 9], "categories": ["finance", "world", "blockchain"] },
+    "lunch": { "hours": [11, 12, 13], "categories": ["game", "lifestyle", "entertainment"] },
+    "afternoon": { "hours": [14, 15, 16], "categories": ["tech", "science", "education"] },
+    "evening": { "hours": [19, 20, 21], "categories": ["blockchain", "finance", "world"] },
+    "night": { "hours": [21, 22, 23], "categories": ["game", "entertainment", "lifestyle"] }
+  },
+  "keywords": {
+    "finance": [
+      { "keyword": "FED cắt giảm lãi suất Q4 2026", "intent": "Informational / Commercial", "title": "Fed Cắt Giảm Lãi Suất Q4/2026: Tác Động Trực Tiếp Đến Tỷ Giá USD/VND Và Dòng Vốn Ngoại Vào Việt Nam" },
+      { "keyword": "Thanh toán số mBridge Nhân dân tệ", "intent": "Informational / Analytical", "title": "Dự Án mBridge Mở Rộng Cuối 2026: Cơ Chế Vận Hành Và Tương Lai Phi USD Hóa Thương Mại Toàn Cầu" }
+    ],
+    "tech": [
+      { "keyword": "Autonomous AI Agent doanh nghiệp 2026", "intent": "Commercial / Transactional", "title": "AI Agent Tự Trị Năm 2026 Là Gì? Top 5 Ứng Dụng Đột Phá Giúp Doanh Nghiệp Tối Ưu Hóa Chi Phí Tức Thì" },
+      { "keyword": "Robot hình người Tesla Optimus thương mại", "intent": "Informational / Commercial", "title": "Giá Bán Và Khả Năng Vận Hành Của Tesla Optimus Thương Mại Hóa 2026: Những Gì Bạn Cần Biết" }
+    ],
+    "game": [
+      { "keyword": "Lịch thi đấu Bán kết CKTG 2026", "intent": "Navigational / Informational", "title": "Lịch Thi Đấu Bán Kết CKTG 2026: Phân Tích Meta Đường Giữa Và Dự Đoán Đại Chiến LCK - LPL" },
+      { "keyword": "GTA 6 Online crossplay PC console", "intent": "Informational / How-to", "title": "GTA 6 Online Có Hỗ Trợ Crossplay Giữa PC Và Console Không? Chi Tiết Lộ Trình Cập Nhật Mới Nhất" }
+    ],
+    "lifestyle": [
+      { "keyword": "Trào lưu Micro-Retirement 2026", "intent": "Informational / Lifestyle", "title": "Nghỉ Hưu Vi Mô (Micro-Retirement) Là Gì? Xu Hướng 'Làm 3 Năm Nghỉ 6 Tháng' Đang Thống Trị Gen Z" },
+      { "keyword": "Ứng dụng AI thanh lọc dopamine", "intent": "How-to / Solution-seeking", "title": "Hướng Dẫn Dopamine Detox 2.0: Cách Dùng Công Nghệ Ngăn Chặn Tình Trạng Kiệt Sức Kỹ Thuật Số" }
+    ],
+    "blockchain": [
+      { "keyword": "RWA Tokenization bất động sản 2026", "intent": "Informational / Transactional", "title": "Token Hóa Bất Động Sản (RWA) Năm 2026: Khung Pháp Lý Quốc Tế Và Cách Đầu Tư An Toàn Cho Cá Nhân" },
+      { "keyword": "DePIN AI phân tán năng lượng", "intent": "Informational / Tech Research", "title": "Mạng Lưới DePIN Kết Hợp AI: Lời Giải Mới Cho Bài Toán Khủng Hoảng Năng Lượng Và Điện Toán Toàn Cầu" }
+    ]
+  }
+}
