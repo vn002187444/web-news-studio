@@ -13,18 +13,22 @@ import "../globals.css";
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin", "vietnamese"],
+  display: 'swap',
 });
 
 const playfair = Playfair_Display({
   variable: "--font-serif",
   subsets: ["latin", "vietnamese"],
-  style: ['normal', 'italic']
+  style: ['normal', 'italic'],
+  display: 'swap',
 });
 
 const spaceMono = Space_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
-  weight: ["400", "700"]
+  weight: ["400", "700"],
+  display: 'swap',
+  preload: false,
 });
 
 import { NextIntlClientProvider } from 'next-intl';
@@ -91,9 +95,19 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
       className={`${inter.variable} ${playfair.variable} ${spaceMono.variable} font-sans h-full antialiased selection:bg-black selection:text-white`}
     >
       <head>
-        {/* Rút ngắn handshake tới host ảnh chính → cải thiện LCP (ảnh hero đã priority) */}
+                {/* Rút ngắn handshake tới host ảnh chính → cải thiện LCP (ảnh hero đã priority) */}
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://vcdn1-thethao.vnecdn.net" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://vcdn1-thethao.vnecdn.net" />
+        <link rel="preconnect" href="https://vcdn1-giadinh.vnecdn.net" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://vcdn1-giadinh.vnecdn.net" />
+        <link rel="preconnect" href="https://vcdn1-vnexpress.vnecdn.net" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://vcdn1-vnexpress.vnecdn.net" />
+        <link rel="preconnect" href="https://s3-images.ctmedia.io" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://s3-images.ctmedia.io" />
+        <link rel="preconnect" href="https://cdn.i-scmp.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://cdn.i-scmp.com" />
       </head>
       <body className="min-h-full flex flex-col bg-[#F4F4F0] text-[#111111]">
         <NextTopLoader 

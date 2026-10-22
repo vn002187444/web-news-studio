@@ -42,6 +42,14 @@ export default function imgLoader({
       return u.toString();
     }
 
+    if (host.includes('vnecdn.net')) {
+      if (Array.from(u.searchParams.keys()).length > 0 || src.includes('?')) {
+        u.searchParams.set('w', String(Math.min(width, 800)));
+        u.searchParams.set('q', String(Math.min(quality ?? 70, 70)));
+        return u.toString();
+      }
+    }
+
     return src;
   } catch {
     return src;

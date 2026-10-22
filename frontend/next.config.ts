@@ -66,7 +66,25 @@ const nextConfig: NextConfig = {
         ].join('; '),
       },
     ];
-    return [
+        return [
+      {
+        source: '/:locale(vi|en)/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400' }
+        ],
+      },
+      {
+        source: '/:locale(vi|en)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400' }
+        ],
+      },
+      {
+        source: '/',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400' }
+        ],
+      },
       {
         source: '/:path*.mp4',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
