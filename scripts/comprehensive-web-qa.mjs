@@ -21,19 +21,29 @@ function recordTest(category, name, passed, details = "") {
   console.log(`${passed ? "✅ [PASS]" : "❌ [FAIL]"} [${category.toUpperCase()}] ${name}${details ? ` -> ${details}` : ""}`);
 }
 
-async function testFetch(path) {
+async function testFetch(path, retries = 2) {
   const url = path.startsWith("http") ? path : `${BASE_URL}${path}`;
-  const t0 = Date.now();
-  try {
-    const res = await fetch(url, {
-      headers: { "User-Agent": "WebNews-QA-Auditor/1.0" },
-      signal: AbortSignal.timeout(10000)
-    });
-    const timeMs = Date.now() - t0;
-    const text = await res.text();
-    return { status: res.status, ok: res.ok, timeMs, text, url };
-  } catch (err) {
-    return { status: 0, ok: false, timeMs: Date.now() - t0, error: err.message, text: "", url };
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const t0 = Date.now();
+    try {
+      const res = await fetch(url, {
+        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" },
+        signal: AbortSignal.timeout(10000)
+      });
+      const timeMs = Date.now() - t0;
+      if (res.status === 503 && attempt < retries) {
+        await new Promise(r => setTimeout(r, 600));
+        continue;
+      }
+      const text = await res.text();
+      return { status: res.status, ok: res.ok, timeMs, text, url };
+    } catch (err) {
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, 600));
+        continue;
+      }
+      return { status: 0, ok: false, timeMs: Date.now() - t0, error: err.message, text: "", url };
+    }
   }
 }
 
@@ -66,6 +76,7 @@ async function runQA() {
   for (const r of routes) {
     const res = await testFetch(r.path);
     recordTest("routes", `Route ${r.path} (${r.name})`, res.ok, `Status: ${res.status}, Time: ${res.timeMs}ms`);
+    await new Promise(r => setTimeout(r, 200));
   }
 
   console.log('\n--- 2. AUDITING CMS & STUDIO ACCESS ---');

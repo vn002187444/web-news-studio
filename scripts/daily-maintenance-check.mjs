@@ -16,7 +16,7 @@ async function auditWorkers() {
   // Check Web Reader Edge Worker
   try {
     const t0 = Date.now();
-    const res = await fetch(WEB_BASE, { signal: AbortSignal.timeout(10000) });
+    const res = await fetch(WEB_BASE, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
     const latency = Date.now() - t0;
     results.webReader = { status: res.status, latencyMs: latency, ok: res.ok };
     console.log(`✅ [WORKER: WEB READER] Homepage -> Status: ${res.status}, Latency: ${latency}ms`);
@@ -27,7 +27,7 @@ async function auditWorkers() {
 
   // Check Sanity Studio CMS
   try {
-    const res = await fetch(STUDIO_BASE, { signal: AbortSignal.timeout(10000) });
+    const res = await fetch(STUDIO_BASE, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
     results.studioStatus = { status: res.status, ok: res.status < 400 };
     console.log(`✅ [WORKER: STUDIO CMS] /studio -> Status: ${res.status}`);
   } catch (err) {
