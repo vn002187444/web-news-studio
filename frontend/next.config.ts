@@ -5,6 +5,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['framer-motion', 'lucide-react'],
+  },
   images: {
     // Custom loader (src/lib/imgLoader.ts): ảnh remote tải trực tiếp từ CDN gốc,
     // không qua `/_next/image` (tránh Cloudflare Images trả phí + TTFB ~2.4s ở LCP).

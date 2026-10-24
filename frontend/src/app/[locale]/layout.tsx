@@ -1,11 +1,23 @@
-import SmoothScrollProvider from "@/components/ui/SmoothScrollProvider";
+import dynamic from 'next/dynamic';
 import Header from "@/components/ui/Header";
 import Footer from "@/components/ui/Footer";
-import CustomCursor from "@/components/ui/CustomCursor";
 import CommandPalette from "@/components/ui/CommandPalette";
 import MobileBottomNav from "@/components/ui/MobileBottomNav";
 import { SearchProvider } from "@/components/ui/SearchProvider";
-import HomepagePreloader from "@/components/ui/HomepagePreloader";
+
+// Defer heavy client-only components — do NOT block LCP/FCP
+const HomepagePreloader = dynamic(
+  () => import("@/components/ui/HomepagePreloader"),
+  { ssr: false }
+);
+const CustomCursor = dynamic(
+  () => import("@/components/ui/CustomCursor"),
+  { ssr: false }
+);
+const SmoothScrollProvider = dynamic(
+  () => import("@/components/ui/SmoothScrollProvider"),
+  { ssr: false, loading: (props: any) => <>{props.children}</> }
+);
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, Space_Mono } from "next/font/google";
 import "../globals.css";
@@ -95,6 +107,8 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
       className={`${inter.variable} ${playfair.variable} ${spaceMono.variable} font-sans h-full antialiased selection:bg-black selection:text-white`}
     >
       <head>
+        {/* Preload web manifest to prevent render-blocking discovery */}
+        <link rel="preload" href="/manifest.webmanifest" as="fetch" crossOrigin="anonymous" />
                 {/* Rút ngắn handshake tới host ảnh chính → cải thiện LCP (ảnh hero đã priority) */}
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="anonymous" />
