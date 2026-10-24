@@ -1,7 +1,6 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 
@@ -16,16 +15,10 @@ interface HeroArticle {
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80';
 
 export default function HeroSection({ article }: { article?: HeroArticle }) {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
   return (
-    <section ref={containerRef} className="relative pt-32 pb-20 px-6 min-h-[90vh] flex flex-col justify-center overflow-hidden">
+    <section className="relative pt-32 pb-20 px-6 min-h-[90vh] flex flex-col justify-center overflow-hidden">
       <div className="max-w-[1600px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
         {/* Left: Typography */}
@@ -75,16 +68,17 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
           {article && (
             <Link href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" data-cursor="READ" aria-label={article.title} />
           )}
-          <motion.div style={{ y }} className="w-full h-[120%] -top-[10%] relative">
+          <div className="w-full h-[120%] -top-[10%] relative">
             <Image 
               src={article?.thumbnail.url || FALLBACK_IMG}
               alt={article?.thumbnail.alt || 'Retro Tech Setup'}
               fill
               sizes="(max-width: 1024px) 100vw, 42vw"
-              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+              className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
               priority
+              loading="eager"
             />
-          </motion.div>
+          </div>
           {article && (
             <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/80 to-transparent z-10 pointer-events-none">
               <span className="font-mono text-[10px] uppercase tracking-widest bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-white">

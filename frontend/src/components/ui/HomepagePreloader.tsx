@@ -27,7 +27,7 @@ export default function HomepagePreloader() {
     }
 
     // Simulate preload progress
-    const duration = 2500; // Total 2.5 seconds
+    const duration = 1200; // Reduced from 2500ms to 1200ms for faster perceived load
     const intervalTime = 50;
     const steps = duration / intervalTime;
     let currentStep = 0;
@@ -46,7 +46,7 @@ export default function HomepagePreloader() {
         setTimeout(() => {
           setIsVisible(false);
           sessionStorage.setItem('ns_preloaded', 'true');
-        }, 500); // Hold at 100% for 500ms
+        }, 200); // Reduced hold from 500ms to 200ms
       }
     }, intervalTime);
 
@@ -59,6 +59,7 @@ export default function HomepagePreloader() {
     <AnimatePresence>
       <motion.div
         className="fixed inset-0 z-[999999] bg-[#0c0c0c] text-white flex flex-col items-center justify-center font-mono overflow-hidden"
+        style={{ pointerEvents: 'none' }} // Allow LCP image discovery below while preloader animates
         initial={{ opacity: 1 }}
         exit={{ opacity: 0, y: '-100%' }}
         transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
