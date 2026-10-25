@@ -20,7 +20,7 @@ export const CURATED_THUMBNAIL_POOL: Record<string, string[]> = {
   ],
   blockchain: [
     'https://images.unsplash.com/photo-1639762681485-074b7f938ba0', // Web3 3D Sphere
-    'https://images.unsplash.com/photo-1622979135225-d2ba269bc1df', // Crypto Neon Matrix
+    'https://images.unsplash.com/photo-1621504450181-5d356f61d307', // Crypto Exchange & Neon Chart
     'https://images.unsplash.com/photo-1516245834210-c4c142787335', // Bitcoin Golden Coin
     'https://images.unsplash.com/photo-1642543492481-44e81e3914a7', // Ethereum / DeFi
     'https://images.unsplash.com/photo-1621416894569-0f39ed31d247', // Blockchain Nodes
@@ -48,8 +48,8 @@ export const CURATED_THUMBNAIL_POOL: Record<string, string[]> = {
   ],
   sports: [
     'https://images.unsplash.com/photo-1461896836934-ffe607ba8211', // Running Track
-    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2', // Football Soccer Stadium
-    'https://images.unsplash.com/photo-1517649763962-0c623266ddc0', // Gym & Athletics
+    'https://images.unsplash.com/photo-1579952363873-27f3bade9f55', // Football Soccer Stadium / Match
+    'https://images.unsplash.com/photo-1517838277536-f5f99be501cd', // Fitness & Gym Athletics
     'https://images.unsplash.com/photo-1546519638-68e109498ffc', // Basketball Court
     'https://images.unsplash.com/photo-1530549387789-4c1017266635', // Swimming Pool
   ],
@@ -60,7 +60,7 @@ export const CURATED_THUMBNAIL_POOL: Record<string, string[]> = {
     'https://images.unsplash.com/photo-1485846234645-a62644f84728', // Film Reel Vintage
   ],
   education: [
-    'https://images.unsplash.com/photo-1523050854058-8df90110c9f1', // Graduation & Library
+    'https://images.unsplash.com/photo-1524178232363-1fb2b075b655', // Graduation & Lecture Hall
     'https://images.unsplash.com/photo-1497633762265-9d179a990aa6', // Stack of Books
     'https://images.unsplash.com/photo-1503676260728-1c00da094a0b', // School Learning Desk
     'https://images.unsplash.com/photo-1434030216411-0b793f4b4173', // Online Learning Laptop
@@ -73,7 +73,7 @@ export const CURATED_THUMBNAIL_POOL: Record<string, string[]> = {
   ],
   world: [
     'https://images.unsplash.com/photo-1451187580459-43490279c0fa', // Globe / Satellites
-    'https://images.unsplash.com/photo-1477959858617-67f30bc75b82', // Global Metropolis
+    'https://images.unsplash.com/photo-1444723121867-7a241cacace9', // Global Metropolis Skyline
     'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1', // World Map Compass
   ],
 };

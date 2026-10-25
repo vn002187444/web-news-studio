@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect, useState } from 'react';
 import { Link } from '@/i18n/routing';
-import Image from 'next/image';
+import AdaptiveImage from './AdaptiveImage';
 import { useArticleTracker } from '@/hooks/useArticleTracker';
 import { useTranslations } from 'next-intl';
 import { UnifiedPost } from '@/lib/posts';
@@ -66,7 +66,7 @@ export default function RecommendedArticles({ recentPosts, currentSlug, currentC
         {recommendedPosts.map((post) => (
           <Link href={`/${post.meta.category}/${post.slug}`} key={post.slug} className="group block cursor-pointer" data-cursor="READ">
             <div className="relative w-full h-48 mb-4 overflow-hidden rounded-xl bg-gray-100">
-              <Image 
+              <AdaptiveImage 
                 src={post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80'}
                 alt={post.meta.title}
                 fill

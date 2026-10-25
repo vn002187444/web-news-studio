@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import AdaptiveImage from './AdaptiveImage';
 import { Link } from '@/i18n/routing';
 import VelocitySkew from './VelocitySkew';
 import { Article } from '@/types';
@@ -51,7 +51,7 @@ export default function BentoGrid({ articles }: BentoGridProps) {
               >
                 <Link href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" aria-label={article.title} data-cursor="READ" />
                 
-                <Image 
+                <AdaptiveImage 
                   src={article.thumbnail.url}
                   alt={article.thumbnail.alt}
                   fill

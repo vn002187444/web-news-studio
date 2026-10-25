@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import AdaptiveImage from './AdaptiveImage';
 import { Link } from '@/i18n/routing';
 
 interface HeroArticle {
@@ -69,7 +69,7 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
             <Link href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" data-cursor="READ" aria-label={article.title} />
           )}
           <div className="w-full h-[120%] -top-[10%] relative">
-            <Image 
+            <AdaptiveImage 
               src={article?.thumbnail.url || FALLBACK_IMG}
               alt={article?.thumbnail.alt || 'Retro Tech Setup'}
               fill

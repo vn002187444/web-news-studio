@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import AdaptiveImage from './AdaptiveImage';
 import { Link } from '@/i18n/routing';
 
 interface SectionArticle {
@@ -72,7 +72,7 @@ export default function CategorySections({ articles }: { articles: SectionArticl
                   data-cursor="READ"
                 >
                   <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
-                    <Image
+                    <AdaptiveImage
                       src={post.thumbnail.url}
                       alt={post.thumbnail.alt}
                       fill

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Image from 'next/image';
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
 import { Link } from '@/i18n/routing';
 import RecommendedArticles from '@/components/ui/RecommendedArticles';
 import MarkdownBody from '@/components/ui/MarkdownBody';
@@ -189,7 +190,7 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
 
           <figure className="mb-16">
             <div className="w-full h-[500px] relative overflow-hidden rounded-lg">
-<Image 
+<AdaptiveImage 
   src={meta.thumbnail || "https://images.unsplash.com/photo-1677442136019-21780ecad995"}
   alt={meta.title}
   fill
@@ -209,7 +210,7 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
 
           {/* Author Tag — hồ sơ tác giả từ Sanity (S3), fallback avatar mặc định */}
           <div className="mt-20 pt-10 border-t border-gray-200 flex items-center gap-6">
-            <Image 
+            <AdaptiveImage 
               src={meta.authorAvatar || "/icon-192x192.png"}
               alt={meta.author || "Ban Biên Tập News Studio"}
               width={80}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#111111"/>
+  <rect width="1200" height="6" fill="#DC2626"/>
+  <circle cx="1050" cy="150" r="280" fill="#DC2626" fill-opacity="0.12"/>
+  <text x="100" y="240" fill="#DC2626" font-family="monospace" font-size="16" font-weight="700" letter-spacing="4">NEWS STUDIO EDITORIAL</text>
+  <text x="100" y="320" fill="#F4F4F0" font-family="Georgia, serif" font-size="48" font-weight="700">Tạp Chí Tin Tức Đa Chiều Thế Hệ Mới</text>
+  <text x="100" y="420" fill="#71717A" font-family="sans-serif" font-size="20">Tin tức chuyên sâu • Phân tích công nghệ, tài chính & đời sống</text>
+</svg>
