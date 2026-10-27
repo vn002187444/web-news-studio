@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from '@/i18n/routing';
-import Image from 'next/image';
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
 
 interface MatchItem {
   id: string;
@@ -180,15 +180,14 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
                   {/* Hero Spotlight (First Article) */}
                   <Link href={`/sports/${filteredArticles[0].slug}`} className="group block relative overflow-hidden rounded-2xl bg-black border border-white/10 hover:border-[#00F59B]/50 transition-colors">
                      <div className="relative aspect-video w-full overflow-hidden">
-                        {filteredArticles[0].thumbnail?.url && (
-                          <Image
-                            src={filteredArticles[0].thumbnail.url}
-                            alt={filteredArticles[0].thumbnail.alt || filteredArticles[0].title}
+                        <AdaptiveImage
+                            src={filteredArticles[0].thumbnail}
+                            alt={filteredArticles[0].title}
+                            category="sports"
                             fill
                             sizes="(max-width: 1024px) 100vw, 75vw"
                             className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
                           />
-                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-[#08090C] via-[#08090C]/50 to-transparent" />
                      </div>
                      <div className="absolute bottom-0 left-0 w-full p-8 md:p-12">
@@ -217,17 +216,14 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
                            return (
                             <Link key={i} href={`/sports/${article.slug}`} className="group flex flex-col border border-white/10 bg-white/5 rounded-2xl overflow-hidden hover:border-[#00F59B]/30 hover:bg-white/10 transition-all">
                                <div className="relative aspect-video w-full overflow-hidden">
-                                 {article.thumbnail?.url ? (
-                                   <Image
-                                     src={article.thumbnail.url}
-                                     alt={article.thumbnail.alt || article.title}
-                                     fill
-                                     sizes="(max-width: 768px) 100vw, 35vw"
-                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                   />
-                                 ) : (
-                                   <div className="w-full h-full bg-white/5" />
-                                 )}
+                                 <AdaptiveImage
+                                      src={article.thumbnail}
+                                      alt={article.title}
+                                      category="sports"
+                                      fill
+                                      sizes="(max-width: 768px) 100vw, 35vw"
+                                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
                                  <div className="absolute top-3 left-3">
                                    <span className="inline-block bg-black/70 backdrop-blur-md text-[#00F59B] border border-[#00F59B]/30 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
                                      {subCat}

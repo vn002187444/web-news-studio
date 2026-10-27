@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
 
 export default function EntertainmentTemplate({ articles }: { articles: any[] }) {
   const entertainmentArticles = articles && articles.length > 0 ? articles : [];
@@ -26,9 +26,10 @@ export default function EntertainmentTemplate({ articles }: { articles: any[] })
           {entertainmentArticles.map((article, i) => (
             <Link key={i} href={`/entertainment/${article.slug}`} className="group relative block aspect-[2/3] overflow-hidden rounded-lg">
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10 transition-opacity duration-300 group-hover:opacity-100" />
-              <Image 
-                src={article.thumbnail?.url || 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=800&q=80'} 
+              <AdaptiveImage 
+                src={article.thumbnail} 
                 alt={article.title}
+                category="entertainment"
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
               />

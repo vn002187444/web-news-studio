@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
 
 export default function ScienceTemplate({ articles }: { articles: any[] }) {
   const scienceArticles = articles && articles.length > 0 ? articles : [];
@@ -24,9 +24,10 @@ export default function ScienceTemplate({ articles }: { articles: any[] }) {
             {scienceArticles.slice(0, 1).map((article, i) => (
               <Link key={i} href={`/science/${article.slug}`} className="group block mb-12">
                 <div className="relative h-[400px] bg-gray-100 rounded-xl mb-6 overflow-hidden border border-gray-200">
-                  <Image
-                    src={article.thumbnail?.url}
-                    alt={article.thumbnail?.alt || article.title}
+                  <AdaptiveImage
+                    src={article.thumbnail}
+                    alt={article.title}
+                    category="science"
                     fill
                     sizes="(max-width: 768px) 100vw, 66vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -57,9 +58,10 @@ export default function ScienceTemplate({ articles }: { articles: any[] }) {
             {scienceArticles.slice(1, 4).map((article, i) => (
               <Link key={i} href={`/science/${article.slug}`} className="group block border-l-4 border-[#008080] pl-6 hover:border-[#ff7f50] transition-colors">
                 <div className="relative h-32 w-full mb-3 overflow-hidden rounded-lg bg-gray-100">
-                  <Image
-                    src={article.thumbnail?.url}
-                    alt={article.thumbnail?.alt || article.title}
+                  <AdaptiveImage
+                    src={article.thumbnail}
+                    alt={article.title}
+                    category="science"
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"

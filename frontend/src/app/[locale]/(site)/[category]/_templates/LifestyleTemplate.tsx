@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Link } from '@/i18n/routing';
-import Image from 'next/image';
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
 
 export function detectLifestyleTopic(article: { title?: string; excerpt?: string; tags?: string[] }): string {
   const text = `${article.title || ''} ${(article.tags || []).join(' ')} ${article.excerpt || ''}`.toLowerCase();
@@ -106,15 +106,15 @@ export default function LifestyleTemplate({ articles }: { articles: any[] }) {
                  {/* Cover Story (Featured First Article) */}
                  {filteredArticles[0] && (
                    <Link href={`/lifestyle/${filteredArticles[0].slug}`} className="group block relative w-full h-[60vh] md:h-[70vh] overflow-hidden rounded-2xl">
-                     {filteredArticles[0].thumbnail?.url && (
-                       <Image
-                         src={filteredArticles[0].thumbnail.url}
-                         alt={filteredArticles[0].thumbnail.alt || filteredArticles[0].title}
-                         fill
-                         sizes="(max-width: 1024px) 100vw, 75vw"
-                         className="object-cover transition-transform duration-[1.5s] group-hover:scale-105"
-                       />
-                     )}
+                     <AdaptiveImage
+                          src={filteredArticles[0].thumbnail}
+                          alt={filteredArticles[0].title}
+                          category="lifestyle"
+                          fill
+                          priority
+                          sizes="(max-width: 1024px) 100vw, 75vw"
+                          className="object-cover transition-transform duration-[1.5s] group-hover:scale-105"
+                        />
                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                      <div className="absolute bottom-0 left-0 w-full p-8 md:p-12 text-white">
                         <div className="flex items-center gap-2 mb-4">
@@ -147,15 +147,14 @@ export default function LifestyleTemplate({ articles }: { articles: any[] }) {
                            return (
                              <Link key={i} href={`/lifestyle/${item.slug}`} className="w-[75vw] md:w-[40vw] lg:w-[30vw] shrink-0 snap-center group flex flex-col cursor-pointer">
                                 <div className="relative aspect-[4/5] w-full overflow-hidden mb-4 bg-black/5 rounded-xl">
-                                   {item.thumbnail?.url && (
-                                     <Image
-                                       src={item.thumbnail.url}
-                                       alt={item.title || 'Lifestyle Article'}
-                                       fill
-                                       sizes="(max-width: 768px) 75vw, 30vw"
-                                       className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                     />
-                                   )}
+                                   <AdaptiveImage
+                                        src={item.thumbnail}
+                                        alt={item.title || 'Lifestyle Article'}
+                                        category="lifestyle"
+                                        fill
+                                        sizes="(max-width: 768px) 75vw, 30vw"
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                      />
                                    <div className="absolute top-3 left-3">
                                      <span className="font-sans text-[10px] font-bold uppercase tracking-widest bg-white/90 backdrop-blur-md text-[#1C1917] px-2.5 py-1 rounded-full shadow-sm">
                                        {topic}
@@ -195,15 +194,14 @@ export default function LifestyleTemplate({ articles }: { articles: any[] }) {
                                   {item.title}
                                 </h3>
                                 <div className="relative aspect-video w-full overflow-hidden mb-4 bg-black/5 rounded-xl">
-                                   {item.thumbnail?.url && (
-                                     <Image
-                                       src={item.thumbnail.url}
-                                       alt={item.title || 'Lifestyle Article'}
-                                       fill
-                                       sizes="(max-width: 768px) 100vw, 35vw"
-                                       className="object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0"
-                                     />
-                                   )}
+                                   <AdaptiveImage
+                                        src={item.thumbnail}
+                                        alt={item.title || 'Lifestyle Article'}
+                                        category="lifestyle"
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 35vw"
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0"
+                                      />
                                 </div>
                                 <p className="font-sans text-sm text-[#1C1917]/60 line-clamp-2">
                                   {item.excerpt}

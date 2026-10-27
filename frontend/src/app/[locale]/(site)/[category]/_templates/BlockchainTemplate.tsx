@@ -1,5 +1,7 @@
 'use client';
 
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
+
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
@@ -167,12 +169,18 @@ const TiltCard = ({ article }: { article: any }) => {
     >
       {/* 3D Inner Content */}
       <div 
-        className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-500"
-        style={{ 
-          backgroundImage: `url(${article.thumbnail.url})`, 
-          transform: "translateZ(20px) scale(1.1)" 
-        }}
-      />
+        className="absolute inset-0 overflow-hidden"
+        style={{ transform: "translateZ(20px) scale(1.1)" }}
+      >
+        <AdaptiveImage
+          src={article.thumbnail}
+          alt={article.title}
+          category="blockchain"
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500"
+        />
+      </div>
       
       {/* Bloom Lighting Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent z-10" />

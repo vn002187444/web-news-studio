@@ -1,5 +1,7 @@
 'use client';
 
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
+
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
@@ -115,9 +117,10 @@ export default function GameTemplate({ articles }: { articles: any[] }) {
           <Link href={`/game/${featured.slug}`} className="group block mb-14" data-cursor="PLAY">
             <article className="grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-3xl overflow-hidden border border-white/15 bg-white/[0.03] hover:border-green-400/50 transition-colors">
               <div className="relative h-72 lg:h-[420px] overflow-hidden">
-                <Image
-                  src={optimizeThumbnail(featured.thumbnail?.url || featured.thumbnail, 1200, 65)}
+                <AdaptiveImage
+                  src={featured.thumbnail}
                   alt={featured.title}
+                  category="game"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -157,9 +160,10 @@ export default function GameTemplate({ articles }: { articles: any[] }) {
                 <Link key={article.slug || i} href={`/game/${article.slug}`} className="group" data-cursor="READ">
                   <article className="h-full rounded-2xl overflow-hidden border border-white/12 bg-white/[0.02] hover:border-green-400/40 hover:bg-white/[0.05] transition-all">
                     <div className="relative h-48 overflow-hidden">
-                      <Image
-                        src={optimizeThumbnail(article.thumbnail?.url || article.thumbnail, 800, 65)}
+                      <AdaptiveImage
+                        src={article.thumbnail}
                         alt={article.title}
+                        category="game"
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500"

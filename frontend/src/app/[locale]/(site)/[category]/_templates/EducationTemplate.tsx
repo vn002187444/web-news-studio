@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Link } from '@/i18n/routing';
-import Image from 'next/image';
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
 
 export function detectEduSubCategory(article: { title?: string; excerpt?: string; tags?: string[] }): string {
   const text = `${article.title || ''} ${(article.tags || []).join(' ')} ${article.excerpt || ''}`.toLowerCase();
@@ -96,17 +96,14 @@ export default function EducationTemplate({ articles }: { articles: any[] }) {
                     
                     <Link href={`/education/${article.slug}`} className="md:w-1/2 group block bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-[#1c355e]/5 overflow-hidden">
                       <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                        {article.thumbnail?.url ? (
-                          <Image
-                            src={article.thumbnail.url}
-                            alt={article.thumbnail.alt || article.title}
+                        <AdaptiveImage
+                            src={article.thumbnail}
+                            alt={article.title}
+                            category="education"
                             fill
                             sizes="(max-width: 768px) 100vw, 50vw"
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                           />
-                        ) : (
-                          <div className="w-full h-full bg-gray-100" />
-                        )}
                         <div className="absolute top-3 left-3">
                           <span className="text-[10px] font-bold text-white uppercase tracking-wider bg-[#0047AB]/90 backdrop-blur-md px-3 py-1 rounded-full shadow-sm">
                             {subCat}

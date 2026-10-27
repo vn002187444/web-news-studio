@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
 import { Link } from '@/i18n/routing';
 import { Suspense, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -109,9 +109,10 @@ export default function TechTemplate({ articles }: { articles: any[] }) {
                 {/* Glow effect on hover */}
                 <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 rounded-2xl pointer-events-none" />
                 <div className="relative h-48 w-full shrink-0 overflow-hidden">
-                  <Image
-                    src={article.thumbnail?.url}
-                    alt={article.thumbnail?.alt || article.title}
+                  <AdaptiveImage
+                    src={article.thumbnail}
+                    alt={article.title}
+                    category="tech"
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"

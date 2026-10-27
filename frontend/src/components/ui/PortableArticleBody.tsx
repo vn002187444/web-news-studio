@@ -2,6 +2,20 @@
 
 import { PortableText, type PortableTextComponents } from '@portabletext/react';
 import { Link } from '@/i18n/routing';
+import imageUrlBuilder from '@sanity/image-url';
+import AdaptiveImage from './AdaptiveImage';
+
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'cb3cdnq7';
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+const imageBuilder = imageUrlBuilder({ projectId, dataset });
+
+function urlFor(source: any) {
+  try {
+    return imageBuilder.image(source).auto('format').fit('max').width(1600).url();
+  } catch {
+    return null;
+  }
+}
 
 function YoutubeEmbed({ url, caption }: { url: string; caption?: string }) {
   const id = (url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{6,})/) || [])[1] || '';
@@ -49,6 +63,36 @@ const components: PortableTextComponents = {
     em: ({ children }) => <em className="italic">{children}</em>,
   },
   types: {
+    image: ({ value }: any) => {
+      let resolvedSrc = '';
+      if (value?.asset?._ref || value?.asset?._id) {
+        resolvedSrc = urlFor(value) || '';
+      }
+      if (!resolvedSrc) {
+        resolvedSrc = value?.url || value?.asset?.url || '';
+      }
+      const altText = value?.alt || value?.caption || 'News Studio Visual';
+      const captionText = value?.caption;
+
+      return (
+        <figure className="my-10 overflow-hidden rounded-2xl bg-gray-100 border border-gray-200/60 shadow-sm dark:bg-neutral-900 dark:border-neutral-800">
+          <div className="relative aspect-[16/10] md:aspect-[16/9] w-full overflow-hidden bg-gray-100 dark:bg-neutral-900">
+            <AdaptiveImage
+              src={resolvedSrc}
+              alt={altText}
+              fill
+              sizes="(max-width: 1024px) 100vw, 900px"
+              className="object-cover"
+            />
+          </div>
+          {captionText && captionText.trim() && (
+            <figcaption className="px-5 py-3 text-center font-sans text-xs italic text-gray-500 bg-gray-50/80 dark:bg-neutral-950/80 dark:text-neutral-400 border-t border-gray-100 dark:border-neutral-800">
+              {captionText}
+            </figcaption>
+          )}
+        </figure>
+      );
+    },
     keyTakeaways: ({ value }: any) => (
       <aside className="my-8 rounded-lg border border-amber-300 bg-amber-50 p-6">
         <h4 className="font-mono text-xs uppercase tracking-widest text-amber-700 mb-3">Những điểm chính</h4>

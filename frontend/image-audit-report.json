@@ -1,0 +1,557 @@
+{
+  "timestamp": "2026-10-27T05:41:13.373Z",
+  "local": {
+    "total": 508,
+    "missing": [],
+    "invalid": [],
+    "broken": [
+      {
+        "url": "https://vcdn1-thethao.vnecdn.net/2026/10/20/ten-hag-ronaldo-1792487608-3855-1792487846.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=LvFOCOIRBoVu7A1E0iC8vQ",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "ten-hag-tiet-lo-ronaldo-bo-tap-gay-anh-huong-xau-man-utd",
+            "title": "Ten Hag tiết lộ sự thật gây sốc về Ronaldo tại Man Utd: Bỏ tập, làm gương xấu",
+            "category": "sports"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-thethao.vnecdn.net/2026/10/19/A-nh-ma-n-hi-nh-2026-10-19-lu-c-17-35-16-1792406139.png?w=1200&h=0&q=100&dpr=1&fit=crop&s=SX1u6I1SZwKQUG0SMj55tw",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "8-tr-n-c-ch-i-nh-t-l-t-ba-champions-league",
+            "title": "[Auto-Generated] 8 trận được chờ đợi nhất lượt ba Champions League",
+            "category": "sports"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giaitri.vnecdn.net/2026/10/19/cuahanghermesbiphabaoloanophap-6504-5228-1792402302.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=48XW0YXbuYO0IJPk784Ovw",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "lan-song-bao-loan-tai-phap-cac-thuong-hieu-xa-xi-bi-tan-cong",
+            "title": "Làn sóng bạo loạn tại Pháp: Các thương hiệu xa xỉ bị tấn công dữ dội",
+            "category": "entertainment"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/20/1792456052202f3d3eebac2eedaf96-5724-6064-1792458649.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=qZbAq5mNJ7sz7G5PmZSyUw",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "nu-tro-giang-hoc-vien-quan-y-thang-quan-ham-truoc-nien-han",
+            "title": "Chân dung nữ trợ giảng Học viện Quân y thăng quân hàm vượt cấp 2 lần",
+            "category": "education"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-kinhdoanh.vnecdn.net/2026/10/18/816e311ff3f3-b7b4-d2247b1e9cec-4972-6143-1792286588.png?w=1200&h=0&q=100&dpr=1&fit=crop&s=6GILdCjv5N2S7coGy2MdLQ",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "cach-nao-de-quan-ao-tu-thien-khong-thanh-rac",
+            "title": "Chấm dứt nạn quần áo từ thiện thành rác: Giải pháp nào cho bền vững?",
+            "category": "finance"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giadinh.vnecdn.net/2026/10/18/y7ve3ulhxl8pfqofkfwxbkemqvikud-1526-9066-1792312366.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=I4uO8rDIDnPKSa8xB2aneQ",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "bay-trai-thuc-tinh-trung-quoc-phu-huynh-mat-tien",
+            "title": "Bẫy 'trại thức tỉnh' tại Trung Quốc: Khi phụ huynh mất tiền vì kỳ vọng ảo",
+            "category": "lifestyle"
+          }
+        ]
+      },
+      {
+        "url": "https://s3-images.ctmedia.io/media/article-covers/2026/10/01M5BCJK9DVS7TSCX6JCMYXHPZ/bitcoin-treasury.jpg",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "bitcoin-rally-revive-treasury-buying-easy-money-over",
+            "title": "Bitcoin Hồi Sinh: Các Doanh Nghiệp Có Nên Quay Lại Chiến Lược Dự Trữ Treasury?",
+            "category": "blockchain"
+          }
+        ]
+      },
+      {
+        "url": "https://cdn.i-scmp.com/sites/default/files/styles/1280x720/public/d8/images/canvas/2026/10/19/7b91cfc0-d8e3-4b7e-8a57-a9c5d75d384e_180badbd.jpg?itok=3gGnfE2w&v=1792418095",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "my-trung-chay-dua-chot-thoa-thuan-kinh-te-truoc-them-apec",
+            "title": "Mỹ - Trung chạy đua 'chốt' thỏa thuận kinh tế trước thềm hội nghị APEC",
+            "category": "tech"
+          }
+        ]
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=75",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 2,
+        "posts": [
+          {
+            "slug": "microsoft-canh-bao-ai-agents-la-moi-de-doa-noi-bo",
+            "title": "Microsoft cảnh báo: AI Agents có thể là 'mối đe dọa nội bộ' nguy hiểm",
+            "category": "tech"
+          },
+          {
+            "slug": "rivian-chuan-bi-tich-hop-ai-agents-cho-xe-dien",
+            "title": "Rivian chuẩn bị tích hợp AI Agents: Kỷ nguyên xe thông minh sắp bắt đầu",
+            "category": "tech"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-thethao.vnecdn.net/2026/10/19/d6yo3f2jmzm3lpr2vxrrzizlxq-179-4303-2378-1792418283.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=Rsw17IqmN5nijF259y-ecA",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "svitolina-chia-tay-monfils-sau-5-nam-ket-hon",
+            "title": "Cú sốc làng banh nỉ: Elina Svitolina ly hôn Gael Monfils sau 5 năm",
+            "category": "sports"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giaitri.vnecdn.net/2026/10/12/mong-lien-hoa-dinh-thu-ha-1791779191.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=us3sO3kffNdOycpGFFJp2A",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "ve-dep-thieu-nu-viet-qua-ngon-ngu-son-mai",
+            "title": "Vẻ Đẹp Thiếu Nữ Việt Qua Ngôn Ngữ Sơn Mài Đầy Chiều Sâu Nội Tâm",
+            "category": "entertainment"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/19/858006241-n-1792388324-9570-1792389966.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=-5Y0iMJmyyEAD5NLed4N9A",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "truong-thcs-hai-ba-trung-dung-ban-tru-sau-4-ca-nao-mo-cau",
+            "title": "Trường THCS Hai Bà Trưng tạm dừng bán trú sau 4 ca nhiễm não mô cầu",
+            "category": "education"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giadinh.vnecdn.net/2026/10/16/screenshot-at-1792140315-3608-1792140423.png?w=1200&h=0&q=100&dpr=1&fit=crop&s=pTN4k7oim37nY4Vj3cYfUQ",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "vi-sao-cha-me-chau-a-thuong-dat-ten-con-xau",
+            "title": "Vì sao cha mẹ châu Á thường đặt tên con 'xấu' để tránh tai ương?",
+            "category": "lifestyle"
+          }
+        ]
+      },
+      {
+        "url": "https://s3-images.ctmedia.io/media/article-covers/2026/10/01M5AYKKWE9EN0JZE01QZ6T9SW/hi-how-to-swap-tokens-between-base-and-solana.png",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "skyai-ban-toan-bo-solana-trien-khai-mua-lai-co-phieu",
+            "title": "SkyAI 'xả' toàn bộ kho dự trữ Solana, công bố chương trình mua lại 201 triệu USD",
+            "category": "blockchain"
+          }
+        ]
+      },
+      {
+        "url": "https://assetsio.gnwcdn.com/Revamp-Dracula.png?width=690&quality=85&format=jpg&auto=webp",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "moonlighter-dev-hoan-thu-nghiem-revamp-vi-lo-ngai-ai-sao-chep",
+            "title": "Nhà phát triển Moonlighter hoãn thử nghiệm game vì sợ bị AI đánh cắp ý tưởng",
+            "category": "game"
+          }
+        ]
+      },
+      {
+        "url": "https://cdn.i-scmp.com/sites/default/files/styles/1280x720/public/d8/images/canvas/2026/10/20/52aff97a-f32f-46bd-8a98-e1520580a8ca_3ed03b80.jpg?itok=CbRgt9kr&v=1792432914",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "hang-tram-truong-hoc-anh-hungary-serbia-bi-de-doa-danh-bom",
+            "title": "Hàng trăm trường học tại Anh, Hungary và Serbia rung chuyển vì đe dọa đánh bom",
+            "category": "tech"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/19/dji-d-1792414456-9930-1792414593.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=Wb9HczRCBNgrViEMuWiw3Q",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "da-nang-thi-diem-thanh-toan-tai-san-ma-hoa-10-tuyen-pho",
+            "title": "Đà Nẵng mở rộng thí điểm thanh toán bằng tài sản mã hóa tại 10 tuyến phố",
+            "category": "tech"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-thethao.vnecdn.net/2026/10/19/1792413906979-3335204109587707909-g3366314180581885691-7dca60a8956dadb3da453b5a3378d270-1792419594.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=qYoLakdQ1wNbKbzuc-wCNw",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "var-tai-v-league-khi-su-cong-bang-tro-thanh-rao-can-nhip-do-tran-dau",
+            "title": "VAR tại V-League: Khi sự công bằng trở thành rào cản nhịp độ trận đấu",
+            "category": "sports"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giaitri.vnecdn.net/2026/10/19/check-out-all-the-stills-from-3451-5155-1792401197.png?w=1200&h=0&q=100&dpr=1&fit=crop&s=My8KHHiBMXFeB44Qjtu1_A",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "verity-su-that-bi-thao-tung-me-cung-tam-ly",
+            "title": "Verity: Khi sự thật bị thao túng và mê cung tâm lý đầy ám ảnh",
+            "category": "entertainment"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/19/VNEProdigy-1792405084-7920-1792405419.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=GxbMdF8ukepH45ePRM_PFQ",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "than-dong-ai-nathan-chen-roi-moonshot-ai",
+            "title": "Cú sốc công nghệ: Thần đồng AI Nathan Chen đột ngột rời Moonshot AI",
+            "category": "science"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-kinhdoanh.vnecdn.net/2026/10/19/afp-d38k9zt-v1-midres-chinalif-2366-1354-1792395467.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=62ia5P59KfJVcw5YNMVpWg",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "hang-xa-xi-phuong-tay-loay-hoay-giu-cho-dung-tai-trung-quoc",
+            "title": "Hàng xa xỉ phương Tây 'lao đao' tại Trung Quốc: Vì sao mất dần vị thế?",
+            "category": "finance"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/19/td59318-1792426760-9145-1792427320.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=WlsvNCpYBXFIKRuBbEKPGQ",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "10-loi-chuc-ngay-20-10-bang-tieng-anh",
+            "title": "10 Lời Chúc Ngày 20/10 Bằng Tiếng Anh Ý Nghĩa, Tinh Tế Cho Phụ Nữ Việt",
+            "category": "education"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giadinh.vnecdn.net/2026/10/19/egoctqmhgfcrzy8bt2tg9yqkwjebna-1593-5726-1792386327.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=yUAVt8kbQxyeUOEjgqBorA",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "ti-u-th-ng-paris-tr-ng-tay-sau-m-b-o-lo-n",
+            "title": "[Auto-Generated] Tiểu thương Paris trắng tay sau đêm bạo loạn",
+            "category": "lifestyle"
+          }
+        ]
+      },
+      {
+        "url": "https://s3-images.ctmedia.io/media/article-covers/2026/10/01M5AJ2EGPXJENGSEWEZ0NCJ4J/hi-taking-a-closer-look-at-gibraltar-and-how-the-jurisdiction-fares-in-comparison-to-other-small-ones.png",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "revolut-nhan-giay-phep-tien-dien-tu-gibraltar-day-manh-toan-cau-hoa",
+            "title": "Revolut nhận giấy phép tiền điện tử tại Gibraltar, đẩy mạnh toàn cầu hóa",
+            "category": "blockchain"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/19/VNECore-1792385988-4880-1792386039.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=xgzUUzOAEUOWO83IGpIZbw",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "loi-trai-dat-dang-ro-ri-suot-hang-ty-nam",
+            "title": "Phát hiện chấn động: Lõi Trái Đất đang 'rò rỉ' suốt hàng tỷ năm qua",
+            "category": "tech"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giaitri.vnecdn.net/2026/10/19/ai3-1792398527-1927-1792399456.webp?w=1200&h=0&q=100&dpr=1&fit=crop&s=PsNGvcLKbYw9jIo3pzZBbg",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "con-sot-phim-ngan-ai-trung-quoc-khi-cac-nu-chinh-dung-chung-mot-khuon-mat",
+            "title": "Cơn sốt phim ngắn AI Trung Quốc: Khi các nữ chính dùng chung một khuôn mặt",
+            "category": "entertainment"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/19/wm1-wm1-apple-store-tq-1792401816-2086-1792401989.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=tIa23FsmoWIu1F-RkplQ0g",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "apple-bi-chi-trich-vi-sai-lam-chien-luoc-khi-mo-ban-iphone-duo",
+            "title": "Mark Gurman cảnh báo Apple gặp sai lầm lớn khi mở bán iPhone Duo toàn cầu",
+            "category": "science"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-kinhdoanh.vnecdn.net/2026/10/19/mt-1792386516-1535-1792386534.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=Xz2HMpG074y0GlIHgVvyLg",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "khu-kinh-te-dung-quat-duoc-de-xuat-ap-dung-co-che-uu-dai-cao-nhat",
+            "title": "Khu Kinh tế Dung Quất bứt phá với cơ chế ưu đãi đặc thù cao nhất",
+            "category": "finance"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/19/233a1675-1792391437-5971-1792392232.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=MkWYahYznnSlNDT5SzdQJg",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "tp-hcm-hon-2400-hieu-truong-hieu-pho-chuyen-lam-giao-vien",
+            "title": "TP HCM: Hơn 2.400 hiệu trưởng, hiệu phó trở lại giảng dạy sau sắp xếp",
+            "category": "education"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giadinh.vnecdn.net/2026/10/19/a-nh-ma-n-hi-nh-lu-c-179237594-9637-6471-1792375975.png?w=1200&h=0&q=100&dpr=1&fit=crop&s=jkZK_pzmaAZd8IBptjAiyQ",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "bi-quyet-giu-noi-thit-kho-thom-ngon-dung-voi-bo-lop-mo-dong",
+            "title": "Bí quyết giữ nồi thịt kho luôn thơm ngon: Đừng vội bỏ lớp mỡ đông",
+            "category": "lifestyle"
+          }
+        ]
+      },
+      {
+        "url": "https://s3-images.ctmedia.io/media/article-covers/2026/10/01M59PRYYJ0CH73MJP40F9FCA9/news-crypto-studio-mica-eu-1.jpg",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "bingx-youhodler-gia-nhap-dang-ky-mica-esma",
+            "title": "BingX và YouHodler chính thức góp mặt trong danh sách đăng ký MiCA của ESMA",
+            "category": "blockchain"
+          }
+        ]
+      },
+      {
+        "url": "https://assetsio.gnwcdn.com/Farrah-Call-of-Duty-Modern-Warfare-3-2023.jpg?width=690&quality=85&format=jpg&auto=webp",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "call-of-duty-se-gioi-thieu-dong-game-con-moi",
+            "title": "Activision Xác Nhận: Call of Duty Sắp Ra Mắt Một Dòng Game Hoàn Toàn Mới",
+            "category": "game"
+          }
+        ]
+      },
+      {
+        "url": "https://cdn.i-scmp.com/sites/default/files/styles/1280x720/public/d8/images/canvas/2026/10/18/6149732b-b637-476c-a501-6767f484bdd3_20d1314b.jpg?itok=M6UFNF_j&v=1792307360",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "sinh-vien-y-khoa-alfred-lam-spirit-of-hong-kong-awards",
+            "title": "Chàng sinh viên y khoa Alfred Lam: Dùng trái tim tình nguyện chữa lành bệnh nhân",
+            "category": "tech"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-thethao.vnecdn.net/2026/10/19/1-1792371466-2255-1792371499.gif?w=1200&h=0&q=100&dpr=1&fit=crop&s=c2i9HMxm5qPrhNfL5Zantg&t=image",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "diego-gomez-tai-hien-sieu-pham-giua-san-cua-beckham",
+            "title": "Diego Gomez tái hiện siêu phẩm giữa sân kinh điển của David Beckham",
+            "category": "sports"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giaitri.vnecdn.net/2026/10/19/2TLmNhichnhthccxngtnngivQunqun-6180-4570-1792366082.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=_TFFxZMCrKPRaERmG67uAw",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "ta-lam-nhi-quan-quan-model-kid-vietnam-2026",
+            "title": "Bé Tạ Lâm Nhi - 'Công chúa làng xiếc' đăng quang Model Kid Vietnam 2026",
+            "category": "entertainment"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/13/ai-humanizer-1791870277-5825-1791870441.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=KBVZizfIyOESiUAUwj5kOg",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "bung-no-cong-cu-nhan-hoa-noi-dung-ai",
+            "title": "Bùng nổ công cụ 'nhân hóa' nội dung AI: Lối thoát cho bài viết máy móc?",
+            "category": "science"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-kinhdoanh.vnecdn.net/2026/10/17/nam-jpg-1792210662-5398-1792210793.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=1zEx_ciMDTU2zwfhVPZNEA",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "vai-tro-quan-ly-van-hanh-toa-nha",
+            "title": "Vai trò của quản lý vận hành tòa nhà: Chìa khóa nâng tầm giá trị tài sản",
+            "category": "finance"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-vnexpress.vnecdn.net/2026/10/15/233a3191-1792077430-1207-1792077550.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=oQekIM88lA0rUIlH2u8S9Q",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "giao-vien-kiet-suc-vi-viec-khong-ten",
+            "title": "Áp lực 'việc không tên': Khi giáo viên kiệt sức vì làm việc đến 21h đêm",
+            "category": "education"
+          }
+        ]
+      },
+      {
+        "url": "https://vcdn1-giadinh.vnecdn.net/2026/10/18/img-1792321451-7203-1792321661.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=o9Je8ShzM9-fVFSFQfQE8Q",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "bo-nha-di-lanh-nan-vi-bi-choi-kham-bang-don-hang",
+            "title": "Kinh hoàng nạn 'bom hàng' trả thù: Người đàn ông phải bỏ nhà lánh nạn",
+            "category": "lifestyle"
+          }
+        ]
+      },
+      {
+        "url": "https://s3-images.ctmedia.io/media/article-covers/2026/10/01M58TDQ3XD133AKC254WEC04M/wallet.jpg",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "slug": "qubic-khoa-chuoi-sau-vu-tan-cong-1400-vi",
+            "title": "Qubic khẩn cấp khóa chuỗi sau vụ tấn công 1.400 ví do lỗ hổng bảo mật",
+            "category": "blockchain"
+          }
+        ]
+      }
+    ]
+  },
+  "sanity": {
+    "total": 675,
+    "missing": [],
+    "broken": [
+      {
+        "url": "https://cdn.i-scmp.com/sites/default/files/styles/1280x720/public/d8/images/canvas/2026/10/21/31d97a68-36f1-46f3-b07c-210eefe069cf_eeb8d173.jpg?itok=VZmGc7Kg&v=1792519401",
+        "status": 0,
+        "reason": "The operation was aborted due to timeout",
+        "affectedCount": 1,
+        "posts": [
+          {
+            "_id": "article-ca-map-tan-cong-phu-nu-tai-nam-phi",
+            "category": "tech",
+            "metaThumb": null,
+            "slug": "ca-map-tan-cong-phu-nu-tai-nam-phi",
+            "thumbnail": "https://cdn.i-scmp.com/sites/default/files/styles/1280x720/public/d8/images/canvas/2026/10/21/31d97a68-36f1-46f3-b07c-210eefe069cf_eeb8d173.jpg?itok=VZmGc7Kg&v=1792519401",
+            "title": "Kinh hoàng cá mập tấn công khiến phụ nữ 65 tuổi tử vong tại Nam Phi"
+          }
+        ]
+      }
+    ]
+  }
+}

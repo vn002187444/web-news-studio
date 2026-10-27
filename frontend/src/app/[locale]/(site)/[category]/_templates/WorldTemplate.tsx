@@ -1,7 +1,7 @@
 'use client';
 
 import { Link } from '@/i18n/routing';
-import Image from 'next/image';
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
 
 interface ArticleItem {
   id: string;
@@ -52,9 +52,10 @@ export default function WorldTemplate({ articles }: { articles: ArticleItem[] })
                 <article key={article.slug} className="group">
                   <Link href={`/world/${article.slug}`} className="block">
                     <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-200 rounded-lg mb-6">
-                      <Image
-                        src={article.thumbnail?.url}
-                        alt={article.thumbnail?.alt || article.title}
+                      <AdaptiveImage
+                        src={article.thumbnail}
+                        alt={article.title}
+                        category="world"
                         fill
                         sizes="(max-width: 1024px) 100vw, 66vw"
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -84,9 +85,10 @@ export default function WorldTemplate({ articles }: { articles: ArticleItem[] })
                   <article key={article.slug} className="group flex flex-col justify-between">
                     <Link href={`/world/${article.slug}`} className="block">
                       <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-200 rounded-lg mb-4">
-                        <Image
-                          src={article.thumbnail?.url}
-                          alt={article.thumbnail?.alt || article.title}
+                        <AdaptiveImage
+                          src={article.thumbnail}
+                          alt={article.title}
+                          category="world"
                           fill
                           sizes="(max-width: 768px) 100vw, 33vw"
                           className="object-cover transition-transform duration-500 group-hover:scale-105"

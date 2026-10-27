@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
+import AdaptiveImage from '@/components/ui/AdaptiveImage';
 import { Link } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
 
@@ -181,9 +181,10 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
               <Link key={i} href={`/finance/${article?.slug}`} className="group">
                 <div className="border border-[#111111]/10 h-full hover:bg-white transition-colors shadow-none overflow-hidden bg-white/60">
                   <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                    <Image
-                      src={article?.thumbnail?.url}
-                      alt={article?.thumbnail?.alt || article?.title}
+                    <AdaptiveImage
+                      src={article?.thumbnail}
+                      alt={article?.title}
+                      category="finance"
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
