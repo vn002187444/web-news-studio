@@ -7,6 +7,11 @@
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 /* Reset base colors applied in layout */
 body {
   font-family: var(--font-sans);

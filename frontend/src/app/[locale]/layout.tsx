@@ -109,7 +109,7 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
         <link rel="preconnect" href="https://cdn.i-scmp.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://cdn.i-scmp.com" />
       </head>
-      <body className="min-h-full flex flex-col bg-[#F4F4F0] text-[#111111]">
+      <body className="min-h-full flex flex-col bg-[#F4F4F0] text-[#111111] overflow-x-hidden w-full max-w-full">
         <NextTopLoader 
           color="#DC2626"
           initialPosition={0.08}
@@ -127,7 +127,7 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
             <SearchProvider>
               <Header />
               <CommandPalette />
-              <main className="flex-grow mb-16 md:mb-0">
+              <main className="flex-grow mb-16 md:mb-0 w-full overflow-x-hidden">
                 {children}
               </main>
               <Footer />

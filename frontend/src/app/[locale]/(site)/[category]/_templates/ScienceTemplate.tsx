@@ -7,9 +7,9 @@ export default function ScienceTemplate({ articles }: { articles: any[] }) {
   const scienceArticles = articles && articles.length > 0 ? articles : [];
   
   return (
-    <div className="pt-32 pb-20 px-6 min-h-screen bg-white text-gray-900 font-sans">
+    <div className="pt-32 pb-20 px-6 min-h-screen bg-white text-gray-900 font-sans overflow-hidden">
       <div className="max-w-[1200px] mx-auto">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 text-[#008080]">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-4 text-[#008080]">
           Data <span className="text-[#ff7f50]">Storytelling</span>
         </h1>
         <p className="text-xl text-gray-500 mb-16 max-w-2xl">

@@ -82,13 +82,13 @@ export default function FinanceTemplate({ articles }: { articles: any[] }) {
   };
 
   return (
-    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#F4F4F0] text-[#111111]">
+    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#F4F4F0] text-[#111111] overflow-hidden">
       <div className="max-w-[1600px] mx-auto">
         
         {/* Market Overview Header */}
         <div className="flex flex-col lg:flex-row justify-between items-end mb-12 border-b border-[#111111]/20 pb-8">
           <div>
-            <h1 className="text-6xl md:text-8xl font-serif tracking-tighter uppercase">
+            <h1 className="text-4xl sm:text-6xl md:text-8xl font-serif tracking-tighter uppercase">
               Thị Trường <br /> <span className="italic font-light text-red-600">Trực Tiếp</span>
             </h1>
           </div>

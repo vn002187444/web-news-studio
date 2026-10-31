@@ -35,7 +35,7 @@ export default function TechTemplate({ articles }: { articles: any[] }) {
   });
 
   return (
-    <div className="relative min-h-screen text-white pt-32 pb-20 px-6">
+    <div className="relative min-h-screen bg-[#050505] text-white pt-32 pb-20 px-6 overflow-hidden">
       {/* 3D Background — lazy, có skeleton */}
       <Suspense fallback={<div className="absolute inset-0 bg-black -z-10" aria-hidden="true" />}>
         <ParticleNetwork />
@@ -43,7 +43,7 @@ export default function TechTemplate({ articles }: { articles: any[] }) {
 
       <div className="max-w-[1600px] mx-auto relative z-10">
         {/* Glitch Typography Title — keyframes ngẫu nhiên clip-path + text-shadow */}
-        <h1 className="text-5xl md:text-8xl font-mono font-bold tracking-tighter uppercase mb-6 inline-block relative select-none">
+        <h1 className="text-3xl sm:text-5xl md:text-8xl break-words font-mono font-bold tracking-tighter uppercase mb-6 inline-block relative select-none overflow-hidden">
           <span className="relative z-10 animate-glitch-main block">CÔNG NGHỆ<span className="text-transparent [-webkit-text-stroke:1px_white]">_TƯƠNG LAI</span></span>
           <span aria-hidden="true" className="absolute inset-0 text-cyan-400 opacity-70 animate-glitch-rgb1">CÔNG NGHỆ_TƯƠNG LAI</span>
           <span aria-hidden="true" className="absolute inset-0 text-red-500 opacity-70 animate-glitch-rgb2">CÔNG NGHỆ_TƯƠNG LAI</span>

@@ -86,19 +86,19 @@ export default function GameTemplate({ articles }: { articles: any[] }) {
         <div className="relative mb-6 inline-block">
           <motion.h1
             style={{ x: xRed }}
-            className="absolute top-0 left-0 text-6xl md:text-[110px] font-black uppercase tracking-tighter italic text-red-500 mix-blend-screen opacity-70 pointer-events-none whitespace-nowrap"
+            className="absolute top-0 left-0 text-3xl sm:text-5xl md:text-[110px] font-black uppercase tracking-tighter italic text-red-500 mix-blend-screen opacity-70 pointer-events-none sm:whitespace-nowrap"
             aria-hidden="true"
           >
             ESPORTS &amp; GAME
           </motion.h1>
           <motion.h1
             style={{ x: xBlue }}
-            className="absolute top-0 left-0 text-6xl md:text-[110px] font-black uppercase tracking-tighter italic text-blue-500 mix-blend-screen opacity-70 pointer-events-none whitespace-nowrap"
+            className="absolute top-0 left-0 text-3xl sm:text-5xl md:text-[110px] font-black uppercase tracking-tighter italic text-blue-500 mix-blend-screen opacity-70 pointer-events-none sm:whitespace-nowrap"
             aria-hidden="true"
           >
             ESPORTS &amp; GAME
           </motion.h1>
-          <h1 className="relative text-6xl md:text-[110px] font-black uppercase tracking-tighter italic text-transparent [-webkit-text-stroke:2px_white]">
+          <h1 className="relative text-3xl sm:text-5xl md:text-[110px] font-black uppercase tracking-tighter italic text-transparent [-webkit-text-stroke:2px_white]">
             ESPORTS &amp; GAME
           </h1>
         </div>

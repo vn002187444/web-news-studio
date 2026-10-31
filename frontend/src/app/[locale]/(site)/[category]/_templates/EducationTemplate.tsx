@@ -37,7 +37,7 @@ export default function EducationTemplate({ articles }: { articles: any[] }) {
   }, [eduArticles, activeTag]);
 
   return (
-    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#faf9f6] text-[#1c355e] font-sans selection:bg-[#0047AB] selection:text-white">
+    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#faf9f6] text-[#1c355e] font-sans selection:bg-[#0047AB] selection:text-white overflow-hidden">
       <div className="max-w-[1200px] mx-auto">
         
         {/* Header */}
@@ -45,7 +45,7 @@ export default function EducationTemplate({ articles }: { articles: any[] }) {
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#0047AB] block mb-2">
             Youth & Knowledge Hub
           </span>
-          <h1 className="text-5xl md:text-7xl font-serif text-[#1c355e] tracking-tight mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-serif text-[#1c355e] tracking-tight mb-4">
             Campus <span className="italic text-[#0047AB]">Editorial</span>
           </h1>
           <p className="text-gray-500 max-w-lg mx-auto">

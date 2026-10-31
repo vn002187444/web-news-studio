@@ -9,14 +9,6 @@ interface TickerArticle {
   category: string;
 }
 
-const FALLBACK_NEWS: TickerArticle[] = [
-  { title: 'APPLE RA MẮT KÍNH AR THẾ HỆ MỚI VỚI CHIP M5', slug: '', category: 'tech' },
-  { title: 'BITCOIN VƯỢT MỐC $120,000 SAU KHI ETF ĐƯỢC PHÊ DUYỆT RỘNG RÃI', slug: '', category: 'blockchain' },
-  { title: 'AI TRỞ THÀNH CEO CHO CÔNG TY KHỞI NGHIỆP TẠI THUNG LŨNG SILICON', slug: '', category: 'tech' },
-  { title: 'GTA 6 ĐẠT KỶ LỤC 1 TỶ USD DOANH THU TRONG 12 GIỜ ĐẦU TIÊN', slug: '', category: 'game' },
-  { title: 'THỊ TRƯỜNG CHỨNG KHOÁN CHÂU Á XANH SÀN NHỜ CHÍNH SÁCH NỚI LỎNG', slug: '', category: 'finance' },
-];
-
 function TickerItem({ article }: { article: TickerArticle }) {
   const inner = (
     <>
@@ -44,7 +36,8 @@ function TickerItem({ article }: { article: TickerArticle }) {
 }
 
 export default function NewsTicker({ articles }: { articles?: TickerArticle[] }) {
-  const news = articles && articles.length > 0 ? articles.slice(0, 10) : FALLBACK_NEWS;
+  if (!articles || articles.length === 0) return null;
+  const news = articles.slice(0, 10);
 
   return (
     <div

@@ -7,9 +7,9 @@ export default function EntertainmentTemplate({ articles }: { articles: any[] })
   const entertainmentArticles = articles && articles.length > 0 ? articles : [];
   
   return (
-    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#1c0024] text-[#e5d08f] font-sans selection:bg-[#e5d08f] selection:text-[#1c0024]">
+    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#1c0024] text-[#e5d08f] font-sans selection:bg-[#e5d08f] selection:text-[#1c0024] overflow-hidden">
       <div className="max-w-[1600px] mx-auto">
-        <h1 className="text-7xl md:text-9xl font-serif italic tracking-tighter mb-4 text-[#e5d08f] text-center">
+        <h1 className="text-4xl sm:text-7xl md:text-9xl font-serif italic tracking-tighter mb-4 text-[#e5d08f] text-center">
           Showbiz
         </h1>
         

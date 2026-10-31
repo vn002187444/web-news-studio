@@ -225,7 +225,7 @@ export default function BlockchainTemplate({ articles }: { articles: any[] }) {
 
       <div className="max-w-[1600px] mx-auto relative">
         <div className="flex items-start justify-between gap-8">
-          <h1 className="text-6xl md:text-9xl font-sans font-black tracking-tighter uppercase mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-700">
+          <h1 className="text-4xl sm:text-6xl md:text-9xl font-sans font-black tracking-tighter uppercase mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-700">
             WEB3 <br /> FRONTIER
           </h1>
           {/* Quả cầu wireframe Three.js xoay + Bloom (dynamic ssr:false) */}

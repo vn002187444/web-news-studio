@@ -18,7 +18,7 @@ export default function WorldTemplate({ articles }: { articles: ArticleItem[] })
   const worldArticles = articles && articles.length > 0 ? articles : [];
 
   return (
-    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#FBFBFA] text-[#111111] font-sans selection:bg-red-600 selection:text-white">
+    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#FBFBFA] text-[#111111] font-sans selection:bg-red-600 selection:text-white overflow-hidden">
       <div className="max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="border-b-2 border-black pb-8 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -29,7 +29,7 @@ export default function WorldTemplate({ articles }: { articles: ArticleItem[] })
                 Toàn Cầu & Địa Chính Trị
               </span>
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-black tracking-tight uppercase leading-[0.95]">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif font-black tracking-tight uppercase leading-[0.95]">
               Thời Sự <span className="font-light italic">& Thế Giới</span>
             </h1>
           </div>

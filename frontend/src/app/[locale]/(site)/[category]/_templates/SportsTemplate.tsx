@@ -81,7 +81,7 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
     : matches.filter(m => m.league === activeLeagueFilter);
 
   return (
-    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#08090C] text-white font-sans selection:bg-[#00F59B] selection:text-black">
+    <div className="pt-32 pb-20 px-6 min-h-screen bg-[#08090C] text-white font-sans selection:bg-[#00F59B] selection:text-black overflow-hidden">
       <div className="max-w-[1600px] mx-auto">
         
         {/* Header & Sport Filters */}
@@ -90,7 +90,7 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
             <span className="text-xs uppercase font-extrabold tracking-widest text-[#00F59B] block mb-2">
               Sports Network 24/7
             </span>
-            <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter">
+            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black uppercase tracking-tighter">
               Live <span className="text-[#00F59B]">Sports</span>
             </h1>
           </div>
@@ -290,45 +290,11 @@ export default function SportsTemplate({ articles }: { articles: any[] }) {
               <div className="p-6 tabular-nums">
                 {activeSidebarTab === "Standings" ? (
                    <div>
-                     <div className="flex text-xs text-white/40 font-bold uppercase mb-4 px-2">
-                        <div className="w-8">#</div>
-                        <div className="flex-1">Đội</div>
-                        <div className="w-8 text-right">Pts</div>
-                     </div>
-                     <ul className="space-y-3">
-                       {[
-                         { name: "Arsenal", pts: 64, form: "W" },
-                         { name: "Liverpool", pts: 63, form: "W" },
-                         { name: "Man City", pts: 62, form: "D" },
-                         { name: "Aston Villa", pts: 55, form: "L" },
-                         { name: "Tottenham", pts: 53, form: "W" },
-                       ].map((team, i) => (
-                         <li key={i} className="flex items-center text-sm bg-white/5 rounded-lg p-2">
-                           <span className="w-8 text-white/50 font-bold">{i+1}</span>
-                           <span className="flex-1 text-white font-bold">{team.name}</span>
-                           <span className="w-8 text-right text-[#00F59B] font-bold">{team.pts}</span>
-                         </li>
-                       ))}
-                     </ul>
+                     <p className="text-white/50 text-sm italic text-center py-8">Đang cập nhật bảng xếp hạng mùa giải...</p>
                    </div>
                 ) : (
                    <div>
-                      <ul className="space-y-4">
-                       {[
-                         { time: "22:00 Hôm nay", home: "Chelsea", away: "Man Utd" },
-                         { time: "00:30 Ngày mai", home: "Newcastle", away: "Everton" },
-                         { time: "02:00 Ngày mai", home: "Brighton", away: "Brentford" },
-                       ].map((fixture, i) => (
-                         <li key={i} className="text-sm bg-white/5 rounded-lg p-3">
-                           <div className="text-xs text-[#FF5722] font-bold mb-2">{fixture.time}</div>
-                           <div className="flex justify-between items-center font-bold">
-                              <span>{fixture.home}</span>
-                              <span className="text-white/30 text-xs px-2">vs</span>
-                              <span>{fixture.away}</span>
-                           </div>
-                         </li>
-                       ))}
-                     </ul>
+                     <p className="text-white/50 text-sm italic text-center py-8">Đang cập nhật lịch thi đấu...</p>
                    </div>
                 )}
               </div>

@@ -236,18 +236,7 @@ export default function LifestyleTemplate({ articles }: { articles: any[] }) {
                      Gợi Ý Trải Nghiệm Tuần Này
                    </h4>
                    <ul className="space-y-4 font-serif text-lg">
-                      <li className="flex gap-4 group cursor-pointer">
-                         <span className="text-[#1C1917]/40 font-sans text-sm mt-1">01</span>
-                         <span className="group-hover:underline underline-offset-4">Triển lãm nghệ thuật đương đại tại The Factory</span>
-                      </li>
-                      <li className="flex gap-4 group cursor-pointer">
-                         <span className="text-[#1C1917]/40 font-sans text-sm mt-1">02</span>
-                         <span className="group-hover:underline underline-offset-4">Thưởng thức Omakase phong cách fusion mới</span>
-                      </li>
-                      <li className="flex gap-4 group cursor-pointer">
-                         <span className="text-[#1C1917]/40 font-sans text-sm mt-1">03</span>
-                         <span className="group-hover:underline underline-offset-4">Workshop gốm thủ công cuối tuần</span>
-                      </li>
+                      <li className="text-[#1C1917]/40 font-sans text-sm mt-1">Đang cập nhật gợi ý trải nghiệm mới nhất...</li>
                    </ul>
                 </div>
 
