@@ -443,6 +443,10 @@ async function runAutoblogger() {
           }
         }
 
+        if (rawThumbUrl) {
+          rawThumbUrl = rawThumbUrl.replace(/&#0*38;/gi, '&').replace(/&amp;/gi, '&').trim();
+        }
+
         // Tối ưu hóa & phân bổ ảnh thumbnail thông minh (đa dạng hóa, chống trùng ảnh liên tiếp)
         const candidateSlug = toSlug(latestItem.title);
         const resolvedImage = resolveSmartThumbnail(rawThumbUrl, feed.category, candidateSlug, latestItem.title);

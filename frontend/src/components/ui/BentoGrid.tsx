@@ -51,9 +51,10 @@ export default function BentoGrid({ articles }: BentoGridProps) {
               >
                 <Link href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" aria-label={article.title} data-cursor="READ" />
                 
-                <AdaptiveImage 
+                <AdaptiveImage
                   src={article.thumbnail.url}
                   alt={article.thumbnail.alt}
+                  category={article.category}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority={i === 0}

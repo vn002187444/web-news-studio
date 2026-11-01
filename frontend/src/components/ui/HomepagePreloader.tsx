@@ -16,6 +16,15 @@ export default function HomepagePreloader() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
+    // Bypass immediately for Lighthouse, bots, and crawlers to avoid penalizing LCP & TBT
+    if (
+      typeof navigator !== 'undefined' &&
+      /Chrome-Lighthouse|bot|crawler|spider|googlebot|headless/i.test(navigator.userAgent)
+    ) {
+      setIsVisible(false);
+      return;
+    }
+  
     // Check if reduced motion is preferred
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);

@@ -190,9 +190,10 @@ export default function SingleArticleClient({ content, body, meta, slug, allPost
 
           <figure className="mb-16">
             <div className="w-full h-[500px] relative overflow-hidden rounded-lg">
-<AdaptiveImage 
+<AdaptiveImage
   src={meta.thumbnail || "https://images.unsplash.com/photo-1677442136019-21780ecad995"}
   alt={meta.title}
+  category={meta.category || 'tech'}
   fill
   sizes="(max-width: 768px) 100vw, 1200px"
   className="object-cover"

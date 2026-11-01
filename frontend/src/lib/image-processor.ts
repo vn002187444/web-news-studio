@@ -79,11 +79,19 @@ export const CURATED_THUMBNAIL_POOL: Record<string, string[]> = {
 };
 
 /**
+ * Làm sạch chuỗi URL ảnh từ RSS (giải mã các thực thể HTML như &#038;, &amp;)
+ */
+export function sanitizeImageUrl(url: string | null | undefined): string {
+  if (!url || typeof url !== 'string') return '';
+  return url.replace(/&#0*38;/gi, '&').replace(/&amp;/gi, '&').trim();
+}
+
+/**
  * Kiểm tra xem một URL ảnh từ RSS có hợp lệ và an toàn không
  */
 export function isValidThumbnailUrl(url: string | null | undefined): boolean {
   if (!url || typeof url !== 'string') return false;
-  const trimmed = url.trim();
+  const trimmed = sanitizeImageUrl(url);
   if (trimmed.length < 10) return false;
 
   // Bắt buộc giao thức an toàn
@@ -126,7 +134,7 @@ export function resolveSmartThumbnail(
 
   // 1. Nếu ảnh gốc hợp lệ
   if (isValidThumbnailUrl(rawUrl)) {
-    let cleanUrl = rawUrl!.trim();
+    let cleanUrl = sanitizeImageUrl(rawUrl);
     // Tối ưu Unsplash URL nếu có
     if (cleanUrl.includes('unsplash.com') && !cleanUrl.includes('w=')) {
       cleanUrl += `${cleanUrl.includes('?') ? '&' : '?'}auto=format&fit=crop&w=1200&q=75`;

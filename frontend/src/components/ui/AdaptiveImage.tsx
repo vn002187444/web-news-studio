@@ -15,7 +15,7 @@ export interface AdaptiveImageProps extends Omit<ImageProps, 'src'> {
 function extractValidSrc(src: string | { url?: string; src?: string } | null | undefined): string {
   if (!src) return '';
   if (typeof src === 'string') {
-    const s = src.trim();
+    const s = src.trim().replace(/&#0*38;/gi, '&').replace(/&amp;/gi, '&');
     if (s.startsWith('javascript:') || s.startsWith('vbscript:') || s.startsWith('data:text/html')) {
       return '';
     }
@@ -32,8 +32,7 @@ function extractValidSrc(src: string | { url?: string; src?: string } | null | u
 }
 
 function resolveCategoryCuratedPhoto(category?: string, seed = ''): string {
-  if (!category) return '';
-  const cat = category.toLowerCase().trim();
+  const cat = (category || 'tech').toLowerCase().trim();
   const pool = CURATED_THUMBNAIL_POOL[cat] || CURATED_THUMBNAIL_POOL.tech;
   if (!pool || pool.length === 0) return '';
   
@@ -122,6 +121,7 @@ export default function AdaptiveImage({
 
       <Image
         {...props}
+        referrerPolicy="no-referrer"
         src={currentSrc}
         alt={altText}
         className={combinedImageClass}

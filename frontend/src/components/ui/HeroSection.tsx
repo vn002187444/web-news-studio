@@ -23,15 +23,12 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
         
         {/* Left: Typography */}
         <div className="lg:col-span-7 z-10">
-          <motion.h1 
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-[105px] xl:text-[120px] leading-[1.08] font-serif tracking-normal uppercase mb-6"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          <h1
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-[105px] xl:text-[120px] leading-[1.08] font-serif tracking-normal uppercase mb-6 opacity-100"
           >
             Tương Lai <br className="hidden sm:inline" />
             <span className="italic font-light">Đã</span> Bắt Đầu
-          </motion.h1>
+          </h1>
           
           <motion.p 
             className="font-mono text-sm uppercase max-w-md mt-8 border-l-2 border-[#111111] pl-4 text-gray-800 leading-relaxed"
@@ -69,9 +66,10 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
             <Link href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" data-cursor="READ" aria-label={article.title} />
           )}
           <div className="w-full h-[120%] -top-[10%] relative">
-            <AdaptiveImage 
+            <AdaptiveImage
               src={article?.thumbnail.url || FALLBACK_IMG}
               alt={article?.thumbnail.alt || 'Retro Tech Setup'}
+              category={article?.category || 'tech'}
               fill
               sizes="(max-width: 1024px) 100vw, 42vw"
               className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
