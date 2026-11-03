@@ -52,10 +52,12 @@ const components: PortableTextComponents = {
   },
   marks: {
     link: ({ children, value }) => {
-      const href = value?.href || '#';
+      let href = value?.href || '#';
       const internal = href.startsWith('/');
       if (internal) {
-        return <Link href={href} className="text-red-600 no-underline hover:underline">{children}</Link>;
+        // Làm sạch tiền tố locale nếu có sẵn để Link của next-intl không sinh URL nhân đôi (/vi/vi/... hay /en/vi/...)
+        const cleanHref = href.replace(/^\/(?:vi|en)(?=\/|$)/, '') || '/';
+        return <Link href={cleanHref} className="text-red-600 no-underline hover:underline">{children}</Link>;
       }
       return <a href={href} target="_blank" rel="noopener noreferrer" className="text-red-600 no-underline hover:underline">{children}</a>;
     },

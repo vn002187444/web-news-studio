@@ -106,13 +106,44 @@ export function tagToSlug(tag: string): string {
   return toSlug(tag);
 }
 
-/** Lấy bài theo tag (so khớp slug hóa, không phân biệt hoa thường). Tag không tồn tại → []. */
-export async function getPostsByTagUnified(tagSlug: string): Promise<{ tag: string; posts: UnifiedPost[] }> {
-  const slug = (tagSlug || '').toLowerCase().trim().slice(0, 80);
+export const TAG_ALIASES: Record<string, string> = {
+  'bong-a': 'bong-da',
+  'bat-ong-san': 'bat-dong-san',
+  'lanh-ao': 'lanh-dao',
+  'gia-inh': 'gia-dinh',
+  'ai-su-quan-my': 'dai-su-quan-my',
+  'tien-ien-tu': 'tien-dien-tu',
+  'oc-to-than-kinh': 'doc-to-than-kinh',
+  'tai-chinh-gia-inh': 'tai-chinh-gia-dinh',
+  'ien-kinh-viet-nam': 'dien-kinh-viet-nam',
+  'ty-phu-an-o': 'ty-phu-an-do',
+  'e-thi-tuyen-dung': 'de-thi-tuyen-dung',
+  'chien-luoc-bong-a': 'chien-luoc-bong-da',
+  'phap-ly-tien-ien-tu': 'phap-ly-tien-dien-tu',
+};
+
+export function resolveTagAlias(slug: string): string {
+  const s = (slug || '').toLowerCase().trim();
+  return TAG_ALIASES[s] || s;
+}
+
+/** Lấy bài theo tag (so khớp slug hóa, hỗ trợ alias, không phân biệt hoa thường). Tag không tồn tại → []. */
+export async function getPostsByTagUnified(tagSlug: string): Promise<{ tag: string; canonicalSlug: string; isAlias: boolean; posts: UnifiedPost[] }> {
+  const rawSlug = (tagSlug || '').toLowerCase().trim().slice(0, 80);
+  const canonicalSlug = resolveTagAlias(rawSlug);
+  const isAlias = rawSlug !== canonicalSlug;
+
   const all = await getAllPostsUnified();
-  const matched = all.filter((p) => (p.meta.tags || []).some((t) => tagToSlug(t) === slug));
-  const tag = matched[0]?.meta.tags?.find((t) => tagToSlug(t) === slug) || tagSlug;
-  return { tag, posts: matched };
+  const matched = all.filter((p) => (p.meta.tags || []).some((t) => {
+    const s = tagToSlug(t);
+    return s === canonicalSlug || s === rawSlug;
+  }));
+  const tag = matched[0]?.meta.tags?.find((t) => {
+    const s = tagToSlug(t);
+    return s === canonicalSlug || s === rawSlug;
+  }) || (canonicalSlug.replace(/-/g, ' '));
+
+  return { tag, canonicalSlug, isAlias, posts: matched };
 }
 
 /** Liệt kê mọi tag đang có bài (kèm số lượng) — dùng cho generateStaticParams + tag cloud. */
@@ -123,9 +154,10 @@ export async function getAllTagsUnified(): Promise<{ tag: string; slug: string; 
     for (const t of p.meta.tags || []) {
       const slug = tagToSlug(t);
       if (!slug) continue;
-      const cur = map.get(slug);
+      const canonical = resolveTagAlias(slug);
+      const cur = map.get(canonical);
       if (cur) cur.count++;
-      else map.set(slug, { tag: t, count: 1 });
+      else map.set(canonical, { tag: t, count: 1 });
     }
   }
   return [...map.entries()]

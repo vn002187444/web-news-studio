@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       languages: {
         vi: `/vi/${category}/${slug}`,
         en: `/en/${category}/${slug}`,
+        'x-default': `/vi/${category}/${slug}`,
       },
     },
     openGraph: {
@@ -44,13 +45,15 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 // ISR 1h: bài render 1 lần rồi phục vụ từ cache — giảm CPU/SSR trên Workers Free.
 export const revalidate = 3600;
 
-// Prerender tĩnh mọi bài viết — Sanity-first, MDX fallback
+// Prerender 30 bài mới nhất cho 'vi' để build nhanh, các bài cũ phục vụ qua ISR cache 1h
 export async function generateStaticParams() {
   try {
     const posts = await getAllPostsUnified();
-    return ['vi', 'en'].flatMap((locale) =>
-      posts.map((p) => ({ locale, category: p.meta.category, slug: p.slug }))
-    );
+    return posts.slice(0, 30).map((p) => ({
+      locale: 'vi',
+      category: p.meta.category,
+      slug: p.slug
+    }));
   } catch {
     return [];
   }
@@ -66,7 +69,6 @@ export default async function SingleArticlePage({ params }: { params: Promise<{ 
   }
 
   // Gợi ý "Dành cho bạn" chỉ cần 12 bài gọn nhẹ (slug + meta tối thiểu).
-  // KHÔNG truyền allPosts full (kèm content/body ~170 bài) → HTML/RSC phình ~440KB, chuyển trang chậm.
   const relatedPosts = allPosts
     .filter((p) => p.slug !== slug)
     .sort(

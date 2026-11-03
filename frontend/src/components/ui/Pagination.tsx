@@ -11,18 +11,24 @@ interface PaginationProps {
 export default function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps) {
   if (totalPages <= 1) return null;
 
+  const getPageUrl = (page: number) => {
+    // Trang 1 không đính kèm query param ?page=1 để tránh duplicate content trên Googlebot
+    if (page <= 1) return baseUrl;
+    return `${baseUrl}?page=${page}`;
+  };
+
   return (
     <div className="flex justify-center items-center gap-2 mt-12 mb-8 font-mono text-sm">
       {/* Nút Previous */}
       {currentPage > 1 ? (
         <Link
-          href={`${baseUrl}?page=${currentPage - 1}`}
-          className="px-4 py-2 border border-black hover:bg-black hover:text-white transition-colors"
+          href={getPageUrl(currentPage - 1)}
+          className="px-4 py-2 border border-black dark:border-white/20 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
         >
           Trang trước
         </Link>
       ) : (
-        <span className="px-4 py-2 border border-gray-300 text-gray-400 cursor-not-allowed">
+        <span className="px-4 py-2 border border-gray-300 dark:border-neutral-800 text-gray-400 dark:text-neutral-600 cursor-not-allowed">
           Trang trước
         </span>
       )}
@@ -35,11 +41,11 @@ export default function Pagination({ currentPage, totalPages, baseUrl }: Paginat
           return (
             <Link
               key={pageNum}
-              href={`${baseUrl}?page=${pageNum}`}
+              href={getPageUrl(pageNum)}
               className={`w-10 h-10 flex items-center justify-center border transition-colors ${
                 isActive
-                  ? 'bg-black text-white border-black'
-                  : 'border-black hover:bg-gray-100'
+                  ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white'
+                  : 'border-black dark:border-white/20 hover:bg-gray-100 dark:hover:bg-white/10'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >
@@ -52,13 +58,13 @@ export default function Pagination({ currentPage, totalPages, baseUrl }: Paginat
       {/* Nút Next */}
       {currentPage < totalPages ? (
         <Link
-          href={`${baseUrl}?page=${currentPage + 1}`}
-          className="px-4 py-2 border border-black hover:bg-black hover:text-white transition-colors"
+          href={getPageUrl(currentPage + 1)}
+          className="px-4 py-2 border border-black dark:border-white/20 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
         >
           Trang sau
         </Link>
       ) : (
-        <span className="px-4 py-2 border border-gray-300 text-gray-400 cursor-not-allowed">
+        <span className="px-4 py-2 border border-gray-300 dark:border-neutral-800 text-gray-400 dark:text-neutral-600 cursor-not-allowed">
           Trang sau
         </span>
       )}

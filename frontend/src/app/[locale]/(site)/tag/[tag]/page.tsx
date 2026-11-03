@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { Metadata } from 'next';
@@ -6,11 +6,11 @@ import { getPostsByTagUnified, getAllTagsUnified } from '@/lib/posts';
 import { optimizeThumbnail } from '@/lib/image';
 
 // Trang chủ đề theo tag: /vi/tag/kbo-league — gom mọi bài có tag đó (mọi chuyên mục).
-// Giải quyết việc các "nhánh" như Esports / DeFi / AI chỉ là nhãn trang trí, không có trang lọc riêng.
 export async function generateStaticParams() {
   try {
     const tags = await getAllTagsUnified();
-    return ['vi', 'en'].flatMap((locale) => tags.map((t) => ({ locale, tag: t.slug })));
+    // Prerender 20 tag có nhiều bài nhất cho 'vi' để build nhanh, các tag khác phục vụ qua ISR
+    return tags.slice(0, 20).map((t) => ({ locale: 'vi', tag: t.slug }));
   } catch {
     return [{ locale: 'vi', tag: 'ai' }];
   }
@@ -18,23 +18,38 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; tag: string }> }): Promise<Metadata> {
   const { locale, tag } = await params;
-  const { tag: label, posts } = await getPostsByTagUnified(tag);
+  const { tag: label, canonicalSlug, posts } = await getPostsByTagUnified(tag);
   const title = `Chủ đề ${label} — ${posts.length} bài viết`;
-  const url = `/${locale}/tag/${tag}`;
+  const canonicalUrl = `/${locale}/tag/${canonicalSlug}`;
   return {
     title,
     description: `Tổng hợp ${posts.length} bài viết về ${label} mới nhất.`,
-    alternates: { canonical: url, languages: { vi: `/vi/tag/${tag}`, en: `/en/tag/${tag}` } },
-    openGraph: { title, description: `Tổng hợp ${posts.length} bài viết về ${label}.`, url, type: 'website' },
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        vi: `/vi/tag/${canonicalSlug}`,
+        en: `/en/tag/${canonicalSlug}`,
+        'x-default': `/vi/tag/${canonicalSlug}`,
+      },
+    },
+    openGraph: { title, description: `Tổng hợp ${posts.length} bài viết về ${label}.`, url: canonicalUrl, type: 'website' },
   };
 }
 
 export const revalidate = 3600;
 
-export default async function TagPage({ params }: { params: Promise<{ tag: string }> }) {
-  const { tag } = await params;
-  const { tag: label, posts } = await getPostsByTagUnified(tag);
-  if (!posts || posts.length === 0) notFound();
+export default async function TagPage({ params }: { params: Promise<{ locale: string; tag: string }> }) {
+  const { locale, tag } = await params;
+  const { tag: label, canonicalSlug, isAlias, posts } = await getPostsByTagUnified(tag);
+
+  // 301 Permanent redirect alias tags to canonical tag (chống duplicate content trên GSC)
+  if (isAlias) {
+    permanentRedirect(`/${locale}/tag/${canonicalSlug}`);
+  }
+
+  if (!posts || posts.length === 0) {
+    notFound();
+  }
 
   return (
     <div className="pt-32 pb-20 px-6 min-h-screen">

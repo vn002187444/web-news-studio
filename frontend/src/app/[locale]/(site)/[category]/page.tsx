@@ -14,6 +14,7 @@ import DefaultTemplate from './_templates/DefaultTemplate';
 import { Metadata } from 'next';
 import { getPostsByCategoryUnified } from '@/lib/posts';
 import { optimizeThumbnail } from '@/lib/image';
+import Pagination from '@/components/ui/Pagination';
 
 const CATEGORIES = ['world', 'tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
 
@@ -30,18 +31,34 @@ const CATEGORY_META: Record<string, { title: string; description: string }> = {
   science: { title: 'Khoa Học', description: 'Vũ trụ, phát minh và công nghệ sinh học.' },
 };
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string; category: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string; category: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}): Promise<Metadata> {
   const { locale, category } = await params;
+  const sp = searchParams ? await searchParams : {};
+  const pageStr = sp?.page;
+  const pageNum = typeof pageStr === 'string' ? parseInt(pageStr, 10) || 1 : 1;
+
   const meta = CATEGORY_META[category] || { title: category, description: `Tin ${category} mới nhất.` };
-  const url = `/${locale}/${category}`;
+  const pageSuffix = pageNum > 1 ? `?page=${pageNum}` : '';
+  const canonicalUrl = `/${locale}/${category}${pageSuffix}`;
+
   return {
-    title: meta.title,
+    title: pageNum > 1 ? `${meta.title} (Trang ${pageNum})` : meta.title,
     description: meta.description,
     alternates: {
-      canonical: url,
-      languages: { vi: `/vi/${category}`, en: `/en/${category}` },
+      canonical: canonicalUrl,
+      languages: {
+        vi: `/vi/${category}${pageSuffix}`,
+        en: `/en/${category}${pageSuffix}`,
+        'x-default': `/vi/${category}${pageSuffix}`,
+      },
     },
-    openGraph: { title: meta.title, description: meta.description, url, type: 'website' },
+    openGraph: { title: meta.title, description: meta.description, url: canonicalUrl, type: 'website' },
   };
 }
 
@@ -52,8 +69,6 @@ export const revalidate = 3600;
 export function generateStaticParams() {
   return ['vi', 'en'].flatMap((locale) => CATEGORIES.map((category) => ({ locale, category })));
 }
-
-import Pagination from '@/components/ui/Pagination';
 
 export default async function CategoryPage({
   params,
@@ -66,21 +81,20 @@ export default async function CategoryPage({
   const searchParamsValue = await searchParams;
   
   // Validate category
-  const validCategories = ['world', 'tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
-  if (!validCategories.includes(category)) {
+  if (!CATEGORIES.includes(category)) {
     notFound();
   }
 
-  // Xử lý phân trang
+  // Xử lý phân trang an toàn, chống crash 500
   const pageStr = searchParamsValue?.page;
-  const currentPage = typeof pageStr === 'string' ? parseInt(pageStr, 10) || 1 : 1;
+  const parsedPage = typeof pageStr === 'string' ? parseInt(pageStr, 10) || 1 : 1;
+  const currentPage = Math.max(1, parsedPage);
   const itemsPerPage = 12;
 
   // Fetch real articles — Sanity-first, MDX fallback.
-  // Excerpt cắt 140 ký tự (card line-clamp, không đổi giao diện) → nhẹ HTML/RSC payload.
   const rawPosts = await getPostsByCategoryUnified(category);
   const totalItems = rawPosts.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedPosts = rawPosts.slice(startIndex, startIndex + itemsPerPage);
 
@@ -90,7 +104,14 @@ export default async function CategoryPage({
     title: post.meta.title,
     excerpt: (post.meta.excerpt || '').slice(0, 140),
     category: post.meta.category,
-    thumbnail: { url: optimizeThumbnail(post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80', 1200, 65), alt: post.meta.title },
+    thumbnail: {
+      url: optimizeThumbnail(
+        post.meta.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+        1200,
+        65
+      ),
+      alt: post.meta.title
+    },
     tags: post.meta.tags || [],
     publishedAt: post.meta.publishedAt
   }));
@@ -135,6 +156,11 @@ export default async function CategoryPage({
   return (
     <>
       {TemplateComponent}
+      {articles.length === 0 && currentPage > 1 && (
+        <div className="text-center py-12 font-mono text-sm opacity-60">
+          Chưa có thêm bài viết ở trang {currentPage}. Vui lòng quay lại các trang trước.
+        </div>
+      )}
       <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/${category}`} />
     </>
   );

@@ -4,7 +4,9 @@ import { SITE_URL } from '@/lib/site';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
-  const locales = ['vi', 'en'];
+  // Chỉ xuất bản các URL tiếng Việt (vi) vì nội dung bài viết và chuyên mục bằng tiếng Việt
+  // Điều này triệt tiêu hoàn toàn 684 lỗi "Excluded by 'noindex' tag" trên Google Search Console
+  const indexableLocales = ['vi'];
 
   let posts: Awaited<ReturnType<typeof getAllPostsUnified>> = [];
   try {
@@ -16,12 +18,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categories = ['world', 'tech', 'blockchain', 'game', 'finance', 'lifestyle', 'sports', 'entertainment', 'education', 'science'];
   
   const categoryRoutes: MetadataRoute.Sitemap = categories.flatMap((cat) => {
-    // Posts are already sorted by publishedAt descending in getAllPostsUnified
     const catPosts = posts.filter(p => p.meta.category.toLowerCase() === cat);
     const lastPost = catPosts.length > 0 ? catPosts[0] : null;
     const lastModified = lastPost ? new Date(lastPost.meta.publishedAt) : new Date();
 
-    return locales.map((locale) => ({
+    return indexableLocales.map((locale) => ({
       url: `${baseUrl}/${locale}/${cat}`,
       lastModified,
       changeFrequency: 'daily' as const,
@@ -30,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   const articleRoutes: MetadataRoute.Sitemap = posts.flatMap((article) =>
-    locales.map((locale) => ({
+    indexableLocales.map((locale) => ({
       url: `${baseUrl}/${locale}/${article.meta.category}/${article.slug}`,
       lastModified: new Date(article.meta.publishedAt),
       changeFrequency: 'never' as const,
@@ -46,14 +47,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const tagRoutes: MetadataRoute.Sitemap = tags.flatMap((tagObj) =>
-    locales.map((locale) => ({
+    indexableLocales.map((locale) => ({
       url: `${baseUrl}/${locale}/tag/${tagObj.slug}`,
       changeFrequency: 'weekly' as const,
       priority: 0.5,
     }))
   );
 
-  const homeRoutes: MetadataRoute.Sitemap = locales.map((locale) => ({
+  const homeRoutes: MetadataRoute.Sitemap = indexableLocales.map((locale) => ({
     url: `${baseUrl}/${locale}`,
     lastModified: new Date(),
     changeFrequency: 'always' as const,
