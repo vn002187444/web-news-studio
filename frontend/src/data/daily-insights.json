@@ -1,6 +1,6 @@
 {
-  "date": "2026-10-21",
-  "generatedAt": "2026-10-21T21:26:25+07:00",
+  "date": "2026-11-04",
+  "generatedAt": "2026-11-04T07:00:00+07:00",
   "goldenHours": {
     "morning": { "hours": [6, 7, 8, 9], "categories": ["finance", "world", "blockchain"] },
     "lunch": { "hours": [11, 12, 13], "categories": ["game", "lifestyle", "entertainment"] },
@@ -10,24 +10,64 @@
   },
   "keywords": {
     "finance": [
-      { "keyword": "FED cắt giảm lãi suất Q4 2026", "intent": "Informational / Commercial", "title": "Fed Cắt Giảm Lãi Suất Q4/2026: Tác Động Trực Tiếp Đến Tỷ Giá USD/VND Và Dòng Vốn Ngoại Vào Việt Nam" },
-      { "keyword": "Thanh toán số mBridge Nhân dân tệ", "intent": "Informational / Analytical", "title": "Dự Án mBridge Mở Rộng Cuối 2026: Cơ Chế Vận Hành Và Tương Lai Phi USD Hóa Thương Mại Toàn Cầu" }
+      {
+        "keyword": "FED họp chính sách tiền tệ tháng 11 2026",
+        "intent": "Informational / Analytical",
+        "title": "Kỳ Vọng FED Giữ Đà Giảm Lãi Suất Tháng 11/2026: Tác Động Sâu Rộng Đến Tỷ Giá USD/VND Và Thị Trường Chứng Khoán"
+      },
+      {
+        "keyword": "Thanh toán QR xuyên biên giới Đông Nam Á",
+        "intent": "Informational / Commercial",
+        "title": "Mạng Lưới Thanh Toán QR Xuyên Biên Giới Mở Rộng Cuối 2026: Đòn Bẩy Du Lịch Và Thương Mại Không Dùng Tiền Mặt"
+      }
     ],
     "tech": [
-      { "keyword": "Autonomous AI Agent doanh nghiệp 2026", "intent": "Commercial / Transactional", "title": "AI Agent Tự Trị Năm 2026 Là Gì? Top 5 Ứng Dụng Đột Phá Giúp Doanh Nghiệp Tối Ưu Hóa Chi Phí Tức Thì" },
-      { "keyword": "Robot hình người Tesla Optimus thương mại", "intent": "Informational / Commercial", "title": "Giá Bán Và Khả Năng Vận Hành Của Tesla Optimus Thương Mại Hóa 2026: Những Gì Bạn Cần Biết" }
+      {
+        "keyword": "Kiến trúc DRAM 3D bán dẫn 2nm 2026",
+        "intent": "Informational / Tech Research",
+        "title": "Cuộc Đua DRAM 3D Và Bán Dẫn 2nm Năm 2026: Các Hãng Công Nghệ Lách Hàng Rào Cấm Vận Như Thế Nào?"
+      },
+      {
+        "keyword": "Hệ sinh thái Multi Agent tự trị doanh nghiệp",
+        "intent": "Commercial / Transactional",
+        "title": "Hệ Sinh Thái Multi-Agent Tự Trị Doanh Nghiệp 2026: Tự Động Hóa Vận Hành Và Cắt Giảm Chi Phí Lên Đến 70%"
+      }
     ],
     "game": [
-      { "keyword": "Lịch thi đấu Bán kết CKTG 2026", "intent": "Navigational / Informational", "title": "Lịch Thi Đấu Bán Kết CKTG 2026: Phân Tích Meta Đường Giữa Và Dự Đoán Đại Chiến LCK - LPL" },
-      { "keyword": "GTA 6 Online crossplay PC console", "intent": "Informational / How-to", "title": "GTA 6 Online Có Hỗ Trợ Crossplay Giữa PC Và Console Không? Chi Tiết Lộ Trình Cập Nhật Mới Nhất" }
+      {
+        "keyword": "Phân tích meta Bán kết CKTG 2026",
+        "intent": "Navigational / Informational",
+        "title": "Đại Chiến Bán Kết CKTG 2026: Giải Mã Meta Đường Giữa Và Dự Đoán Cuộc Chạm Trán Siêu Kinh Điển"
+      },
+      {
+        "keyword": "GTA 6 công nghệ đồ họa ray tracing",
+        "intent": "Informational / Entertainment",
+        "title": "GTA 6 Đột Phá Đồ Họa Ray-Tracing Thời Gian Thực: Trải Nghiệm Thế Giới Mở Chân Thực Đến Từng Chi Tiết"
+      }
     ],
     "lifestyle": [
-      { "keyword": "Trào lưu Micro-Retirement 2026", "intent": "Informational / Lifestyle", "title": "Nghỉ Hưu Vi Mô (Micro-Retirement) Là Gì? Xu Hướng 'Làm 3 Năm Nghỉ 6 Tháng' Đang Thống Trị Gen Z" },
-      { "keyword": "Ứng dụng AI thanh lọc dopamine", "intent": "How-to / Solution-seeking", "title": "Hướng Dẫn Dopamine Detox 2.0: Cách Dùng Công Nghệ Ngăn Chặn Tình Trạng Kiệt Sức Kỹ Thuật Số" }
+      {
+        "keyword": "Digital Minimalism 2.0 cai nghiện mạng xã hội",
+        "intent": "How-to / Lifestyle",
+        "title": "Tối Giản Kỹ Thuật Số 2.0: 5 Bước Cai Nghiện Thông Báo Và Tái Thiết Lập Cân Bằng Não Bộ Năm 2026"
+      },
+      {
+        "keyword": "Xu hướng Slow Travel kết hợp làm việc từ xa",
+        "intent": "Informational / Trend",
+        "title": "Trào Lưu Du Lịch Chậm (Slow Travel) Kết Hợp Workation 2026: Khi Giới Trẻ Chọn 'Sống Đậm' Thay Vì Check-in Vội Vã"
+      }
     ],
     "blockchain": [
-      { "keyword": "RWA Tokenization bất động sản 2026", "intent": "Informational / Transactional", "title": "Token Hóa Bất Động Sản (RWA) Năm 2026: Khung Pháp Lý Quốc Tế Và Cách Đầu Tư An Toàn Cho Cá Nhân" },
-      { "keyword": "DePIN AI phân tán năng lượng", "intent": "Informational / Tech Research", "title": "Mạng Lưới DePIN Kết Hợp AI: Lời Giải Mới Cho Bài Toán Khủng Hoảng Năng Lượng Và Điện Toán Toàn Cầu" }
+      {
+        "keyword": "Khung pháp lý tài sản ảo châu Á 2026",
+        "intent": "Informational / Commercial",
+        "title": "Khung Thử Nghiệm Sandbox Tài Sản Ảo (VA) Tại Châu Á Cuối 2026: Bước Đệm Cho Các Quỹ Thể Chế Nhập Cuộc"
+      },
+      {
+        "keyword": "Mạng DePIN lưu trữ dữ liệu AI phi tập trung",
+        "intent": "Informational / Technical",
+        "title": "DePIN Kết Hợp Điện Toán Phân Tán AI 2026: Giải Pháp Hạ Tầng Tối Ưu Cho Kỷ Nguyên Trí Tuệ Nhân Tạo"
+      }
     ]
   }
 }
