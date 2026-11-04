@@ -77,9 +77,9 @@ export default function AdaptiveImage({
   useEffect(() => {
     const raw = extractValidSrc(src);
     setCurrentSrc(raw || targetFallback);
-    setIsLoading(true);
+    setIsLoading(!isPriority);
     setErrorStage(0);
-  }, [src, targetFallback]);
+  }, [src, targetFallback, isPriority]);
 
   const handleLoadingComplete = (e: any) => {
     setIsLoading(false);
@@ -106,12 +106,12 @@ export default function AdaptiveImage({
   };
 
   const combinedImageClass = `object-cover transition-opacity duration-500 ease-out ${
-    isLoading ? 'opacity-0 scale-[1.02]' : 'opacity-100 scale-100'
+    isLoading && !isPriority ? 'opacity-0 scale-[1.02]' : 'opacity-100 scale-100'
   } ${className}`;
 
   return (
     <>
-      {isLoading && (
+      {!isPriority && isLoading && (
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 overflow-hidden bg-gray-200/80 dark:bg-neutral-800 pointer-events-none"
@@ -125,6 +125,7 @@ export default function AdaptiveImage({
         referrerPolicy="no-referrer"
         src={currentSrc}
         alt={altText}
+        fetchPriority={isPriority ? "high" : "auto"}
         className={combinedImageClass}
         onLoad={handleLoadingComplete}
         onError={handleError}

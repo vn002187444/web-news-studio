@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import NewsTicker from "@/components/ui/NewsTicker";
 import HeroSection from "@/components/ui/HeroSection";
 import BentoGrid from "@/components/ui/BentoGrid";
@@ -41,6 +42,10 @@ export default async function Home() {
   // Phân bổ nội dung thông minh: Tính điểm biên tập, đa dạng chuyên mục trong Bento, cân bằng Hero
   const allocated = allocateHomepageContent(articles);
 
+  const heroArticle = allocated.hero as unknown as Article;
+  const heroImgUrl = heroArticle?.thumbnail?.url || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80';
+  ReactDOM.preload(heroImgUrl, { as: 'image', fetchPriority: 'high' });
+
   const CATEGORY_ORDER = [
     'world', 'tech', 'finance', 'blockchain', 'game', 'sports', 
     'entertainment', 'education', 'science', 'lifestyle'
@@ -54,7 +59,7 @@ export default async function Home() {
       <div className="pt-24 bg-[#F4F4F0]">
         <NewsTicker articles={allocated.ticker} />
       </div>
-      <HeroSection article={allocated.hero as unknown as Article} />
+      <HeroSection article={heroArticle} />
       <div className="bg-white">
         <div className="max-w-[1600px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-9 min-w-0">

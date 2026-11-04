@@ -1,6 +1,3 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import AdaptiveImage from './AdaptiveImage';
 import { Link } from '@/i18n/routing';
 
@@ -15,7 +12,7 @@ interface HeroArticle {
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80';
 
 export default function HeroSection({ article }: { article?: HeroArticle }) {
-
+  const heroImgUrl = article?.thumbnail?.url || FALLBACK_IMG;
 
   return (
     <section className="relative pt-32 pb-20 px-6 min-h-[90vh] flex flex-col justify-center overflow-hidden">
@@ -30,21 +27,15 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
             <span className="italic font-light">Đã</span> Bắt Đầu
           </h1>
           
-          <motion.p 
-            className="font-mono text-sm uppercase max-w-md mt-8 border-l-2 border-[#111111] pl-4 text-gray-800 leading-relaxed"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1 }}
+          <p 
+            className="font-mono text-sm uppercase max-w-md mt-8 border-l-2 border-[#111111] pl-4 text-gray-800 leading-relaxed transition-opacity duration-700"
           >
             Khám phá những điểm giao thoa giữa Công nghệ, Blockchain và Phong cách sống thế hệ mới.
-          </motion.p>
+          </p>
 
           {article && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 1 }}
-              className="mt-8 max-w-md"
+            <div
+              className="mt-8 max-w-md transition-opacity duration-700"
             >
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-red-600">
                 Tin mới nhất — {article.category}
@@ -56,7 +47,7 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
               >
                 {article.title}
               </Link>
-            </motion.div>
+            </div>
           )}
         </div>
 
@@ -67,8 +58,8 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
           )}
           <div className="w-full h-[120%] -top-[10%] relative">
             <AdaptiveImage
-              src={article?.thumbnail.url || FALLBACK_IMG}
-              alt={article?.thumbnail.alt || 'Retro Tech Setup'}
+              src={heroImgUrl}
+              alt={article?.thumbnail?.alt || 'Retro Tech Setup'}
               category={article?.category || 'tech'}
               fill
               sizes="(max-width: 1024px) 100vw, 42vw"
