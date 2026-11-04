@@ -65,8 +65,7 @@ export default function TrendingWidget({ articles }: { articles: TrendingItem[] 
       <ol className="flex flex-col">
         {trending.map((a, i) => (
           <li key={a.slug || i} className="group border-b border-black/10 last:border-0">
-            <Link
-              href={`/${a.category}/${a.slug}`}
+            <Link prefetch={false} href={`/${a.category}/${a.slug}`}
               className="flex gap-4 py-4 items-start"
               data-cursor="HOT"
               onMouseMove={(e: React.MouseEvent) => {

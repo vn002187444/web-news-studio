@@ -96,21 +96,23 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
         {/* Preload web manifest to prevent render-blocking discovery */}
         <link rel="preload" href="/manifest.webmanifest" as="fetch" crossOrigin="anonymous" />
         {/* Rút ngắn handshake tới host ảnh chính → cải thiện LCP (ảnh hero đã priority) */}
-        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://vcdn1-thethao.vnecdn.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+        <link rel="dns-prefetch" href="https://cdn.sanity.io" />
+        <link rel="preconnect" href="https://vcdn1-thethao.vnecdn.net"  />
         <link rel="dns-prefetch" href="https://vcdn1-thethao.vnecdn.net" />
-        <link rel="preconnect" href="https://vcdn1-giadinh.vnecdn.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://vcdn1-giadinh.vnecdn.net"  />
         <link rel="dns-prefetch" href="https://vcdn1-giadinh.vnecdn.net" />
-        <link rel="preconnect" href="https://vcdn1-vnexpress.vnecdn.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://vcdn1-vnexpress.vnecdn.net"  />
         <link rel="dns-prefetch" href="https://vcdn1-vnexpress.vnecdn.net" />
-        <link rel="preconnect" href="https://s3-images.ctmedia.io" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://s3-images.ctmedia.io"  />
         <link rel="dns-prefetch" href="https://s3-images.ctmedia.io" />
-        <link rel="preconnect" href="https://cdn.i-scmp.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cdn.i-scmp.com"  />
         <link rel="dns-prefetch" href="https://cdn.i-scmp.com" />
-        <link rel="preconnect" href="https://vnecdn.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://vnecdn.net"  />
         <link rel="dns-prefetch" href="https://vnecdn.net" />
-        <link rel="preconnect" href="https://cdn.mos.cms.futurecdn.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cdn.mos.cms.futurecdn.net"  />
         <link rel="dns-prefetch" href="https://cdn.mos.cms.futurecdn.net" />
       </head>
       <body className="min-h-full flex flex-col bg-[#F4F4F0] text-[#111111] overflow-x-hidden w-full max-w-full">

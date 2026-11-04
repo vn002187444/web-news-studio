@@ -49,7 +49,7 @@ export default function BentoGrid({ articles }: BentoGridProps) {
                   'col-span-1 row-span-1'
                 }`}
               >
-                <Link href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" aria-label={article.title} data-cursor="READ" />
+                <Link prefetch={false} href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" aria-label={article.title} data-cursor="READ" />
                 
                 <AdaptiveImage
                   src={article.thumbnail.url}
@@ -57,7 +57,7 @@ export default function BentoGrid({ articles }: BentoGridProps) {
                   category={article.category}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  priority={i === 0}
+                  priority={false}
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 

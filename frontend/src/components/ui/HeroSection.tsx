@@ -40,8 +40,7 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-red-600">
                 Tin mới nhất — {article.category}
               </span>
-              <Link
-                href={`/${article.category}/${article.slug}`}
+              <Link prefetch={false} href={`/${article.category}/${article.slug}`}
                 className="block mt-2 font-serif text-xl font-bold leading-snug hover:underline underline-offset-4"
                 data-cursor="READ"
               >
@@ -54,7 +53,7 @@ export default function HeroSection({ article }: { article?: HeroArticle }) {
         {/* Right: Parallax Image — ảnh bài mới nhất */}
         <div className="lg:col-span-5 h-[500px] lg:h-[700px] w-full relative overflow-hidden bg-gray-200 group">
           {article && (
-            <Link href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" data-cursor="READ" aria-label={article.title} />
+            <Link prefetch={false} href={`/${article.category}/${article.slug}`} className="absolute inset-0 z-20" data-cursor="READ" aria-label={article.title} />
           )}
           <div className="w-full h-[120%] -top-[10%] relative">
             <AdaptiveImage

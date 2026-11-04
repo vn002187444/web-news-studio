@@ -55,8 +55,7 @@ export default function CategorySections({ articles }: { articles: SectionArticl
               <h2 className="text-3xl md:text-4xl font-serif uppercase tracking-tight">
                 {CATEGORY_NAMES[category] || category}
               </h2>
-              <Link
-                href={`/${category}`}
+              <Link prefetch={false} href={`/${category}`}
                 className="font-mono text-xs uppercase tracking-widest hover:underline underline-offset-4"
                 data-cursor="MORE"
               >
