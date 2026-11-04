@@ -15,3 +15,5 @@ count_unsplash.mjs
 dist_hosts.mjs
 migrate-thumbs.mjs
 verify.mjs
+.wrangler
+.wrangler/
