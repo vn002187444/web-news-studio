@@ -41,6 +41,14 @@ export default async function Home() {
   // Phân bổ nội dung thông minh: Tính điểm biên tập, đa dạng chuyên mục trong Bento, cân bằng Hero
   const allocated = allocateHomepageContent(articles);
 
+  const CATEGORY_ORDER = [
+    'world', 'tech', 'finance', 'blockchain', 'game', 'sports', 
+    'entertainment', 'education', 'science', 'lifestyle'
+  ];
+  const sectionArticles = CATEGORY_ORDER.map(cat => 
+    articles.filter(a => a.category === cat).slice(0, 4)
+  ).flat();
+
   return (
     <>
       <div className="pt-24 bg-[#F4F4F0]">
@@ -57,7 +65,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
-      <CategorySections articles={articles} />
+      <CategorySections articles={sectionArticles} />
     </>
   );
 }

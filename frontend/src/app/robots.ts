@@ -10,14 +10,11 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/admin/', '/studio/'],
       },
       {
+        // Chỉ chặn các bot càn quét quá khích (Reflectionbot spam hàng nghìn req/ngày, Bytespider)
+        // Cho phép các bot AI tìm kiếm (GPTBot, ClaudeBot, PerplexityBot, OAI-SearchBot) crawl để tăng view & thứ hạng SEO
         userAgent: [
           'Reflectionbot',
           'Bytespider',
-          'CCBot',
-          'Amazonbot',
-          'ClaudeBot',
-          'GPTBot',
-          'DataForSeoBot',
         ],
         disallow: ['/'],
       },

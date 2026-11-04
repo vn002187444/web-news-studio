@@ -108,6 +108,10 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
         <link rel="dns-prefetch" href="https://s3-images.ctmedia.io" />
         <link rel="preconnect" href="https://cdn.i-scmp.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://cdn.i-scmp.com" />
+        <link rel="preconnect" href="https://vnecdn.net" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://vnecdn.net" />
+        <link rel="preconnect" href="https://cdn.mos.cms.futurecdn.net" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://cdn.mos.cms.futurecdn.net" />
       </head>
       <body className="min-h-full flex flex-col bg-[#F4F4F0] text-[#111111] overflow-x-hidden w-full max-w-full">
         <NextTopLoader 

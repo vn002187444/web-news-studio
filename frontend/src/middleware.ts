@@ -4,16 +4,17 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const handleI18nRouting = createMiddleware(routing);
 
-// Danh sách AI Scraper Bots càn quét gây cạn kiệt tài nguyên CPU của Cloudflare Worker Free Tier
-const BLOCKED_BOT_REGEX = /Reflectionbot|Bytespider|CCBot|Amazonbot|ClaudeBot|GPTBot|DataForSeoBot/i;
+// Chỉ chặn các bot càn quét quá khích (Abusive / Hyper-aggressive Scrapers) gây cạn kiệt CPU Worker
+// Tuyệt đối CHO PHÉP các AI bot chính thống giúp tăng view, trích dẫn nguồn và index SEO (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Googlebot...)
+const AGGRESSIVE_ABUSIVE_BOT_REGEX = /Reflectionbot|Bytespider/i;
 
 export default function middleware(request: NextRequest) {
   const ua = request.headers.get('user-agent') || '';
 
-  // 1. Chặn đứng các AI scraper bot ngốn hàng nghìn request/ngày (như Reflectionbot - 4,963 reqs/ngày)
+  // 1. Chặn đứng bot càn quét quá khích ngốn hàng nghìn request/ngày (như Reflectionbot - 4,963 reqs/ngày)
   // Trả về 403 Forbidden ngay tại tầng Edge trong 0.01ms, triệt tiêu 100% tài nguyên CPU lãng phí
-  if (BLOCKED_BOT_REGEX.test(ua)) {
-    return new NextResponse('Access Denied: AI Scraper Bot Restricted.', {
+  if (AGGRESSIVE_ABUSIVE_BOT_REGEX.test(ua)) {
+    return new NextResponse('Access Denied: Abusive Scraper Bot Restricted.', {
       status: 403,
       headers: {
         'Content-Type': 'text/plain',

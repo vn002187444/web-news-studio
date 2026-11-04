@@ -70,7 +70,8 @@ export default function AdaptiveImage({
   }, [src, targetFallback]);
 
   const [currentSrc, setCurrentSrc] = useState<string>(initialSrc);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const isPriority = !!props.priority;
+  const [isLoading, setIsLoading] = useState<boolean>(!isPriority);
   const [errorStage, setErrorStage] = useState<number>(0);
 
   useEffect(() => {
