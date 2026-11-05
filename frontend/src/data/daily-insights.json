@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-04",
-  "generatedAt": "2026-11-04T07:00:00+07:00",
+  "date": "2026-11-05",
+  "generatedAt": "2026-11-05T07:00:00+07:00",
   "goldenHours": {
     "morning": { "hours": [6, 7, 8, 9], "categories": ["finance", "world", "blockchain"] },
     "lunch": { "hours": [11, 12, 13], "categories": ["game", "lifestyle", "entertainment"] },
@@ -11,62 +11,62 @@
   "keywords": {
     "finance": [
       {
-        "keyword": "FED họp chính sách tiền tệ tháng 11 2026",
+        "keyword": "Lãi suất trái phiếu toàn cầu tháng 11 2026",
         "intent": "Informational / Analytical",
-        "title": "Kỳ Vọng FED Giữ Đà Giảm Lãi Suất Tháng 11/2026: Tác Động Sâu Rộng Đến Tỷ Giá USD/VND Và Thị Trường Chứng Khoán"
+        "title": "Biến Động Lãi Suất Trái Phiếu Toàn Cầu Tháng 11/2026: Dòng Vốn Đầu Tư Đang Chuyển Dịch Về Đâu?"
       },
       {
-        "keyword": "Thanh toán QR xuyên biên giới Đông Nam Á",
+        "keyword": "Thị trường vàng và ngoại hối hậu bầu cử Mỹ 2026",
         "intent": "Informational / Commercial",
-        "title": "Mạng Lưới Thanh Toán QR Xuyên Biên Giới Mở Rộng Cuối 2026: Đòn Bẩy Du Lịch Và Thương Mại Không Dùng Tiền Mặt"
+        "title": "Giá Vàng Thế Giới Và Tỷ Giá Ngoại Tệ Hậu Bầu Cử Mỹ 2026: Chiến Lược Quản Trị Rủi Ro Của Nhà Đầu Tư"
       }
     ],
     "tech": [
       {
-        "keyword": "Kiến trúc DRAM 3D bán dẫn 2nm 2026",
+        "keyword": "Qualcomm chip trung tâm dữ liệu AI 2026",
         "intent": "Informational / Tech Research",
-        "title": "Cuộc Đua DRAM 3D Và Bán Dẫn 2nm Năm 2026: Các Hãng Công Nghệ Lách Hàng Rào Cấm Vận Như Thế Nào?"
+        "title": "Qualcomm Tuyên Chiến Với Nvidia Trong Mảng Chip Trung Tâm Dữ Liệu AI: Cục Diện Mới Của Điện Toán Đám Mây"
       },
       {
-        "keyword": "Hệ sinh thái Multi Agent tự trị doanh nghiệp",
+        "keyword": "Hệ điều hành AI đa phương thức on-device 2026",
         "intent": "Commercial / Transactional",
-        "title": "Hệ Sinh Thái Multi-Agent Tự Trị Doanh Nghiệp 2026: Tự Động Hóa Vận Hành Và Cắt Giảm Chi Phí Lên Đến 70%"
+        "title": "Bước Ngoặt On-Device AI 2026: Khi Mô Hình Đa Phương Thức Vận Hành Trơn Tru Không Cần Internet"
       }
     ],
     "game": [
       {
-        "keyword": "Phân tích meta Bán kết CKTG 2026",
+        "keyword": "Meta Chung Kết Thế Giới CKTG 2026",
         "intent": "Navigational / Informational",
-        "title": "Đại Chiến Bán Kết CKTG 2026: Giải Mã Meta Đường Giữa Và Dự Đoán Cuộc Chạm Trán Siêu Kinh Điển"
+        "title": "Cục Diện CKTG 2026 Trước Giờ G: Đội Hình Nào Đang Thống Trị Meta Bản Đồ Mới?"
       },
       {
-        "keyword": "GTA 6 công nghệ đồ họa ray tracing",
+        "keyword": "Làn sóng tái cấu trúc ngành game 2026",
         "intent": "Informational / Entertainment",
-        "title": "GTA 6 Đột Phá Đồ Họa Ray-Tracing Thời Gian Thực: Trải Nghiệm Thế Giới Mở Chân Thực Đến Từng Chi Tiết"
+        "title": "Làn Sóng Tái Cấu Trúc Studio Game Cuối 2026: Hướng Đi Mới Cho Các Dự Án Game Độc Lập (Indie)"
       }
     ],
     "lifestyle": [
       {
-        "keyword": "Digital Minimalism 2.0 cai nghiện mạng xã hội",
+        "keyword": "Du lịch chữa lành mùa đông 2026",
         "intent": "How-to / Lifestyle",
-        "title": "Tối Giản Kỹ Thuật Số 2.0: 5 Bước Cai Nghiện Thông Báo Và Tái Thiết Lập Cân Bằng Não Bộ Năm 2026"
+        "title": "Xu Hướng Du Lịch Chữa Lành Mùa Đông 2026: Trải Nghiệm Onsen Và Thiền Định Giữa Thiên Nhiên"
       },
       {
-        "keyword": "Xu hướng Slow Travel kết hợp làm việc từ xa",
+        "keyword": "Lối sống Loud Budgeting Gen Z 2026",
         "intent": "Informational / Trend",
-        "title": "Trào Lưu Du Lịch Chậm (Slow Travel) Kết Hợp Workation 2026: Khi Giới Trẻ Chọn 'Sống Đậm' Thay Vì Check-in Vội Vã"
+        "title": "Lối Sống 'Loud Budgeting' Của Giới Trẻ 2026: Công Khai Giới Hạn Tài Chính Để Tự Do Cuộc Sống"
       }
     ],
     "blockchain": [
       {
-        "keyword": "Khung pháp lý tài sản ảo châu Á 2026",
-        "intent": "Informational / Commercial",
-        "title": "Khung Thử Nghiệm Sandbox Tài Sản Ảo (VA) Tại Châu Á Cuối 2026: Bước Đệm Cho Các Quỹ Thể Chế Nhập Cuộc"
+        "keyword": "Soft fork Bitcoin và tương lai mở rộng Layer 1 2026",
+        "intent": "Informational / Technical",
+        "title": "Giải Mã Đợt Nâng Cấp Soft Fork Của Bitcoin 2026: Tác Động Đến Bảo Mật Và Khả Năng Xử Lý Giao Dịch"
       },
       {
-        "keyword": "Mạng DePIN lưu trữ dữ liệu AI phi tập trung",
-        "intent": "Informational / Technical",
-        "title": "DePIN Kết Hợp Điện Toán Phân Tán AI 2026: Giải Pháp Hạ Tầng Tối Ưu Cho Kỷ Nguyên Trí Tuệ Nhân Tạo"
+        "keyword": "Stablecoin chuẩn hóa pháp lý toàn cầu cuối 2026",
+        "intent": "Informational / Commercial",
+        "title": "Làn Sóng Stablecoin Được Cấp Phép Toàn Cầu Cuối 2026: Cầu Nối Dòng Vốn Thể Chế Vào Web3"
       }
     ]
   }
