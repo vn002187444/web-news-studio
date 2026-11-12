@@ -20,7 +20,7 @@ export async function GET() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   ${recentPosts
-    .flatMap(post => ['vi', 'en'].map(locale => {
+    .flatMap(post => ['vi'].map(locale => {
       const url = `${SITE_URL}/${locale}/${post.meta.category}/${post.slug}`;
       const pubDate = new Date(post.meta.publishedAt).toISOString();
       const language = locale;

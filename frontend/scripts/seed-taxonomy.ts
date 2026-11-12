@@ -31,9 +31,11 @@ const AUTHORS = [
   { v: 'education', name: 'Thu Hà', role: 'Phóng viên Giáo dục', bio: 'Giáo dục phổ thông, đại học và du học. Đồng hành cùng phụ huynh và Gen Z.', icon: '🎓' },
   { v: 'science', name: 'Tiến Dũng', role: 'Biên tập viên Khoa học', bio: 'Vũ trụ, môi trường và công nghệ sinh học. Dịch khoa học khó thành chuyện dễ hiểu.', icon: '🔬' },
   { v: 'lifestyle', name: 'Phương Thảo', role: 'Biên tập viên Đời sống', bio: 'Du lịch, sức khỏe và phong cách sống. Review trải nghiệm thực tế, không PR.', icon: '🌿' },
+  { v: 'world', name: 'Minh Trí', role: 'Biên tập viên Thời sự Quốc tế', bio: 'Ngoại giao, địa chính trị và phân tích diễn biến thế giới từ các nguồn tin quốc tế uy tín.', icon: '🌍' },
 ];
 
 const CATEGORIES: Record<string, { title: string; description: string; color: string }> = {
+  world: { title: 'Thế Giới', description: 'Thời sự quốc tế, địa chính trị và tin tức toàn cầu cập nhật 24/7.', color: '#2563EB' },
   tech: { title: 'Công Nghệ', description: 'Tin công nghệ, AI, smartphone và startup mới nhất.', color: '#0891B2' },
   finance: { title: 'Tài Chính', description: 'Chứng khoán, bất động sản và kinh tế vĩ mô.', color: '#DC2626' },
   blockchain: { title: 'Blockchain', description: 'Giá Bitcoin, Web3, NFT và DeFi cập nhật.', color: '#7C3AED' },
@@ -73,7 +75,7 @@ async function main() {
     });
     console.log(`✅ category: ${c.title} ${a.icon} (${a.v})`);
   }
-  console.log('🏁 Seed taxonomy xong: 9 authors + 9 categories.');
+  console.log('🏁 Seed taxonomy xong: 10 authors + 10 categories.');
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

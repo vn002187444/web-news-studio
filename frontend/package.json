@@ -15,7 +15,8 @@
     "seed-taxonomy": "tsx scripts/seed-taxonomy.ts",
     "report": "tsx scripts/generate-report.ts",
     "check-status": "tsx scripts/check-status.ts",
-    "clean-links": "tsx scripts/clean-broken-links.ts"
+    "clean-links": "tsx scripts/clean-broken-links.ts",
+    "sync-world": "tsx scripts/sync-world-to-sanity.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

@@ -51,6 +51,7 @@ export const articleType = defineType({
       type: 'string',
       options: {
         list: [
+          { title: 'Thế giới (World)', value: 'world' },
           { title: 'Công nghệ (Tech)', value: 'tech' },
           { title: 'Tài chính (Finance)', value: 'finance' },
           { title: 'Blockchain / Crypto', value: 'blockchain' },

@@ -83,6 +83,7 @@ const FALLBACK_THUMB_IDS = [
   'photo-1523050854058-8df90110c9f1', // education
   'photo-1532094349884-543bc11b234d', // science
   'photo-1639762681485-074b7f938ba0', // blockchain
+  'photo-1451187580459-43490279c0fa', // world
 ];
 
 function isFingerprintableThumb(url: string): boolean {
@@ -277,13 +278,13 @@ async function runAutoblogger() {
 
   if (preferredCategories.length === 0) {
     if (vnHour >= 6 && vnHour < 10) {
-      preferredCategories = ['finance', 'tech', 'blockchain', 'world'];
+      preferredCategories = ['finance', 'tech', 'education', 'science', 'world'];
     } else if (vnHour >= 11 && vnHour < 15) {
-      preferredCategories = ['tech', 'lifestyle', 'game'];
+      preferredCategories = ['tech', 'lifestyle', 'game', 'education'];
     } else if (vnHour >= 16 && vnHour < 20) {
-      preferredCategories = ['entertainment', 'sports', 'lifestyle'];
+      preferredCategories = ['entertainment', 'sports', 'lifestyle', 'science'];
     } else {
-      preferredCategories = ['game', 'tech', 'science', 'blockchain'];
+      preferredCategories = ['game', 'tech', 'science', 'blockchain', 'education'];
     }
   }
   // 2. Phân tích độ đói bài từ posts-manifest.json
@@ -553,7 +554,7 @@ ${rewritten.content}
             title: rewritten.title,
             excerpt: rewritten.excerpt,
             content: rewritten.content,
-            category: feed.category as 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science',
+            category: feed.category as 'world' | 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science',
             tags: aiTags,
             thumbnail: extractedThumbnail,
             author: 'Ban Biên Tập News Studio',

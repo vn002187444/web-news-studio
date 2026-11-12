@@ -28,7 +28,7 @@ export const categoryDocType = defineType({
     defineField({
       name: 'value', title: 'Mã (khớp category bài viết)', type: 'string',
       options: {
-        list: ['tech', 'finance', 'blockchain', 'game', 'sports', 'entertainment', 'education', 'science', 'lifestyle'],
+        list: ['world', 'tech', 'finance', 'blockchain', 'game', 'sports', 'entertainment', 'education', 'science', 'lifestyle'],
       },
       validation: (r) => r.required(),
     }),
