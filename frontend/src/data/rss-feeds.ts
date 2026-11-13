@@ -41,11 +41,12 @@ export const RSS_FEEDS: RssFeedConfig[] = [
   { name: 'SCMP Lifestyle (Trung Quốc)', url: 'https://www.scmp.com/rss/94/feed/', category: 'lifestyle', country: 'CN' },
   { name: 'SoraNews24 Culture & Life (Nhật Bản)', url: 'https://soranews24.com/feed/', category: 'lifestyle', country: 'JP' },
 
-  // 7. Giáo Dục (education) - Tri thức, nghiên cứu & giáo dục quốc tế (Anh, Mỹ)
+  // 7. Giáo Dục (education) - Tri thức, nghiên cứu & giáo dục quốc tế (Anh, Mỹ, VN)
   { name: 'BBC News Education (Anh)', url: 'https://feeds.bbci.co.uk/news/education/rss.xml', category: 'education', country: 'UK' },
   { name: 'The Conversation Education (Mỹ)', url: 'https://theconversation.com/us/education/articles.atom', category: 'education', country: 'US' },
   { name: 'Harvard Gazette Education (Mỹ)', url: 'https://news.harvard.edu/gazette/feed/', category: 'education', country: 'US' },
   { name: 'MIT News (Mỹ)', url: 'https://news.mit.edu/rss/feed', category: 'education', country: 'US' },
+  { name: 'VnExpress Giáo Dục (Việt Nam)', url: 'https://vnexpress.net/rss/giao-duc.rss', category: 'education', country: 'VN' },
 
   // 8. Khoa Học (science) - Khám phá vũ trụ, phát minh & sinh học (Anh, Mỹ)
   { name: 'BBC Science & Environment (Anh)', url: 'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', category: 'science', country: 'UK' },
