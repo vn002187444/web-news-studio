@@ -48,6 +48,18 @@ function fetchV4(targetUrl, timeoutMs = 12000) {
   });
 }
 
+async function fetchV4WithRetry(targetUrl, timeoutMs = 12000, retries = 2) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetchV4(targetUrl, timeoutMs);
+    if (res.ok) return res;
+    if (attempt < retries) {
+      await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+    } else {
+      return res;
+    }
+  }
+}
+
 // 36 Feeds (Quốc tế + Việt Nam)
 const RSS_FEEDS = [
   // 1. Công Nghệ (tech)
@@ -172,7 +184,7 @@ async function main() {
 
   const epResults = [];
   for (const ep of endpoints) {
-    const res = await fetchV4(`${WEB_BASE}${ep.path}`);
+    const res = await fetchV4WithRetry(`${WEB_BASE}${ep.path}`, 12000, 2);
     epResults.push({ ...ep, ...res });
     console.log(`  ${res.ok ? '🟢' : '❌'} ${ep.label}: Status ${res.status} (${res.timeMs}ms)`);
   }
@@ -436,23 +448,23 @@ async function main() {
   md += `# BẢNG NGHIÊN CỨU TỪ KHÓA NÓNG & Ý TƯỞNG BÀI VIẾT (${dateFormatted})\n\n`;
   md += `| Chuyên Mục | Từ Khóa Mục Tiêu | Intent | Độ Hot (Est. Vol) | Tiêu Đề Bài Viết Đề Xuất (Chuẩn AEO/GEO) |\n`;
   md += `| :--- | :--- | :--- | :--- | :--- |\n`;
-  md += `| **Tài Chính** | Dự báo dòng vốn FDI và tỷ giá USD cuối năm 2026 | Informational / Analytical | Rất cao | **Chuyển Động Dòng Tiền Toàn Cầu Cuối Năm 2026: Doanh Nghiệp Xuất Nhập Khẩu Chủ Động Ứng Phó Tỷ Giá** |\n`;
-  md += `| **Tài Chính** | Hợp tác Huawei Maserati xe điện sang trọng 2026 | Commercial / News | Rất cao | **Cái Bắt Tay Triệu Đô Huawei - Maserati: Tái Định Hình Thị Trường Xe Điện Thông Minh Cao Cấp** |\n`;
-  md += `| **Công Nghệ** | Huawei Osta smartphone và hệ sinh thái HarmonyOS Next | Informational / Tech Research | Rất cao | **Huawei Ra Mắt Thương Hiệu Osta: Chiến Lược Tái Định Vị Phân Khúc Cận Cao Cấp Sau Rời Bỏ Honor** |\n`;
-  md += `| **Công Nghệ** | Home Assistant Aux-2 Matter Thread smart home | Commercial / Review | Rất cao | **Đánh Giá Home Assistant Connect Aux-2: Bước Nhảy Vọt Tự Động Hóa Nhà Thông Minh Chuẩn Matter 2026** |\n`;
-  md += `| **Game** | Helldivers 2 hotfix cosmetic mods Arrowhead | Informational / Gaming | Rất cao | **Arrowhead Lắng Nghe Game Thủ: Hotfix Mở Khóa Cosmetic Mod Đưa Helldivers 2 Trở Lại Đỉnh Cao** |\n`;
-  md += `| **Game** | Black Forest Games độc lập Embracer Group 2026 | Informational / Industry | Cao | **Tái Cấu Trúc Ngành Game 2026: Studio 'Destroy All Humans' Tách Khỏi Embracer Giành Quyền Tự Chủ** |\n`;
-  md += `| **Đời Sống** | Ẩm thực kết nối văn hóa gia đình xuyên lục địa | Lifestyle / Human Story | Rất cao | **Hương Vị Cơm Nhà Việt Nam Giữa Lòng Brazil: Sức Hút Văn Hóa Ẩm Thực Chinh Phục Trái Tim Nhà Chồng** |\n`;
-  md += `| **Đời Sống** | Robot barista Butter Bar Hong Kong tự động hóa | Trend / Cultural | Cao | **Quán Cà Phê Robot Tự Động Đầu Tiên Tại Hong Kong: Khi Trải Nghiệm Đồ Uống Hòa Quyện Cùng AI** |\n`;
-  md += `| **Blockchain** | Luật GENIUS Act bảo vệ người gửi tiền DeFi 2026 | Informational / Policy | Rất cao | **Đạo Luật GENIUS Act 2026: Thách Thức Pháp Lý Và Cơ Chế Bảo Vệ Người Dùng Trên Thị Trường DeFi** |\n`;
-  md += `| **Blockchain** | Tái cấu trúc thanh khoản hệ sinh thái Sui 2026 | Analytical / Crypto | Rất cao | **Biến Động Hệ Sinh Thái Layer-1 Cuối 2026: Bài Học Tồn Tại Cho Các DApp Trước Sóng Gió Thanh Khoản** |\n\n`;
+  md += `| **Công Nghệ** | Satya Nadella AGI-pilled Microsoft AI roadmap 2026 | Informational / Tech Leadership | Rất cao | **Satya Nadella Tuyên Bố Đã 'AGI-Pilled': Tầm Nhìn Trí Tuệ Nhân Tạo Tổng Hợp Của Microsoft Trong Kỷ Nguyên Mới** |\n`;
+  md += `| **Công Nghệ** | Báo cáo tài chính Nvidia Q3 2026 doanh thu chip AI | News / Financial Analysis | Rất cao | **Nvidia Vượt Xa Dự Báo Doanh Thu Quý 3/2026: Nhu Cầu Chip Blackwell Và Cơn Khát Hạ Tầng AI Chưa Hạ Nhiệt** |\n`;
+  md += `| **Tài Chính** | JPMorgan AI agent transactions thanh toán tự động hóa | Commercial / FinTech | Rất cao | **JPMorgan Tiên Phong Thử Nghiệm Giao Dịch Bằng AI Agent: Bước Đột Phá Mới Cho Ngân Hàng Số Toàn Cầu** |\n`;
+  md += `| **Tài Chính** | Hong Kong số hóa toàn diện dịch vụ tài chính ngân hàng số | Informational / Policy | Rất cao | **Hong Kong Đẩy Mạnh Số Hóa Toàn Diện: Tham Vọng Giữ Vững Vị Thế Trung Tâm Tài Chính Hàng Đầu Châu Á** |\n`;
+  md += `| **Game** | Đề cử The Game Awards 2026 game of the year GOTY | Informational / Gaming Trend | Rất cao | **Công Bố Đề Cử The Game Awards 2026: Cuộc Đua Game Of The Year Nóng Hơn Bao Giờ Hết** |\n`;
+  md += `| **Thế Giới** | Cầu Crimea sập một phần biến động chiến sự Đông Âu 2026 | Breaking News / Geopolitics | Rất cao | **Cầu Crimea Bị Hư Hại Một Phần: Chuyển Động Chiến Sự Mới Và Tác Động Đến Cục Diện Khu Vực** |\n`;
+  md += `| **Thế Giới** | Mỹ tự chủ đất hiếm chuỗi cung ứng công nghệ cao 2026 | News / Geopolitical Strategy | Cao | **Chiến Lược Tự Chủ Đất Hiếm Của Mỹ: Nỗ Lực Giảm Phụ Thuộc Chuỗi Cung Ứng Công Nghệ Toàn Cầu** |\n`;
+  md += `| **Giáo Dục** | Lệnh cấm điện thoại học đường cải thiện thành tích học sinh 2026 | Educational / Social Impact | Rất cao | **Nghiên Cứu Harvard: Lệnh Cấm Điện Thoại Trong Lớp Học Giúp Nâng Cao Đột Phá Điểm Số Và Sức Khỏe Tinh Thần** |\n`;
+  md += `| **Khoa Học** | Cách mạng điện mặt trời năng lượng tái tạo Nam Á 2026 | Science / Green Energy | Rất cao | **Làn Sóng Điện Mặt Trời Bùng Nổ Tại Nam Á: Bài Học Chuyển Dịch Năng Lượng Xanh Cho Các Quốc Gia Đang Phát Triển** |\n`;
+  md += `| **Blockchain** | Mô hình AI nhỏ gọn on-chain Web3 smart contracts 2026 | Analytical / Web3 & AI | Rất cao | **Mô Hình AI Nhỏ Gọn Kết Hợp Smart Contract: Xu Hướng Mới Cho Ứng Dụng Phi Tập Trung (dApps) Cuối Năm 2026** |\n\n`;
 
   md += `---\n\n`;
   md += `### ⏰ Chiến Lược Điều Phối Khung Giờ Đăng Bài Hôm Nay (${dateFormatted})\n\n`;
-  md += `* **06:30 – 08:30 (Sáng sớm - Commute Time):** Đăng tải cụm **Tài Chính & Doanh Nghiệp Toàn Cầu** (Thương vụ Huawei - Maserati, Dòng vốn FDI và tỷ giá USD). Tiếp cận phân khúc độc giả là chuyên gia tài chính, nhà quản lý và giới đầu tư cập nhật tin tức trước giờ làm việc.\n`;
-  md += `* **11:30 – 13:00 (Nghỉ trưa - Peak Mobile Traffic & Gadget Discovery):** Triển khai mảng **Công Nghệ Tiêu Dùng** và **Câu chuyện Đời Sống** (Ra mắt Huawei Osta, Smart Home Connect Aux-2, Chuyện tình ẩm thực xuyên biên giới). Nội dung hấp dẫn, trực quan, phù hợp độc giả giải trí nhẹ nhàng giờ nghỉ trưa.\n`;
-  md += `* **16:30 – 18:00 (Cuối chiều - Pre-Dinner):** Lên bài **Blockchain & Chính Sách Pháp Lý Số** (GENIUS Act, Biến động hệ sinh thái L1). Khung giờ đón dòng thông tin giao dịch phái sinh và chuyển động chính sách tài chính số từ thị trường châu Âu.\n`;
-  md += `* **19:30 – 22:30 (Khung giờ vàng giải trí ban đêm):** Ưu tiên tuyệt đối cho cụm **Game, Esports & Thể Thao** (Helldivers 2 mod update, Chuyển động tuyển Việt Nam, Black Forest Games độc lập). Thời điểm người dùng trực tuyến trên desktop và mobile đạt đỉnh, tối ưu tương tác, thảo luận và thời gian lưu lại trang.\n\n`;
+  md += `* **06:30 – 08:30 (Sáng sớm - Commute Time):** Đăng tải cụm **Tài Chính & Bán Dẫn Toàn Cầu** (JPMorgan thử nghiệm AI agent transactions, Doanh thu bùng nổ của Nvidia, Chiến lược đất hiếm Mỹ). Tiếp cận giới lãnh đạo doanh nghiệp, chuyên gia tài chính và nhà đầu tư trước giờ giao dịch.\n`;
+  md += `* **11:30 – 13:00 (Nghỉ trưa - Peak Mobile Traffic & Discovery):** Triển khai mảng **Giáo Dục, Khoa Học & Công Nghệ** (Nghiên cứu Harvard về cấm điện thoại trong trường học, Cách mạng điện mặt trời tại Pakistan, Tuyên bố AGI của Satya Nadella). Nội dung sâu sắc, bổ ích, thu hút độc giả đọc khám phá trong giờ nghỉ trưa.\n`;
+  md += `* **16:30 – 18:00 (Cuối chiều - Pre-Dinner):** Lên bài **Blockchain, Web3 & Địa Chính Trị** (Mô hình AI nhỏ gọn on-chain, Cầu Crimea và chuyển động Đông Âu). Khung giờ đón đầu dòng tin tức tài chính số và thế giới khi thị trường châu Âu mở phiên.\n`;
+  md += `* **19:30 – 22:30 (Khung giờ vàng giải trí ban đêm):** Ưu tiên tuyệt đối cho cụm **Game, Esports & Văn Hóa Đại Chúng** (Đề cử The Game Awards 2026 GOTY, Gabe Newell và cộng đồng game thủ Steam, Review Nubia Redmagic 12 Pro). Thời điểm độc giả trực tuyến đông đảo nhất, tối ưu lượng đọc, chia sẻ và tương tác.\n\n`;
 
   md += `---\n`;
   md += `*Báo cáo được tự động tạo bởi News Studio Automated Maintenance Routine & Antigravity Multi-Agent SDLC Protocol.*  \n`;
