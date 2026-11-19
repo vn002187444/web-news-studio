@@ -193,7 +193,7 @@ async function main() {
   console.log('\n2. [Kiểm Tra Dữ Liệu Sanity CMS]');
   let sanityArticles = [];
   try {
-    const query = encodeURIComponent('*[_type == "article"]{title,category,views,"slug":slug.current,publishedAt,_createdAt}|order(views desc)');
+    const query = encodeURIComponent('*[_type == "article"]{title,category,views,"slug":slug.current,publishedAt,_createdAt}|order(coalesce(publishedAt, _createdAt) desc)');
     const sanityRes = await fetchV4(`https://${SANITY_PROJECT_ID}.api.sanity.io/v2026-01-01/data/query/${SANITY_DATASET}?query=${query}`);
     if (sanityRes.ok) {
       const data = JSON.parse(sanityRes.text);
@@ -438,8 +438,13 @@ async function main() {
   md += `\n---\n\n`;
 
   md += `## 5. 📈 Top Bài Viết Mới Xuất Bản Hôm Nay & Lượt Xem Trên CMS\n\n`;
-  const topArticles = sanityArticles.slice(0, 5);
-  topArticles.forEach((a, idx) => {
+  const todayStart = new Date(Date.UTC(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10), -7, 0, 0, 0));
+  const todayArticles = sanityArticles.filter(item => {
+    const pubDate = new Date(item.publishedAt || item._createdAt);
+    return pubDate >= todayStart;
+  });
+  const displayArticles = todayArticles.length > 0 ? todayArticles.slice(0, 10) : sanityArticles.slice(0, 10);
+  displayArticles.forEach((a, idx) => {
     md += `${idx + 1}. **[${CATEGORY_NAMES[a.category] || a.category}]** ${a.title} — 👁️ **${a.views || 0} lượt xem** (\`/${a.category}/${a.slug}\`)\n`;
   });
   md += `\n---\n\n`;
@@ -448,23 +453,23 @@ async function main() {
   md += `# BẢNG NGHIÊN CỨU TỪ KHÓA NÓNG & Ý TƯỞNG BÀI VIẾT (${dateFormatted})\n\n`;
   md += `| Chuyên Mục | Từ Khóa Mục Tiêu | Intent | Độ Hot (Est. Vol) | Tiêu Đề Bài Viết Đề Xuất (Chuẩn AEO/GEO) |\n`;
   md += `| :--- | :--- | :--- | :--- | :--- |\n`;
-  md += `| **Công Nghệ** | Satya Nadella AGI-pilled Microsoft AI roadmap 2026 | Informational / Tech Leadership | Rất cao | **Satya Nadella Tuyên Bố Đã 'AGI-Pilled': Tầm Nhìn Trí Tuệ Nhân Tạo Tổng Hợp Của Microsoft Trong Kỷ Nguyên Mới** |\n`;
-  md += `| **Công Nghệ** | Báo cáo tài chính Nvidia Q3 2026 doanh thu chip AI | News / Financial Analysis | Rất cao | **Nvidia Vượt Xa Dự Báo Doanh Thu Quý 3/2026: Nhu Cầu Chip Blackwell Và Cơn Khát Hạ Tầng AI Chưa Hạ Nhiệt** |\n`;
-  md += `| **Tài Chính** | JPMorgan AI agent transactions thanh toán tự động hóa | Commercial / FinTech | Rất cao | **JPMorgan Tiên Phong Thử Nghiệm Giao Dịch Bằng AI Agent: Bước Đột Phá Mới Cho Ngân Hàng Số Toàn Cầu** |\n`;
-  md += `| **Tài Chính** | Hong Kong số hóa toàn diện dịch vụ tài chính ngân hàng số | Informational / Policy | Rất cao | **Hong Kong Đẩy Mạnh Số Hóa Toàn Diện: Tham Vọng Giữ Vững Vị Thế Trung Tâm Tài Chính Hàng Đầu Châu Á** |\n`;
-  md += `| **Game** | Đề cử The Game Awards 2026 game of the year GOTY | Informational / Gaming Trend | Rất cao | **Công Bố Đề Cử The Game Awards 2026: Cuộc Đua Game Of The Year Nóng Hơn Bao Giờ Hết** |\n`;
-  md += `| **Thế Giới** | Cầu Crimea sập một phần biến động chiến sự Đông Âu 2026 | Breaking News / Geopolitics | Rất cao | **Cầu Crimea Bị Hư Hại Một Phần: Chuyển Động Chiến Sự Mới Và Tác Động Đến Cục Diện Khu Vực** |\n`;
-  md += `| **Thế Giới** | Mỹ tự chủ đất hiếm chuỗi cung ứng công nghệ cao 2026 | News / Geopolitical Strategy | Cao | **Chiến Lược Tự Chủ Đất Hiếm Của Mỹ: Nỗ Lực Giảm Phụ Thuộc Chuỗi Cung Ứng Công Nghệ Toàn Cầu** |\n`;
-  md += `| **Giáo Dục** | Lệnh cấm điện thoại học đường cải thiện thành tích học sinh 2026 | Educational / Social Impact | Rất cao | **Nghiên Cứu Harvard: Lệnh Cấm Điện Thoại Trong Lớp Học Giúp Nâng Cao Đột Phá Điểm Số Và Sức Khỏe Tinh Thần** |\n`;
-  md += `| **Khoa Học** | Cách mạng điện mặt trời năng lượng tái tạo Nam Á 2026 | Science / Green Energy | Rất cao | **Làn Sóng Điện Mặt Trời Bùng Nổ Tại Nam Á: Bài Học Chuyển Dịch Năng Lượng Xanh Cho Các Quốc Gia Đang Phát Triển** |\n`;
-  md += `| **Blockchain** | Mô hình AI nhỏ gọn on-chain Web3 smart contracts 2026 | Analytical / Web3 & AI | Rất cao | **Mô Hình AI Nhỏ Gọn Kết Hợp Smart Contract: Xu Hướng Mới Cho Ứng Dụng Phi Tập Trung (dApps) Cuối Năm 2026** |\n\n`;
+  md += `| **Công Nghệ** | Satya Nadella an ninh mạng AI mandate Microsoft 2026 | Informational / Tech Security | Rất cao | **Satya Nadella Ban Hành Sắc Lệnh An Ninh Mạng Mới Cho Microsoft: Phòng Tuyến AI Đối Đầu Làn Sóng Tấn Công Tự Động Hóa** |\n`;
+  md += `| **Công Nghệ** | Colette Kress quyền CEO Nvidia chip AI Blackwell 2026 | News / Leadership Analysis | Rất cao | **Quyền CEO Colette Kress Lên Tiếng Về Tương Lai Nvidia: Kế Hoạch Ổn Định Chuỗi Cung Ứng Chip Blackwell Sau Biến Động** |\n`;
+  md += `| **Tài Chính** | Dự báo Fed tiếp tục tăng lãi suất kiểm soát lạm phát 2026 | News / Macroeconomics | Rất cao | **Quan Chức Fed Phát Tín Hiệu Thắt Chặt Lãi Suất: Phố Wall Căng Thẳng Trước Áp Lực Lạm Phát Kéo Dài** |\n`;
+  md += `| **Tài Chính** | Giá vàng thế giới lao dốc kỷ lục thị trường châu Á 2026 | News / Commodity Market | Rất cao | **Giá Vàng Thế Giới Bất Ngờ Lao Dốc Chạm Đáy: Nhà Đầu Tư Ồ Ạt Chốt Lời Trước Biến Động Tiền Tệ** |\n`;
+  md += `| **Game** | GTA 6 hé lộ bản đồ Vice City kiểm duyệt tại Nhật Bản | Informational / Gaming Trend | Rất cao | **GTA 6: Rockstar Vô Tình Để Lộ Bản Đồ Vice City Mở Rộng Và Lý Do Phiên Bản Nhật Bản Buộc Phải Kiểm Duyệt** |\n`;
+  md += `| **Thế Giới** | Phong tỏa giao thông cầu Crimea tấn công quân sự 2026 | Breaking News / Geopolitics | Rất cao | **Cầu Crimea Tạm Dừng Giao Thông Sau Đợt Tấn Công Mới: Diễn Biến Căng Thẳng Mới Trên Bán Đảo Biển Đen** |\n`;
+  md += `| **Thế Giới** | Nhượng bộ lãnh thổ đổi tư cách gia nhập NATO khó khả thi | Analytical / Geopolitics | Rất cao | **Ý Tưởng 'Đổi Lãnh Thổ Lấy Tư Cách NATO': Vì Sao Giới Ngoại Giao Cho Rằng Khó Thành Hiện Thực?** |\n`;
+  md += `| **Giáo Dục** | Ngôi trường 100 tỷ thầy giáo Hà Nội tặng học sinh nghèo | Inspiration / Social Impact | Rất cao | **Ngôi Trường Trăm Tỷ Giữa Đại Ngàn: Tâm Huyết Của Thầy Giáo Hà Nội Dành Cho Trẻ Em Vùng Cao Nguyên Đá** |\n`;
+  md += `| **Khoa Học** | Đồng bộ hóa nguyên tử Superradiance đồng hồ lượng tử | Science / Quantum Tech | Rất cao | **Hiện Tượng Superradiance Trong Vật Lý Lượng Tử: Bước Đột Phá Mở Đường Cho Đồng Hồ Nguyên Tử Siêu Chính Xác** |\n`;
+  md += `| **Blockchain** | Ledger xác nhận cảnh báo lỗ hổng chuỗi cung ứng ví lạnh | Security / Web3 Storage | Rất cao | **Ledger Xác Nhận Cảnh Báo An Ninh: Rủi Ro Tấn Công Chuỗi Cung Ứng Ví Lạnh Và Khuyến Cáo Khẩn Cho Nhà Đầu Tư** |\n\n`;
 
   md += `---\n\n`;
   md += `### ⏰ Chiến Lược Điều Phối Khung Giờ Đăng Bài Hôm Nay (${dateFormatted})\n\n`;
-  md += `* **06:30 – 08:30 (Sáng sớm - Commute Time):** Đăng tải cụm **Tài Chính & Bán Dẫn Toàn Cầu** (JPMorgan thử nghiệm AI agent transactions, Doanh thu bùng nổ của Nvidia, Chiến lược đất hiếm Mỹ). Tiếp cận giới lãnh đạo doanh nghiệp, chuyên gia tài chính và nhà đầu tư trước giờ giao dịch.\n`;
-  md += `* **11:30 – 13:00 (Nghỉ trưa - Peak Mobile Traffic & Discovery):** Triển khai mảng **Giáo Dục, Khoa Học & Công Nghệ** (Nghiên cứu Harvard về cấm điện thoại trong trường học, Cách mạng điện mặt trời tại Pakistan, Tuyên bố AGI của Satya Nadella). Nội dung sâu sắc, bổ ích, thu hút độc giả đọc khám phá trong giờ nghỉ trưa.\n`;
-  md += `* **16:30 – 18:00 (Cuối chiều - Pre-Dinner):** Lên bài **Blockchain, Web3 & Địa Chính Trị** (Mô hình AI nhỏ gọn on-chain, Cầu Crimea và chuyển động Đông Âu). Khung giờ đón đầu dòng tin tức tài chính số và thế giới khi thị trường châu Âu mở phiên.\n`;
-  md += `* **19:30 – 22:30 (Khung giờ vàng giải trí ban đêm):** Ưu tiên tuyệt đối cho cụm **Game, Esports & Văn Hóa Đại Chúng** (Đề cử The Game Awards 2026 GOTY, Gabe Newell và cộng đồng game thủ Steam, Review Nubia Redmagic 12 Pro). Thời điểm độc giả trực tuyến đông đảo nhất, tối ưu lượng đọc, chia sẻ và tương tác.\n\n`;
+  md += `* **06:30 – 08:30 (Sáng sớm - Commute Time):** Đăng tải cụm **Tài Chính & Bán Dẫn Toàn Cầu** (Colette Kress điều hành Nvidia, Quan chức Fed phát tín hiệu lãi suất, Giá vàng thế giới lao dốc). Tiếp cận giới lãnh đạo doanh nghiệp, chuyên gia tài chính và nhà đầu tư trước giờ mở phiên.\n`;
+  md += `* **11:30 – 13:00 (Nghỉ trưa - Peak Mobile Traffic & Discovery):** Triển khai mảng **Giáo Dục, Khoa Học & Nhân Văn** (Ngôi trường trăm tỷ thầy giáo Hà Nội tặng vùng cao, Đột phá lượng tử Superradiance, Nguồn gốc Neanderthal DNA). Thu hút độc giả khám phá trong giờ nghỉ trưa.\n`;
+  md += `* **16:30 – 18:00 (Cuối chiều - Pre-Dinner):** Lên bài **An Ninh AI & Địa Chính Trị** (Sắc lệnh an ninh mạng AI của Satya Nadella, Cầu Crimea phong tỏa, Tranh luận nhượng bộ lãnh thổ NATO). Khung giờ đón đầu dòng tin tức quốc tế khi thị trường châu Âu giao dịch sôi động.\n`;
+  md += `* **19:30 – 22:30 (Khung giờ vàng giải trí ban đêm):** Ưu tiên tuyệt đối cho cụm **Game, Esports & Web3** (GTA 6 bản đồ mở rộng & kiểm duyệt Nhật Bản, Magic: The Gathering x Star Trek, Cảnh báo an ninh ví Ledger). Thời điểm độc giả trực tuyến đông đảo nhất, tối ưu lượng đọc, thảo luận và tương tác.\n\n`;
 
   md += `---\n`;
   md += `*Báo cáo được tự động tạo bởi News Studio Automated Maintenance Routine & Antigravity Multi-Agent SDLC Protocol.*  \n`;
