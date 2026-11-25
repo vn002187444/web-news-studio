@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const POSTS_DIR = path.join(process.cwd(), 'frontend/src/data/posts');
 const OUT_FILE = path.join(process.cwd(), 'frontend/src/data/posts-manifest.json');
+const INDEX_FILE = path.join(process.cwd(), 'frontend/src/data/posts-index.json');
 
 function parseFrontmatter(raw) {
   if (!raw.startsWith('---')) return { data: {}, content: raw };
@@ -78,7 +79,9 @@ function main() {
 
   posts.sort((a, b) => new Date(b.meta.publishedAt).getTime() - new Date(a.meta.publishedAt).getTime());
   fs.writeFileSync(OUT_FILE, JSON.stringify(posts, null, 2), 'utf8');
-  console.log(`✅ [sync-manifest] Đã cập nhật thành công ${posts.length} bài viết vào posts-manifest.json`);
+  const index = posts.map(({ slug, meta }) => ({ slug, meta }));
+  fs.writeFileSync(INDEX_FILE, JSON.stringify(index), 'utf8');
+  console.log(`✅ [sync-manifest] Đã cập nhật thành công ${posts.length} bài viết vào posts-manifest.json & posts-index.json`);
   
   const eduCount = posts.filter(p => p.meta?.category === 'education').length;
   const worldCount = posts.filter(p => p.meta?.category === 'world').length;

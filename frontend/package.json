@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:worker": "opennextjs-cloudflare build",
-    "cloudflare:build": "opennextjs-cloudflare build",
+    "build": "node scripts/prepare-worker-assets.mjs && next build",
+    "build:worker": "node scripts/prepare-worker-assets.mjs && opennextjs-cloudflare build",
+    "cloudflare:build": "node scripts/prepare-worker-assets.mjs && opennextjs-cloudflare build",
     "deploy": "npx wrangler deploy",
     "start": "next start",
     "lint": "eslint",

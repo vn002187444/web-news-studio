@@ -13,7 +13,7 @@ on:
 jobs:
   autoblog:
     runs-on: ubuntu-latest
-    timeout-minutes: 8 # Giới hạn 8 phút để chống hao phí runner GitHub
+    timeout-minutes: 10 # Giới hạn 10 phút (script tự dừng sau 5 phút để kịp sync-posts & push)
     permissions:
       contents: write # Cấp quyền cho Bot tự động commit code
     defaults:
@@ -75,7 +75,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Autoblog Action"
-          git add src/data/posts/*.mdx src/data/posts-manifest.json
+          git add src/data/posts/*.mdx src/data/posts-manifest.json src/data/posts-index.json
           
           # Chỉ commit nếu có bài báo mới được sinh ra (tránh báo lỗi empty commit)
           if ! git diff-index --quiet HEAD; then

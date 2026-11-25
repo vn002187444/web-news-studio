@@ -1,4 +1,4 @@
-import { getAllPosts as getMdxPosts, getPostBySlug as getMdxPost, type PostMeta } from './mdx';
+import { getAllPosts as getMdxPosts, getPostBySlugAsync as getMdxPostAsync, type PostMeta } from './mdx';
 import { fetchSanityPosts, fetchSanityPost, fetchSanityByCategory, type SanityArticle } from './sanity';
 import { toSlug } from './site';
 import { cache } from 'react';
@@ -36,7 +36,7 @@ function fromSanity(a: SanityArticle): UnifiedPost {
       categoryColor: a.categoryDetail?.color || '',
       slug: a.slug,
     },
-    content: a.content,
+    content: a.content || '',
     body: a.body,
     source: 'sanity',
   };
@@ -63,14 +63,14 @@ export const getAllPostsUnified = cache(async (): Promise<UnifiedPost[]> => {
   }
 });
 
-export async function getPostUnified(slug: string): Promise<UnifiedPost | null> {
+export const getPostUnified = cache(async (slug: string): Promise<UnifiedPost | null> => {
   try {
     const s = await fetchSanityPost(slug);
     if (s) return fromSanity(s);
   } catch { /* fallback mdx */ }
-  const m = getMdxPost(slug);
+  const m = await getMdxPostAsync(slug);
   return m ? fromMdx(m) : null;
-}
+});
 
 export async function getPostsByCategoryUnified(category: string): Promise<UnifiedPost[]> {
   const cat = category.toLowerCase();

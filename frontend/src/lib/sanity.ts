@@ -74,8 +74,8 @@ export interface SanityArticle {
   slug: string;
   title: string;
   excerpt: string;
-  content: string; // markdown (cũ — fallback)
-  body?: PortableTextBlock[]; // Portable Text (mới — ưu tiên render)
+  content?: string; // markdown (cũ — fallback, chỉ fetch ở BY_SLUG_QUERY)
+  body?: PortableTextBlock[]; // Portable Text (mới — ưu tiên render, chỉ fetch ở BY_SLUG_QUERY)
   category: 'world' | 'tech' | 'blockchain' | 'game' | 'finance' | 'lifestyle' | 'sports' | 'entertainment' | 'education' | 'science';
   tags: string[];
   thumbnail: string;
@@ -88,7 +88,7 @@ export interface SanityArticle {
 const LIST_QUERY = `*[_type == "article" && defined(slug.current)] | order(publishedAt desc) [0...100] {
   _id,
   "slug": slug.current,
-  title, excerpt, content, body, category, tags, thumbnail, author, publishedAt, "authorDetail": authorRef->{name, role, bio, avatar}, "categoryDetail": categoryRef->{title, icon, color}
+  title, excerpt, category, tags, thumbnail, author, publishedAt, "authorDetail": authorRef->{name, role, bio, avatar}, "categoryDetail": categoryRef->{title, icon, color}
 }`;
 
 const BY_SLUG_QUERY = `*[_type == "article" && slug.current == $slug][0] {
@@ -100,7 +100,7 @@ const BY_SLUG_QUERY = `*[_type == "article" && slug.current == $slug][0] {
 const BY_CATEGORY_QUERY = `*[_type == "article" && category == $category] | order(publishedAt desc) [0...50] {
   _id,
   "slug": slug.current,
-  title, excerpt, content, body, category, tags, thumbnail, author, publishedAt, "authorDetail": authorRef->{name, role, bio, avatar}, "categoryDetail": categoryRef->{title, icon, color}
+  title, excerpt, category, tags, thumbnail, author, publishedAt, "authorDetail": authorRef->{name, role, bio, avatar}, "categoryDetail": categoryRef->{title, icon, color}
 }`;
 
 export async function fetchSanityPosts(): Promise<SanityArticle[] | null> {

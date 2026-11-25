@@ -10,6 +10,7 @@ import matter from 'gray-matter';
 
 const POSTS_DIR = path.join(process.cwd(), 'src/data/posts');
 const OUT_FILE = path.join(process.cwd(), 'src/data/posts-manifest.json');
+const INDEX_FILE = path.join(process.cwd(), 'src/data/posts-index.json');
 
 interface ManifestPost {
   slug: string;
@@ -63,7 +64,9 @@ function main() {
   }
   posts.sort((a, b) => new Date(b.meta.publishedAt).getTime() - new Date(a.meta.publishedAt).getTime());
   fs.writeFileSync(OUT_FILE, JSON.stringify(posts), 'utf8');
-  console.log(`[sync-posts] wrote ${posts.length} posts -> src/data/posts-manifest.json`);
+  const index = posts.map(({ slug, meta }) => ({ slug, meta }));
+  fs.writeFileSync(INDEX_FILE, JSON.stringify(index), 'utf8');
+  console.log(`[sync-posts] wrote ${posts.length} posts -> src/data/posts-manifest.json & src/data/posts-index.json`);
 }
 
 main();

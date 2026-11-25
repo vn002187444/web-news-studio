@@ -181,8 +181,9 @@ ${candidateLinksText}
       }
     `;
 
-    let retries = 5;
-    let delay = 3000;
+    let retries = 2;
+    let delay = 2000;
+    let sawOverload = false;
     while (retries >= 0) {
       try {
         const result = await model.generateContent(prompt);
@@ -190,8 +191,11 @@ ${candidateLinksText}
         const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
         return JSON.parse(cleanJson);
       } catch (err: any) {
+        if (err?.status === 503 || err?.status === 429) {
+          sawOverload = true;
+        }
         if (retries > 0 && (err?.status === 503 || err?.status === 429)) {
-          console.warn(`⏳ Gemini API đang quá tải (${err.status}), đang thử lại sau ${delay/1000} giây... (còn ${retries} lần)`);
+          console.warn(`⏳ Gemini API đang quá tải (${err.status}), đang thử lại sau ${delay / 1000} giây... (còn ${retries} lần)`);
           await sleep(delay);
           delay *= 2;
           retries--;
@@ -205,7 +209,9 @@ ${candidateLinksText}
     // Fallback logic when API repeatedly fails
     console.warn(`⚠️ Gemini API thất bại liên tục, sử dụng nội dung fallback cho bài viết: ${title}`);
 
-    return createFallbackArticle(title, content);
+    const fb = createFallbackArticle(title, content);
+    (fb as any).__geminiOverloaded = sawOverload;
+    return fb;
   } catch (error) {
     console.error('Error in rewriteArticle:', error);
     return createFallbackArticle(title, content);
@@ -244,6 +250,9 @@ async function runAutoblogger() {
 
   let articlesProcessed = 0;
   const MAX_ARTICLES_PER_RUN = 20;
+  const MAX_RUN_MS = 5 * 60 * 1000; // Giới hạn 5 phút để không chạm timeout CI (10m) và vẫn kịp clean-links/sync-posts/push
+  const runStartMs = Date.now();
+  let consecutiveOverloads = 0;
 
   // 1. Phân tích Khung Giờ Vàng hiện tại (Giờ VN UTC+7) & Đề xuất AI Insights
   const now = new Date();
@@ -382,6 +391,14 @@ async function runAutoblogger() {
 
   try {
     for (const feed of orderedFeeds) {
+      if (Date.now() - runStartMs >= MAX_RUN_MS) {
+        console.log(`⏱️ Đạt ngân sách thời gian (${Math.round(MAX_RUN_MS / 1000)}s). Kết thúc sớm để đồng bộ manifest và commit an toàn.`);
+        break;
+      }
+      if (consecutiveOverloads >= 3) {
+        console.warn('🛑 Gemini API quá tải 3 bài liên tiếp (503/429). Dừng sớm để tránh lãng phí CI runner.');
+        break;
+      }
       if (articlesProcessed >= MAX_ARTICLES_PER_RUN) {
         console.log(`🛑 Đạt giới hạn an toàn tối đa (${MAX_ARTICLES_PER_RUN} bài/lượt). Tạm dừng để nhường tài nguyên hệ thống.`);
         break;
@@ -468,6 +485,12 @@ async function runAutoblogger() {
         const catSlugs = (publishedSlugsByCat[feed.category] || []).slice(-5);
         const targetKeywords = dailyKeywords[feed.category] || [];
         const rewritten = await rewriteArticle(latestItem.title!, latestItem.content || latestItem.contentSnippet || '', feed.category, catSlugs, analysis.keyFacts, analysis.angle, targetKeywords);
+
+        if ((rewritten as any)?.__geminiOverloaded) {
+          consecutiveOverloads++;
+        } else {
+          consecutiveOverloads = 0;
+        }
 
         if (!rewritten) continue;
         if (!rewritten.title || !rewritten.slug || !rewritten.content) {

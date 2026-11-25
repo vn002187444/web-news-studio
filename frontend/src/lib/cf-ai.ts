@@ -30,6 +30,7 @@ export interface WorkerEnv {
 
 const DAILY_NEURON_HARD_LIMIT = 7500; // Ngưỡng an toàn bảo vệ 10,000 Neurons miễn phí
 const ESTIMATED_NEURONS_PER_CALL = 70; // Ước tính số neuron cho 1 lượt prompt ngắn 1B model
+let workersAiRestDisabledReason: string | null = null;
 
 /**
  * Phân tích & tiền thẩm định tin tức trên Cloudflare Worker với Quota Guard
@@ -183,6 +184,9 @@ export async function analyzeNewsWithWorkersAi(
         });
       }
     } else if (accountId && apiToken) {
+      if (workersAiRestDisabledReason) {
+        return fallback();
+      }
       // 2. Chạy trong môi trường Node.js / GitHub Actions qua Cloudflare REST API
       const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/meta/llama-3.2-1b-instruct`;
       const res = await fetch(url, {
@@ -191,6 +195,7 @@ export async function analyzeNewsWithWorkersAi(
           'Content-Type': 'application/json',
           Authorization: `Bearer ${apiToken}`,
         },
+        signal: AbortSignal.timeout(6000),
         body: JSON.stringify({
           messages: promptMessages,
           max_tokens: 150,
@@ -198,7 +203,12 @@ export async function analyzeNewsWithWorkersAi(
       });
 
       if (!res.ok) {
-        console.warn(`⚠️ [Workers AI] REST API Error ${res.status}. Fallback heuristic.`);
+        if (res.status === 401 || res.status === 403) {
+          workersAiRestDisabledReason = `HTTP ${res.status}`;
+          console.warn(`⚠️ [Workers AI] REST API Error ${res.status} — tạm ngưng gọi REST trong lượt này, dùng heuristic fallback.`);
+        } else {
+          console.warn(`⚠️ [Workers AI] REST API Error ${res.status}. Fallback heuristic.`);
+        }
         return fallback();
       }
 
