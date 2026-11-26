@@ -1,9 +1,16 @@
-import type { NextConfig } from "next";
 import createNextIntlPlugin from 'next-intl/plugin';
+
+// Tự động chuẩn bị index rút gọn và static assets cho Cloudflare Workers ASSETS
+try {
+  await import('./scripts/prepare-worker-assets.mjs');
+} catch (e) {
+  // Fallback nếu chạy trong môi trường không hỗ trợ import động
+}
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   poweredByHeader: false,
   experimental: {
     optimizePackageImports: ['framer-motion', 'lucide-react'],
@@ -65,11 +72,11 @@ const nextConfig: NextConfig = {
           "font-src 'self' data: https:",
           "connect-src 'self' https: wss: https://api.binance.com wss://stream.binance.com",
           "media-src 'self' https: blob:",
-          'frame-ancestors \'self\'',
+          "frame-ancestors 'self'",
         ].join('; '),
       },
     ];
-        return [
+    return [
       {
         source: '/:locale(vi|en)/:path*',
         headers: [

@@ -72,6 +72,7 @@ jobs:
           fi
 
       - name: Commit and Push New Articles
+        id: commit-push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Autoblog Action"
@@ -81,6 +82,19 @@ jobs:
           if ! git diff-index --quiet HEAD; then
             git commit -m "🤖 AI Auto-publish: $(date +'%Y-%m-%d %H:%M:%S')"
             git push
+            echo "has_new=true" >> $GITHUB_OUTPUT
           else
             echo "⏩ No new articles to publish."
+            echo "has_new=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Deploy to Cloudflare Workers (Auto-Sync Static Assets)
+        if: steps.commit-push.outputs.has_new == 'true'
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: production
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          npm run build:worker
+          npx wrangler deploy

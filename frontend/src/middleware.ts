@@ -37,7 +37,22 @@ export default function middleware(request: NextRequest) {
 
   const { pathname, search } = request.nextUrl;
 
-  // 3. Chống lỗi 404 do nhân đôi locale (/vi/vi/..., /en/vi/..., /vi/en/...)
+  // 1. Chặn đứng các bot / scanner thăm dò file nhạy cảm và lỗ hổng (.env, .git, .aws, .php, wp-admin...)
+  // Trả về 404 Not Found ngay tại tầng Edge trong 0.01ms, ngăn next-intl gọi headers() gây lỗi HTTP 500
+  if (
+    /^\/(\.env|\.git|\.aws|\.svn|\.config|wp-admin|wp-login|xmlrpc)/i.test(pathname) ||
+    /\.(env|git|yml|yaml|ini|sql|bak|config|php|asp|aspx)$/i.test(pathname)
+  ) {
+    return new NextResponse('Not Found', {
+      status: 404,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+      },
+    });
+  }
+
+  // 2. Chống lỗi 404 do nhân đôi locale (/vi/vi/..., /en/vi/..., /vi/en/...)
   const doubleLocaleMatch = pathname.match(/^\/(vi|en)\/(vi|en)(\/.*)?$/);
   if (doubleLocaleMatch) {
     const primaryLocale = doubleLocaleMatch[1];
@@ -46,10 +61,10 @@ export default function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl, 301);
   }
 
-  // 4. Xử lý i18n chuẩn qua next-intl
+  // 3. Xử lý i18n chuẩn qua next-intl
   const response = handleI18nRouting(request);
 
-  // 5. Chuẩn hóa mã chuyển hướng sang 301 Permanent Redirect (thay vì 307) cho SEO Googlebot
+  // 4. Chuẩn hóa mã chuyển hướng sang 301 Permanent Redirect (thay vì 307) cho SEO Googlebot
   if (response.status === 307 || response.status === 308) {
     const location = response.headers.get('location');
     if (location) {
@@ -62,5 +77,11 @@ export default function middleware(request: NextRequest) {
 
 export const config = {
   // Bỏ qua api/studio/_next/static để middleware i18n không chặn sitemap, robots, assets, CMS
-  matcher: ['/', '/(vi|en)/:path*', '/((?!api|studio|_next|_vercel|.*\\..*).*)']
+  // Bổ sung pattern để bắt probe files (.env, .git, wp-*, .php) chặn sớm 404
+  matcher: [
+    '/',
+    '/(vi|en)/:path*',
+    '/((?!api|studio|_next|_vercel|.*\\..*).*)',
+    '/(\\.env.*|\\.git.*|\\.aws.*|wp-.*|.*\\.php)'
+  ]
 };
