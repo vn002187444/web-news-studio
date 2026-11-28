@@ -37,7 +37,7 @@ export const RSS_FEEDS: RssFeedConfig[] = [
 
   // 6. Đời Sống (lifestyle) - Phong cách sống & văn hóa quốc tế (Mỹ, Anh, Nhật, Trung)
   { name: 'Lifehacker (Mỹ)', url: 'https://lifehacker.com/feed/rss', category: 'lifestyle', country: 'US' },
-  { name: 'The Guardian Lifestyle (Anh)', url: 'https://www.theguardian.com/uk/lifeandstyle/rss', category: 'lifestyle', country: 'UK' },
+  { name: 'The Independent Lifestyle (Anh)', url: 'https://www.independent.co.uk/life-style/rss', category: 'lifestyle', country: 'UK' },
   { name: 'SCMP Lifestyle (Trung Quốc)', url: 'https://www.scmp.com/rss/94/feed/', category: 'lifestyle', country: 'CN' },
   { name: 'SoraNews24 Culture & Life (Nhật Bản)', url: 'https://soranews24.com/feed/', category: 'lifestyle', country: 'JP' },
 
@@ -62,7 +62,7 @@ export const RSS_FEEDS: RssFeedConfig[] = [
   // 10. Thế Giới / Thời Sự Quốc Tế (world) - Hãng thông tấn toàn cầu (Anh, Mỹ, Trung, Nhật, Nga, Trung Đông)
   { name: 'BBC World News (Anh)', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', category: 'world', country: 'UK' },
   { name: 'NPR World News (Mỹ)', url: 'https://feeds.npr.org/1004/rss.xml', category: 'world', country: 'US' },
-  { name: 'The Guardian World (Anh)', url: 'https://www.theguardian.com/world/rss', category: 'world', country: 'UK' },
+  { name: 'The Independent World (Anh)', url: 'https://www.independent.co.uk/news/world/rss', category: 'world', country: 'UK' },
   { name: 'Al Jazeera English (Quốc Tế)', url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'world', country: 'GLOBAL' },
   { name: 'The Japan Times News (Nhật Bản)', url: 'https://www.japantimes.co.jp/feed/', category: 'world', country: 'JP' },
   { name: 'SCMP Asia & World (Trung Quốc)', url: 'https://www.scmp.com/rss/4/feed/', category: 'world', country: 'CN' },

@@ -410,7 +410,30 @@ async function runAutoblogger() {
 
       console.log(`📡 Fetching RSS: ${feed.url}`);
       try {
-        const feedData = await parser.parseURL(feed.url);
+        let feedData: any;
+        try {
+          feedData = await parser.parseURL(feed.url);
+        } catch {
+          let res = await fetch(feed.url, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+              'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+            },
+            signal: AbortSignal.timeout(8000)
+          }).catch(() => null);
+
+          let xml = res && res.ok ? await res.text() : '';
+
+          if (!xml || xml.length === 0 || res?.status === 202) {
+            const bareRes = await fetch(feed.url, { signal: AbortSignal.timeout(8000) }).catch(() => null);
+            if (bareRes && bareRes.ok) {
+              xml = await bareRes.text();
+            }
+          }
+
+          if (!xml || xml.length === 0) throw new Error(res ? `HTTP ${res.status}` : 'Không thể nạp RSS');
+          feedData = await parser.parseString(xml);
+        }
 
         // Duyệt 5 tin mới nhất, lấy tin đầu tiên chưa đăng (kiểm tra chống trùng theo cả slug và nội dung tiêu đề)
         let latestItem: any = null;

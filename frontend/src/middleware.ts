@@ -68,8 +68,30 @@ export default function middleware(request: NextRequest) {
   if (response.status === 307 || response.status === 308) {
     const location = response.headers.get('location');
     if (location) {
-      return NextResponse.redirect(new URL(location, request.url), 301);
+      const redirectRes = NextResponse.redirect(new URL(location, request.url), 301);
+      redirectRes.headers.set(
+        'Cache-Control',
+        'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800'
+      );
+      return redirectRes;
     }
+  }
+
+  // 5. Tối ưu Cache Edge Cloudflare:
+  // Xóa Set-Cookie dư thừa nếu người dùng đã có cookie NEXT_LOCALE trùng khớp,
+  // tránh Cloudflare Edge bypass cache (CF-Cache-Status: BYPASS) trên trang công khai.
+  const existingLocale = request.cookies.get('NEXT_LOCALE')?.value;
+  const setCookie = response.headers.get('set-cookie');
+  if (existingLocale && setCookie && setCookie.includes(`NEXT_LOCALE=${existingLocale}`)) {
+    response.headers.delete('set-cookie');
+  }
+
+  // Gắn Cache-Control edge-ready cho các trang đọc tin công khai
+  if (request.method === 'GET' && !pathname.startsWith('/studio') && !pathname.startsWith('/api')) {
+    response.headers.set(
+      'Cache-Control',
+      'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400'
+    );
   }
 
   return response;

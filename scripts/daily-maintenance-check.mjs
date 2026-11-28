@@ -174,6 +174,8 @@ async function runLighthouseAudit() {
       };
       console.log(`⭐ Performance: ${scores.performance}/100 | Accessibility: ${scores.accessibility}/100 | SEO: ${scores.seo}/100`);
       console.log(`⚡ Core Web Vitals: FCP=${scores.fcp}, LCP=${scores.lcp}, TBT=${scores.tbt}, CLS=${scores.cls}, TTFB=${scores.ttfb}`);
+      const auditDate = r.fetchTime ? new Date(r.fetchTime).toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'N/A';
+      console.log(`🕒 Lighthouse Audit Baseline: ${auditDate} (Headless Chrome / OpenNext)`);
       return scores;
     }
   } catch (err) {

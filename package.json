@@ -7,6 +7,11 @@
     "build:worker": "npm --prefix frontend run build:worker",
     "cloudflare:build": "npm --prefix frontend run cloudflare:build",
     "start": "npm --prefix frontend run start",
-    "typecheck": "node ./frontend/node_modules/typescript/bin/tsc --noEmit -p frontend/tsconfig.json"
+    "typecheck": "node ./frontend/node_modules/typescript/bin/tsc --noEmit -p frontend/tsconfig.json",
+    "check-status": "npm --prefix frontend run check-status",
+    "qa": "node scripts/comprehensive-web-qa.mjs",
+    "audit": "node scripts/daily-maintenance-check.mjs",
+    "report": "npm --prefix frontend run report",
+    "autoblog": "npm --prefix frontend run autoblog"
   }
 }

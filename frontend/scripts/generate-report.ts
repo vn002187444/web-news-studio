@@ -207,10 +207,37 @@ async function main() {
     latency: number;
   }[] = [];
 
+  async function fetchFeedResilient(url: string) {
+    try {
+      return await parser.parseURL(url);
+    } catch {
+      let res = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+        },
+        signal: AbortSignal.timeout(8000)
+      }).catch(() => null);
+
+      let xml = res && res.ok ? await res.text() : '';
+
+      // Fallback mộc (bare fetch) nếu bị anti-bot 202 hoặc rỗng
+      if (!xml || xml.length === 0 || res?.status === 202) {
+        const bareRes = await fetch(url, { signal: AbortSignal.timeout(8000) }).catch(() => null);
+        if (bareRes && bareRes.ok) {
+          xml = await bareRes.text();
+        }
+      }
+
+      if (!xml || xml.length === 0) throw new Error(res ? `HTTP ${res.status}` : 'Không thể kết nối');
+      return await parser.parseString(xml);
+    }
+  }
+
   for (const feed of RSS_FEEDS) {
     const start = Date.now();
     try {
-      const data = await parser.parseURL(feed.url);
+      const data = await fetchFeedResilient(feed.url);
       const latency = Date.now() - start;
       const count = data.items?.length || 0;
       const latest = data.items?.[0]?.title || 'Không có tiêu đề';
@@ -419,6 +446,21 @@ Kèm thêm 1 đoạn ngắn "Chiến Lược Điều Phối Khung Giờ Đăng B
       console.warn('Không thể ghi GITHUB_STEP_SUMMARY:', e.message);
     }
   }
+
+  // Tự động đóng các issue báo cáo cũ để giữ Issue Tracker gọn gàng và tập trung
+  try {
+    const { execSync } = await import('node:child_process');
+    const oldIssuesStr = execSync('gh issue list --label "report" --state "open" --json number -q ".[].number"', { encoding: 'utf8' }).trim();
+    if (oldIssuesStr) {
+      const nums = oldIssuesStr.split(/\s+/).filter(Boolean);
+      for (const num of nums) {
+        console.log(`🧹 Đóng issue báo cáo cũ #${num}...`);
+        try {
+          execSync(`gh issue close ${num} --comment "Đã hoàn thành và được thay thế bởi Báo cáo Vận hành Buổi Sáng."`);
+        } catch {}
+      }
+    }
+  } catch {}
 
   console.log('🏁 Hoàn thành tạo báo cáo vận hành.');
 }

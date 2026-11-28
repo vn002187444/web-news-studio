@@ -69,14 +69,41 @@ async function checkSystem() {
   console.log(`\n4. [Kiểm tra ${RSS_FEEDS.length} Nguồn RSS Feed Quốc Tế & Trong Nước]`);
   const parser = new Parser({
     headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
     },
     timeout: 8000
   });
 
+  async function fetchFeedResilient(url: string) {
+    try {
+      return await parser.parseURL(url);
+    } catch {
+      let res = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+        },
+        signal: AbortSignal.timeout(8000)
+      }).catch(() => null);
+
+      let xml = res && res.ok ? await res.text() : '';
+
+      // Fallback mộc (bare fetch) nếu bị anti-bot 202 hoặc rỗng
+      if (!xml || xml.length === 0 || res?.status === 202) {
+        const bareRes = await fetch(url, { signal: AbortSignal.timeout(8000) }).catch(() => null);
+        if (bareRes && bareRes.ok) {
+          xml = await bareRes.text();
+        }
+      }
+
+      if (!xml || xml.length === 0) throw new Error(res ? `HTTP ${res.status}` : 'Không thể kết nối');
+      return await parser.parseString(xml);
+    }
+  }
+
   for (const feed of RSS_FEEDS) {
     try {
-      const data = await parser.parseURL(feed.url);
+      const data = await fetchFeedResilient(feed.url);
       const itemCount = data.items?.length || 0;
       const latest = data.items?.[0]?.title || 'Không có tiêu đề';
       console.log(`✅ [${feed.category.toUpperCase()}] [${feed.country}] ${feed.name}: OK (${itemCount} tin) | Mới nhất: "${latest.slice(0, 45)}..."`);

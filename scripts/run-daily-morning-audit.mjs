@@ -98,7 +98,7 @@ const RSS_FEEDS = [
 
   // 6. Đời Sống (lifestyle)
   { name: 'Lifehacker (Mỹ)', url: 'https://lifehacker.com/feed/rss', category: 'lifestyle', country: 'US' },
-  { name: 'The Guardian Lifestyle (Anh)', url: 'https://www.theguardian.com/uk/lifeandstyle/rss', category: 'lifestyle', country: 'UK' },
+  { name: 'The Independent Lifestyle (Anh)', url: 'https://www.independent.co.uk/life-style/rss', category: 'lifestyle', country: 'UK' },
   { name: 'SCMP Lifestyle (Trung Quốc)', url: 'https://www.scmp.com/rss/94/feed/', category: 'lifestyle', country: 'CN' },
   { name: 'SoraNews24 Culture & Life (Nhật Bản)', url: 'https://soranews24.com/feed/', category: 'lifestyle', country: 'JP' },
   { name: 'VnExpress Đời Sống (Việt Nam)', url: 'https://vnexpress.net/rss/gia-dinh.rss', category: 'lifestyle', country: 'VN' },
@@ -122,7 +122,7 @@ const RSS_FEEDS = [
 
   // 10. Thế Giới / Thời Sự Quốc Tế (world)
   { name: 'BBC World News (Anh)', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', category: 'world', country: 'UK' },
-  { name: 'The Guardian World (Anh)', url: 'https://www.theguardian.com/world/rss', category: 'world', country: 'UK' },
+  { name: 'The Independent World (Anh)', url: 'https://www.independent.co.uk/news/world/rss', category: 'world', country: 'UK' },
   { name: 'The Moscow Times (Nga)', url: 'https://www.themoscowtimes.com/rss/news', category: 'world', country: 'RU' },
   { name: 'Meduza English (Nga)', url: 'https://meduza.io/rss/en/all', category: 'world', country: 'RU' },
   { name: 'SCMP Asia & World (Trung Quốc)', url: 'https://www.scmp.com/rss/4/feed/', category: 'world', country: 'CN' },
